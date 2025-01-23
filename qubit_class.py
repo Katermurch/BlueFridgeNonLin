@@ -1,5 +1,13 @@
 class Qubit:
-    def __init__(self, qubit_id, ro_freq, ge_time, ef_time, ge_ssm, ef_ssm):
+    def __init__(
+        self,
+        qubit_id,
+        ro_freq=None,
+        ge_time=None,
+        ef_time=None,
+        ge_ssm=None,
+        ef_ssm=None,
+    ):
         """
         Initialize a Qubit instance with specific properties.
 
@@ -19,27 +27,7 @@ class Qubit:
         self.ef_ssm = ef_ssm
 
     def __repr__(self):
-        return (f"Qubit({self.qubit_id}, ro_freq={self.ro_freq}, ge_time={self.ge_time}, "
-                f"ef_time={self.ef_time}, ge_ssm={self.ge_ssm}, ef_ssm={self.ef_ssm})")
-
-# Example instantiation
-q1 = Qubit(
-    qubit_id="q1",
-    ro_freq=6.7275,
-    ge_time=51,
-    ef_time=77,
-    ge_ssm=-0.111,
-    ef_ssm=-0.2525
-)
-
-q2 = Qubit(
-    qubit_id="q2",
-    ro_freq=6.65555,
-    ge_time=40,
-    ef_time=0,  # Set 0 if not provided in the dictionary
-    ge_ssm=-0.152,
-    ef_ssm=-0.224
-)
-
-print(q1)
-print(q2)
+        return (
+            f"Qubit({self.qubit_id}, ro_freq={self.ro_freq}, ge_time={self.ge_time}, "
+            f"ef_time={self.ef_time}, ge_ssm={self.ge_ssm}, ef_ssm={self.ef_ssm})"
+        )
