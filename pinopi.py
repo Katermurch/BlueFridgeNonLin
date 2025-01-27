@@ -35,4 +35,14 @@ def pipi_pi_nopi(coef=0,off=0,pi_ge=24, ge_amp = 1, ssm_ge = -0.04575,readout_du
     the_seq.write_sequence_to_disk(base_name='foo', file_path=write_dir, use_range_01=False,num_offset=off, write_binary=True)
     the_seq.load_sequence_from_disk(wx_addr, base_name='foo', file_path=write_dir, num_offset=0, ch_amp=[1,1,1,1])
     
-##END geom    
+def pipi_pi_nopi_class(qubit,readout, save_dir):
+    """
+    This function should run the pipi pi nopi sequence for a qubit, using the qubit's properties.
+
+    Args:
+        qubit (class): takes a qubit class instance and runs on this qubit
+        readout (class): takes a readout class instance and runs on this readout
+        save_dir (str): directory where the sequence will be saved
+    """
+
+    
