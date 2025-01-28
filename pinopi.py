@@ -1,6 +1,6 @@
 from generator import *
 from wx_programs import *
-wx_addr =  get_wx_address()
+#wx_addr =  get_wx_address()
     
 def pipi_pi_nopi(coef,offset, qubit,readout,gen_vals, save_dir):
     """
@@ -21,7 +21,7 @@ def pipi_pi_nopi(coef,offset, qubit,readout,gen_vals, save_dir):
     the_seq = Sequence(file_length, num_steps) #this creates something called rabi_seq that is an instance of a sequence class
     
     sweep_time = 200
- 
+    
     rabi_ge = Pulse(start=file_length-readout_dur, duration=-pi_ge*coef, amplitude=ge_amp, ssm_freq=ssm_ge, phase=0) 
     the_seq.add_sweep(channel=3, sweep_name='none', start=0, stop=-sweep_time,initial_pulse=rabi_ge)
     rabi_ge.phase = 90

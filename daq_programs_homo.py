@@ -143,22 +143,9 @@ def run_daq_het_2q(ssm_if_1=-0.04, ssm_if_2=0.10692, deg_1 = 0, deg_2 = 0, num_p
         pass
         bins_1, counts_1 = daq_processing.make_iq_plot(rec_readout_1)
         bins_2, counts_2 = daq_processing.make_iq_plot(rec_readout_2)
-#         
-#    if verbose:
-#        # Create a figure with two subplots side by side
-#        fig, axs = plt.subplots(1, 2, figsize=(8, 4))
-#
-#        # Call make_iq_plot for each dataset, passing the respective axis
-#        bins_1, counts_1 = daq_processing.make_iq_plot(rec_readout_1, axs[0])
-#        bins_2, counts_2 = daq_processing.make_iq_plot(rec_readout_2, axs[1])
-#
-#        # Additional figure adjustments if needed
-#        plt.tight_layout()
-#        plt.show()
+
     
     daq_params.threshold=qubit_1_thr
-    #daq_params.threshold = -2000 #analysis.fit_two_gaussian(bins_1[0],counts_1[0]) #k
-    #print(daq_params.threshold)#k
     n_readout_1 = daq_processing.threshold_record_averages(daq_params, signal_in=rec_readout_1[0])#k
     n_vs_pats_1, prob_vs_pats_1 = daq_processing.readout_vs_patterns(daq_params, n_readout_1)#k
 
@@ -168,9 +155,6 @@ def run_daq_het_2q(ssm_if_1=-0.04, ssm_if_2=0.10692, deg_1 = 0, deg_2 = 0, num_p
     n_readout_2 = daq_processing.threshold_record_averages(daq_params, signal_in=rec_readout_2[0])#k
     n_vs_pats_2, prob_vs_pats_2 = daq_processing.readout_vs_patterns(daq_params, n_readout_2)#k
 
-    
-   
-    #return rec_avg_all, rec_readout, rec_avg_vs_pats
     return n_vs_pats_1,n_vs_pats_2, rec_avg_all, rec_all, rec_readout_1, rec_readout_2, rec_avg_vs_pats_1, rec_avg_vs_pats_2 , rec_all_het_1, rec_all_het_2, bins_1, bins_2, counts_1, counts_2,prob_vs_pats_1,prob_vs_pats_2,n_readout_1,n_readout_2,rec_readout_vs_pats_1,rec_readout_vs_pats_2
 
 
