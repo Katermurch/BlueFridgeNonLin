@@ -4,6 +4,7 @@ q1_dict = {
     "ssm_efq1": -0.2525,
     "pi_ge_time_q1": 51,
     "pi_ef_time_q1": 77,
+    "ge_amp": 1.2,
 }
 q2_dict = {
     "ROq2": 6.65555, 
