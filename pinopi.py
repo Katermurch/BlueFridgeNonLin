@@ -1,6 +1,6 @@
 from generator import *
 from wx_programs import *
-#wx_addr =  get_wx_address()
+wx_addr =  get_wx_address()
     
 def pipi_pi_nopi(coef,offset, qubit,readout,gen_vals, save_dir):
     """
