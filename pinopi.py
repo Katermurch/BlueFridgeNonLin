@@ -2,11 +2,13 @@ from generator import *
 from wx_programs import *
 wx_addr =  get_wx_address()
     
-def pipi_pi_nopi(coef,offset, qubit,readout,gen_vals, save_dir):
+def pipi_pi_nopi(coef:float,offset:float , qubit: object,readout: object,gen_vals: dict, save_dir:str):
     """
     This function should run the pipi pi nopi sequence for a qubit, using the qubit's properties.
 
     Args:
+        coef (float): coefficient for the pi pulse
+        offeset (float): offset for the pi pulse
         qubit (class): takes a qubit class instance and runs on this qubit
         readout (class): takes a readout class instance and runs on this readout
         gen_vals (dict): takes a general_vals class instance and runs on these values
@@ -45,6 +47,4 @@ def pipi_pi_nopi(coef,offset, qubit,readout,gen_vals, save_dir):
     write_dir = f"{save_dir}"
     the_seq.write_sequence_to_disk(base_name='foo', file_path=write_dir, use_range_01=False,num_offset=offset, write_binary=True)
     the_seq.load_sequence_from_disk(wx_addr, base_name='foo', file_path=write_dir, num_offset=0, ch_amp=[1,1,1,1])
-    
 
-    

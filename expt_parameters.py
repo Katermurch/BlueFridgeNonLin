@@ -5,7 +5,7 @@ Created on Fri Mar  6 13:00:39 2020
 @author: P. M. Harrington, 06 March 2020
 """
 import numpy as np
-#from Nop_class import Nop
+from Nop_class import Nop
 
 def expt_parameters(expt_name=None):
     if expt_name is None:

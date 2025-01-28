@@ -15,7 +15,7 @@ import atsapi as ats #serra
 #from daq_processing import *
 import daq_processing
 import wx_programs
-#from Nop_class import Nop
+from Nop_class import Nop
 import math
 
 def get_daq_parameters(num_patterns=None, num_records_per_pattern=None,ro_dur=7000,IQangle=90):
@@ -120,10 +120,9 @@ def run_daq_het_2q(ssm_if_1=-0.04, ssm_if_2=0.10692, deg_1 = 0, deg_2 = 0, num_p
     #print("\nTroubleshoot stuck at this step 2")
     daq_alazar_homo.configure_board(alazar_params, board) # recently changed daq_alazar to daq_alazar_homo
     #print("\nTroubleshoot stuck at this step 3")
-    wx_programs.wx_initialize() # recently added wx_programs.wx_initialize()
+    wx_programs.wx_initialize()
     (rec_avg_all, rec_readout_1, rec_readout_2, rec_all, rec_all_het_1, rec_all_het_2) = daq_alazar_homo.acquire_data_het_2q(daq_params, alazar_params, board, ssm_if_1, ssm_if_2, deg_1, deg_2, verbose=True)
-    #print(alazar_params.buffer_count)
-    #print("\nTroubleshoot stuck at this step 4")
+
     # reshape the records
     rec_readout_vs_pats_1 = daq_processing.record_vs_patterns(daq_params, rec_readout_1)
     rec_readout_vs_pats_2 = daq_processing.record_vs_patterns(daq_params, rec_readout_2)
