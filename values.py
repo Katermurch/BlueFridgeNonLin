@@ -1,16 +1,17 @@
 q1_dict = {
-    "ROq1": 6.7275,
-    "ssm_geq1": -0.111,
-    "ssm_efq1": -0.2525,
-    "pi_ge_time_q1": 51,
-    "pi_ef_time_q1": 77,
+    "qubit_id": "q1",
+    "ro_freq": 6.7275,
+    "ge_ssm": -0.111,
+    "ef_ssm": -0.2525,
+    "ge_time": 51,
+    "ef_time": 77,
     "ge_amp": 1.2,
 }
 q2_dict = {
-    "ROq2": 6.65555, 
-    "ssm_geq2": -0.152, 
-    "ssm_efq2": -0.224, 
-    "pi_ge_time_q2": 40
+    "ro_freq": 6.65555, 
+    "ge_ssm": -0.152, 
+    "ef_ssm": -0.224, 
+    "ge_time": 40
 }
 
 readout_dict = {
