@@ -59,7 +59,6 @@ class Readout:
             "RO_LO",
             "RO_LO_pwr",
             "ROq3",
-            "ro_pulse_duration",
             "ro_dur",
         }
         # Validate and set attributes from the dictionary
