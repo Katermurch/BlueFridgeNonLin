@@ -3,28 +3,26 @@ from wx_programs import *
 
 
 def rabi_ge(
-     qubit_rabi, qubit2, readout, num_steps=51, sweep_time=200,
-    mixer_offset =0
+    qubit_rabi,
+    qubit2,
+    readout,
+    gen_vals,
+    num_steps=101,
+    sweep_time=200,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
     file_length = 16000
-    #    num_steps = 51
     ringupdown_seq = Sequence(
         file_length, num_steps
     )  # this creates something called rabi_seq that is an instance of a sequence class
 
-    #    sweep_time = 200#6000 #300 #1000 #3000
     ## channels
     pi_ge = qubit_rabi.ge_time
-
     ge_amp = qubit_rabi.ge_amp
-    #    ssm_ge = ssm_ge_setting
     ROIF1 = qubit_rabi.ro_freq - readout.RO_LO
     ROIF2 = qubit2.ro_freq - readout.RO_LO
-    readout_dur = readout.ro_dur  # 8000 #13000 #1000
+    readout_dur = readout.ro_dur
+    phase_offset = gen_vals["mixer_offset"]
 
-    phase_offset = mixer_offset
-
-   
     rabi_ge = Pulse(
         start=file_length - readout_dur - 100,
         duration=0,
@@ -39,9 +37,8 @@ def rabi_ge(
         stop=-sweep_time,
         initial_pulse=rabi_ge,
     )
-    # HET
+    # HET readout
     # Q1 Readout
-    # if q == 1:
     main_pulse = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
@@ -52,7 +49,6 @@ def rabi_ge(
     ringupdown_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse)
 
     # Q2 Readout
-    # if q == 0:
     main_pulse = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
@@ -83,22 +79,12 @@ def rabi_ge(
         marker1 = ringupdown_seq.channel_list[0][2]
 
         channel = channel1_ch + channel3_ch + marker1
-        # plt.figure()
-        # plt.imshow(
-        #     channel[:, file_length - 3000 - 300 : file_length - 3000 + 50],
-        #     aspect="auto",
-        # )
-        # plt.show()
-
-        # plt.figure()
-        # plt.imshow(channel[:, 6000:8000], aspect="auto")
-        # plt.show()
 
     write_dir = (
         r"C:\arbsequences\strong_dispersive_withPython\test_pulse_ringupdown_bin"
     )
     ringupdown_seq.write_sequence_to_disk(
-        base_name="foo",
+        base_name="rabi_oop_test",
         file_path=write_dir,
         use_range_01=False,
         num_offset=0,
@@ -106,8 +92,8 @@ def rabi_ge(
     )
     ringupdown_seq.load_sequence_from_disk(
         "128.252.134.31",
-        base_name="foo",
+        base_name="rabi_oop_test",
         file_path=write_dir,
         num_offset=0,
-        ch_amp=[1, 1, 1, 1],
+        ch_amp=gen_vals["wx_amps"],
     )
