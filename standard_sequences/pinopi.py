@@ -2,7 +2,7 @@ from generator import *
 from wx_programs import *
 wx_addr =  get_wx_address()
     
-def pipi_pi_nopi(coef:float,offset:float , qubit: object,readout: object,gen_vals: dict, save_dir:str):
+def pipi_pi_nopi(coef:float,offset:float , qubit: object,readout: object,gen_vals: dict):
     """
     This function should run the pipi pi nopi sequence for a qubit, using the qubit's properties.
 
@@ -34,7 +34,9 @@ def pipi_pi_nopi(coef:float,offset:float , qubit: object,readout: object,gen_val
     the_seq.add_sweep(channel=3, marker=1, sweep_name='none', initial_pulse=alazar_trigger )
     
 
-    write_dir = f"{save_dir}"
+    write_dir = (
+        r"C:\arbsequences\strong_dispersive_withPython\test_pulse_ringupdown_bin"
+    )
     the_seq.write_sequence_to_disk(base_name='foo', file_path=write_dir, use_range_01=False,num_offset=offset, write_binary=True)
     the_seq.load_sequence_from_disk(wx_addr, base_name='foo', file_path=write_dir, num_offset=0, ch_amp=[1,1,1,1])
 
