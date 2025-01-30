@@ -5,16 +5,29 @@ wx_addr = get_wx_address()
 
 
 def spectroscopy_ef(
-    qubit,
-    readout,
-    gen_vals,
-    save_dir,
+    qubit: object,
+    readout: object,
+    gen_vals: dict,
     ssm_start=-0.15,
     ssm_stop=-0.25,
     spec_amp=0.5,
     ROIF1=0,
     ROIF2=0,
 ):
+    """This function does the ef spectroscopy for the qubit by running over single sideband frequencies
+
+    Args:
+        qubit (object): qubit that we perform the spectroscopy on
+        readout (object): readout parameters
+        gen_vals (dict): other parameters that may be necessary
+        ssm_start (float, optional): sweep start frequency Defaults to -0.15.
+        ssm_stop (float, optional): sweep stop frequency Defaults to -0.25.
+        spec_amp (float, optional): amplitude of pulse for spectroscopy Defaults to 0.5.
+        ROIF1 (int, optional): actual sent frequency based on readout frequency and qubit readout for q1 Defaults to 0.
+        ROIF2 (int, optional):  actual sent frequency based on readout frequency and qubit readout for q2. Defaults to 0.
+
+    """
+
     sweep_time = 200
     file_length = 16000
     num_steps = 101
@@ -94,7 +107,9 @@ def spectroscopy_ef(
         plt.imshow(channel[:, 6000:8000], aspect="auto")
         plt.show()
 
-    write_dir = f"{save_dir}"
+    write_dir = (
+        r"C:\arbsequences\strong_dispersive_withPython\test_pulse_ringupdown_bin"
+    )
     ringupdown_seq.write_sequence_to_disk(
         base_name="foo",
         file_path=write_dir,

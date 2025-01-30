@@ -3,13 +3,26 @@ from wx_programs import *
 
 
 def rabi_ge(
-    qubit_rabi,
-    qubit2,
-    readout,
-    gen_vals,
+    qubit_rabi: object,
+    qubit2: object,
+    readout: object,
+    gen_vals: dict,
     num_steps=101,
     sweep_time=200,
-):  # this is pulsed readout to ring up and ring down cavity dfor e state
+):
+    """
+    This function should run the rabi ge sequence for a qubit, using the qubit's properties.
+
+    Args:
+        qubit_rabi (_type_): this is the qubit you are performing the rabi on
+        qubit2 (_type_): this qubit exists for homodyne readout
+        readout (_type_): this object chooses ther readout parameters
+        gen_vals (dict): a dictionary of general values for readout and hardware control
+        num_steps (int, optional): _description_. Defaults to 101.
+        sweep_time (int, optional): _description_. Defaults to 200.
+    """
+
+    # this is pulsed readout to ring up and ring down cavity dfor e state
     file_length = 16000
     ringupdown_seq = Sequence(
         file_length, num_steps
