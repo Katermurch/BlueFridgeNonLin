@@ -5,7 +5,7 @@ wx_addr = get_wx_address()
 
 
 def pipi_pi_nopi(
-    coef: float, offset: float, qubit: object, readout: object, gen_vals: dict
+    coef: float, offset: float, qubit: object, qubit2: object, readout: object, gen_vals: dict
 ):
     """
     This function should run the pipi pi nopi sequence for a qubit, using the qubit's properties.
@@ -21,6 +21,8 @@ def pipi_pi_nopi(
     readout_dur = readout.ro_dur
     pi_ge = qubit.ge_time
     ssm_ge = qubit.ge_ssm
+    ROIF1 = qubit.ro_freq - readout.RO_LO
+    ROIF2 = qubit2.ro_freq - readout.RO_LO
     ge_amp = qubit.ge_amp
     file_length = 16000
     num_steps = 3
@@ -30,15 +32,34 @@ def pipi_pi_nopi(
 
     # channel 4 is for qubit control
     rabi_ge = Pulse(
-        start=file_length - readout_dur,
-        duration=-pi_ge * coef,
+        start=file_length - readout_dur -coef * pi_ge,
+        duration=pi_ge * coef,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
         phase=0,
     )
     the_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=rabi_ge)
+     #Readout
+    # HET readout
+    # Q1 Readout
+    main_pulse = Pulse(
+        start=file_length - readout_dur,
+        duration=readout_dur,
+        amplitude=readout.readout_amp_1,
+        ssm_freq=ROIF1,
+        phase=-file_length * ROIF1 * 360,
+    )
+    the_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse)
 
-    ## markers
+    # Q2 Readout
+    main_pulse = Pulse(
+        start=file_length - readout_dur,
+        duration=readout_dur,
+        amplitude=readout.readout_amp_2,
+        ssm_freq=ROIF2,
+        phase=-file_length * ROIF2 * 360,
+    )
+    the_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse)
 
     # channel 3 marker 1 is for pc trigger
     alazar_trigger = Pulse(

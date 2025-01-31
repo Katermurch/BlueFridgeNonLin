@@ -28,7 +28,7 @@ import traceback
 import os
 import FPJPA_sequence_port4 as Fs
 import wx_programs as wx
-import daq_programs_homo
+import daq.daq_programs_homo as daq_programs_homo
 import analysis
 import chevron
 import bnc
