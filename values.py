@@ -14,6 +14,7 @@ q1_dict = {
     "ge_time": 28,
     "ef_time": 39,
     "ge_amp": 1.2,
+    "ef_amp":1 
 }
 q2_dict = {
     "ro_freq": 6.65555,
@@ -21,6 +22,7 @@ q2_dict = {
     "ef_ssm": -0.224,
     "ge_time": 40,
     "ge_amp": 1.2,
+    "ef_amp": 1
 }
 
 general_vals_dict = {

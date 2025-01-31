@@ -18,6 +18,7 @@ class Qubit:
             "ge_ssm",
             "ef_ssm",
             "ge_amp",
+            "ef_amp",
         }
 
         # Validate and set attributes from the dictionary
