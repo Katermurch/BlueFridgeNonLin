@@ -1,10 +1,8 @@
 readout_dict = {
-    "readout_amp_1": 0.7,
-    "readout_amp_2": 0.4,
     "RO_LO": 6.6247,
     "RO_LO_pwr": 16,
     "ROq3": 6.583064,
-    "ro_dur": 1000,
+    "ro_dur": 5000,
 }
 q1_dict = {
     "qubit_id": "q1",
@@ -14,19 +12,22 @@ q1_dict = {
     "ge_time": 28,
     "ef_time": 39,
     "ge_amp": 1.2,
-    "ef_amp":1 
-    "ROIF",
+    "ef_amp":1,
     "IQ_angle": 240,
     "ro_amp": 0.7,
     "qubit_thr": [-5000, 5000],
 }
 q2_dict = {
+    "qubit_id": "q2",
     "ro_freq": 6.65555,
     "ge_ssm": -0.152,
     "ef_ssm": -0.224,
     "ge_time": 40,
     "ge_amp": 1.2,
-    "ef_amp": 1
+    "ef_amp": 1,
+    "IQ_angle": 220,
+    "ro_amp": 0.4,
+    "qubit_thr": [-5000, 5000],
 }
 
 general_vals_dict = {

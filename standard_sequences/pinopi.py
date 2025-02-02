@@ -5,7 +5,7 @@ wx_addr = get_wx_address()
 
 
 def pi_nopi_ge(
-    coef: float, offset: float, qubit: object, qubit2: object, readout: object, gen_vals: dict
+    coef: float, offset: float, qubit: object, qubit2: object, gen_vals: dict
 ):
     """
     This function should run the pipi pi nopi sequence for a qubit, using the qubit's properties.
@@ -14,15 +14,15 @@ def pi_nopi_ge(
         coef (float): coefficient for the pi pulse
         offeset (float): offset for the pi pulse
         qubit (class): takes a qubit class instance and runs on this qubit
-        readout (class): takes a readout class instance and runs on this readout
+        qubit2 (class): takes a second qubit class instance this is just for readout
         gen_vals (dict): takes a general_vals class instance and runs on these values
         save_dir (str): directory where the sequence will be saved
     """
-    readout_dur = readout.ro_dur
+    readout_dur = qubit.ro_dur
     pi_ge = qubit.ge_time
     ssm_ge = qubit.ge_ssm
-    ROIF1 = qubit.ro_freq - readout.RO_LO
-    ROIF2 = qubit2.ro_freq - readout.RO_LO
+    ROIF1 = qubit.ROIF
+    ROIF2 = qubit2.ROIF
     ge_amp = qubit.ge_amp
     file_length = 16000
     num_steps = 3
@@ -45,7 +45,7 @@ def pi_nopi_ge(
     main_pulse = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
-        amplitude=readout.readout_amp_1,
+        amplitude=qubit.ro_amp,
         ssm_freq=ROIF1,
         phase=-file_length * ROIF1 * 360,
     )
@@ -55,7 +55,7 @@ def pi_nopi_ge(
     main_pulse = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
-        amplitude=readout.readout_amp_2,
+        amplitude=qubit2.ro_amp,
         ssm_freq=ROIF2,
         phase=-file_length * ROIF2 * 360,
     )
