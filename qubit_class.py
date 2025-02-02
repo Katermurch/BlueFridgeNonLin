@@ -19,6 +19,10 @@ class Qubit:
             "ef_ssm",
             "ge_amp",
             "ef_amp",
+            "ROIF",
+            "IQ_angle",
+            "ro_amp",
+            "qubit_thr"
         }
 
         # Validate and set attributes from the dictionary

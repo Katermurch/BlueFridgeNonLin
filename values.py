@@ -15,6 +15,10 @@ q1_dict = {
     "ef_time": 39,
     "ge_amp": 1.2,
     "ef_amp":1 
+    "ROIF",
+    "IQ_angle": 240,
+    "ro_amp": 0.7,
+    "qubit_thr": [-5000, 5000],
 }
 q2_dict = {
     "ro_freq": 6.65555,

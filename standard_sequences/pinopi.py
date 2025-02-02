@@ -4,7 +4,7 @@ from wx_programs import *
 wx_addr = get_wx_address()
 
 
-def pipi_pi_nopi(
+def pi_nopi_ge(
     coef: float, offset: float, qubit: object, qubit2: object, readout: object, gen_vals: dict
 ):
     """
