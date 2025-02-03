@@ -17,6 +17,7 @@ import daq.daq_processing as daq_processing
 import wx_programs
 from Nop_class import Nop
 import math
+from dataclasses import dataclass
 
 def get_daq_parameters(num_patterns=None, num_records_per_pattern=None,ro_dur=7000,IQangle=90):
     daq_params = expt_parameters.get_daq_parameters(ro_dur,IQangle)
@@ -105,65 +106,111 @@ def run_daq_het(ssm_if=0.02, num_patterns=None, num_records_per_pattern=None,ro_
             
     #return rec_avg_all, rec_readout, rec_avg_vs_pats
     return rec_avg_all, rec_readout, rec_avg_vs_pats, rec_all_het, bins, counts
-from dataclasses import dataclass
 
-#2Qubit_DAQ
-def run_daq_het_2q(ssm_if_1=-0.04, ssm_if_2=0.10692, deg_1 = 0, deg_2 = 0, num_patterns=None, num_records_per_pattern=None, ro_dur=None,qubit_1_thr=[-2500,-500],qubit_2_thr=[-2500,-500],verbose=True): #recently added ,ro_dur=ro_dur
-    # get parameters: number of patterns, etc.
+
+def run_daq_het_2q(qubit1, qubit2,
+                   num_patterns=None, num_records_per_pattern=None,
+                    verbose=True):
+    # Define a local dataclass to structure the DAQ results
+
+    qubit_1_thr = qubit1.qubit_thr
+    qubit_2_thr = qubit2.qubit_thr
+    ssm_if_1 = qubit1.ROIF
+    ssm_if_2 = qubit2.ROIF
+    deg_1 = qubit1.IQ_angle
+    deg_2 = qubit2.IQ_angle
+    ro_dur = qubit1.ro_dur
+    @dataclass
+    class DAQResult:
+        n_vs_pats_1: any
+        n_vs_pats_2: any
+        rec_avg_all: any
+        rec_all: any
+        rec_readout_1: any
+        rec_readout_2: any
+        rec_avg_vs_pats_1: any
+        rec_avg_vs_pats_2: any
+        rec_all_het_1: any
+        rec_all_het_2: any
+        bins_1: any
+        bins_2: any
+        counts_1: any
+        counts_2: any
+        prob_vs_pats_1: any
+        prob_vs_pats_2: any
+        n_readout_1: any
+        n_readout_2: any
+        rec_readout_vs_pats_1: any
+        rec_readout_vs_pats_2: any
+
+    # 1. Get DAQ parameters
     daq_params = get_daq_parameters(num_patterns=num_patterns, 
-                                    num_records_per_pattern=num_records_per_pattern,ro_dur=ro_dur) #recently added ,ro_dur=ro_dur
+                                    num_records_per_pattern=num_records_per_pattern,
+                                    ro_dur=ro_dur)
     
-    alazar_params = daq_alazar_homo.get_alazar_parameters(daq_params=daq_params) # recently changed daq_alazar to daq_alazar_homo and removed ,verbose=False)
+    # 2. Get Alazar (DAQ board) parameters and configure board
+    alazar_params = daq_alazar_homo.get_alazar_parameters(daq_params=daq_params)
+    board = ats.Board(systemId=1, boardId=1)
+    daq_alazar_homo.configure_board(alazar_params, board)
     
+    # 3. Initialize any required GUI or supplementary modules
+    wx_programs.wx_initialize()
     
-    #print("\nTroubleshoot stuck at this step 1")
-    board = ats.Board(systemId = 1, boardId = 1)
-    #print("\nTroubleshoot stuck at this step 2")
-    daq_alazar_homo.configure_board(alazar_params, board) # recently changed daq_alazar to daq_alazar_homo
-    #print("\nTroubleshoot stuck at this step 3")
-    wx_programs.wx_initialize() # recently added wx_programs.wx_initialize()
-    (rec_avg_all, rec_readout_1, rec_readout_2, rec_all, rec_all_het_1, rec_all_het_2) = daq_alazar_homo.acquire_data_het_2q(daq_params, alazar_params, board, ssm_if_1, ssm_if_2, deg_1, deg_2, verbose=True)
-    #print(alazar_params.buffer_count)
-    #print("\nTroubleshoot stuck at this step 4")
-    # reshape the records
+    # 4. Acquire data (heterodyne, 2-qubit)
+    (rec_avg_all, rec_readout_1, rec_readout_2, rec_all, 
+     rec_all_het_1, rec_all_het_2) = daq_alazar_homo.acquire_data_het_2q(
+                                            daq_params, alazar_params, board,
+                                            ssm_if_1, ssm_if_2, deg_1, deg_2, verbose=True)
+    
+    # 5. Process the acquired records: reshape and average vs. patterns
     rec_readout_vs_pats_1 = daq_processing.record_vs_patterns(daq_params, rec_readout_1)
     rec_readout_vs_pats_2 = daq_processing.record_vs_patterns(daq_params, rec_readout_2)
-
-    #print("\nTroubleshoot stuck at this step 5")
-    # average all repetitions for each pattIern
+    
     rec_avg_vs_pats_1_ch_a, rec_avg_vs_pats_1_ch_b = daq_processing.record_avg_vs_patterns(daq_params, rec_readout_vs_pats_1)
     rec_avg_vs_pats_2_ch_a, rec_avg_vs_pats_2_ch_b = daq_processing.record_avg_vs_patterns(daq_params, rec_readout_vs_pats_2)
-
-    #print("\nTroubleshoot stuck at this step 6")
-    rec_avg_vs_pats_1 = [ rec_avg_vs_pats_1_ch_a, rec_avg_vs_pats_1_ch_b]
-    rec_avg_vs_pats_2 = [ rec_avg_vs_pats_2_ch_a, rec_avg_vs_pats_2_ch_b]
+    rec_avg_vs_pats_1 = [rec_avg_vs_pats_1_ch_a, rec_avg_vs_pats_1_ch_b]
+    rec_avg_vs_pats_2 = [rec_avg_vs_pats_2_ch_a, rec_avg_vs_pats_2_ch_b]
     
-    # threshold the readout signal for every record (channel a)
-    
+    # 6. Optionally create IQ plots for visualization
     if verbose:
-        pass
-        bins_1, counts_1 = daq_processing.make_iq_plot(rec_readout_1)
-        bins_2, counts_2 = daq_processing.make_iq_plot(rec_readout_2)
-
-
-    daq_params.threshold=qubit_1_thr
-
-
-    n_readout_1 = daq_processing.threshold_record_averages(daq_params, signal_in=rec_readout_1[0])#k
-    n_vs_pats_1, prob_vs_pats_1 = daq_processing.readout_vs_patterns(daq_params, n_readout_1)#k
-
+        bins_1, counts_1 = daq_processing.make_iq_plot(rec_readout_1, "qubit 1")
+        bins_2, counts_2 = daq_processing.make_iq_plot(rec_readout_2, "qubit 2")
+    else:
+        bins_1 = bins_2 = counts_1 = counts_2 = None
     
-    daq_params.threshold=qubit_2_thr
+    # 7. Process thresholds and compute readout vs. patterns for qubit 1
+    daq_params.threshold = qubit_1_thr
+    n_readout_1 = daq_processing.threshold_record_averages(daq_params, signal_in=rec_readout_1[0])
+    n_vs_pats_1, prob_vs_pats_1 = daq_processing.readout_vs_patterns(daq_params, n_readout_1)
     
-    n_readout_2 = daq_processing.threshold_record_averages(daq_params, signal_in=rec_readout_2[0])#k
-    n_vs_pats_2, prob_vs_pats_2 = daq_processing.readout_vs_patterns(daq_params, n_readout_2)#k
-
-
+    # 8. Process thresholds and compute readout vs. patterns for qubit 2
+    daq_params.threshold = qubit_2_thr
+    n_readout_2 = daq_processing.threshold_record_averages(daq_params, signal_in=rec_readout_2[0])
+    n_vs_pats_2, prob_vs_pats_2 = daq_processing.readout_vs_patterns(daq_params, n_readout_2)
     
-   
-    #return rec_avg_all, rec_readout, rec_avg_vs_pats
-    return n_vs_pats_1,n_vs_pats_2, rec_avg_all, rec_all, rec_readout_1, rec_readout_2, rec_avg_vs_pats_1, rec_avg_vs_pats_2 , rec_all_het_1, rec_all_het_2, bins_1, bins_2, counts_1, counts_2,prob_vs_pats_1,prob_vs_pats_2,n_readout_1,n_readout_2,rec_readout_vs_pats_1,rec_readout_vs_pats_2
-
+    # 9. Pack and return all the results using the DAQResult dataclass
+    return DAQResult(
+        n_vs_pats_1=n_vs_pats_1,
+        n_vs_pats_2=n_vs_pats_2,
+        rec_avg_all=rec_avg_all,
+        rec_all=rec_all,
+        rec_readout_1=rec_readout_1,
+        rec_readout_2=rec_readout_2,
+        rec_avg_vs_pats_1=rec_avg_vs_pats_1,
+        rec_avg_vs_pats_2=rec_avg_vs_pats_2,
+        rec_all_het_1=rec_all_het_1,
+        rec_all_het_2=rec_all_het_2,
+        bins_1=bins_1,
+        bins_2=bins_2,
+        counts_1=counts_1,
+        counts_2=counts_2,
+        prob_vs_pats_1=prob_vs_pats_1,
+        prob_vs_pats_2=prob_vs_pats_2,
+        n_readout_1=n_readout_1,
+        n_readout_2=n_readout_2,
+        rec_readout_vs_pats_1=rec_readout_vs_pats_1,
+        rec_readout_vs_pats_2=rec_readout_vs_pats_2
+    )
 
 def run_daq_auto_threshold_modify_ec(prev_threshold=[-160.5,-157],num_patterns=None, num_records_per_pattern=None,authr=0,fg=3,ro_dur=8000,IQangle=90):
     # get parameters: number of patterns, etc.

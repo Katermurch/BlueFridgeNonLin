@@ -282,7 +282,7 @@ def make_readout_histogram_for_each_pattern(rec_vs_pats=[]):
     
     return (bins_cntr, counts)
 
-def make_iq_plot(channel_a_and_b):
+def make_iq_plot(channel_a_and_b, pltitle: str):
     #
     ch_a = channel_a_and_b[0]
     ch_b = channel_a_and_b[1]
@@ -330,16 +330,6 @@ def make_iq_plot(channel_a_and_b):
     counts_x = np.histogram(ch_a)
     counts_y = np.histogram(ch_b)
     
-#    counts_x = np.histogram(ch_a, bins_x)
-#    counts_y = np.histogram(ch_b, bins_y)
-#    plt.hist(bins[:-1], bins, weights=counts)
-
-#    ax_histx.hist(ch_a, bins=bins_x, weights=counts_x)
-#    ax_histy.hist(ch_b, bins=bins_y, weights=counts_y, orientation='horizontal')
-    
-#    ax_histx.hist(ch_a, bins=bins_x, weights=counts_x)
-#    ax_histy.hist(bins_x[:-1], bins=bins_x, weights=counts_y, orientation='horizontal')
-    
     hist_out_x = ax_histx.hist(ch_a, bins=bins_x, histtype='step', orientation='vertical')
     hist_out_y = ax_histy.hist(ch_b, bins=bins_y, histtype='step', orientation='horizontal')
     ax_histx.set_title('Ch 1')
@@ -350,7 +340,6 @@ def make_iq_plot(channel_a_and_b):
     
     ax_histx.set_xlim(ax_scatter.get_xlim())
     ax_histy.set_ylim(ax_scatter.get_ylim())
-    
     plt.show()
     
     bins_cntr_x = 0.5*bins_x[:-1]+0.5*bins_x[1:]
@@ -359,31 +348,6 @@ def make_iq_plot(channel_a_and_b):
     bins_cntr = [bins_cntr_x, bins_cntr_y]
     counts = [counts_x, counts_y]
     return (bins_cntr, counts)
-#
-#
-#
-
-
-
-#def make_iq_plot(channel_a_and_b, ax=None):
-#    if ax is None:
-#        _, ax = plt.subplots(1, figsize=(4, 4))  # Create a new figure and axis if none provided
-#
-#    ch_a = channel_a_and_b[0]
-#    ch_b = channel_a_and_b[1]
-#
-#    # Assuming the original plotting logic remains largely unchanged
-#    # Scatter plot
-#    ax.scatter(ch_a, ch_b, c='black', marker='.', alpha=0.5)
-#    # Other plotting adjustments specific to this plot can go here
-#
-#    # Optionally return calculated bins and counts for external use
-#    # Example bins and counts calculation (simplified)
-#    bins = np.linspace(np.min(ch_a + ch_b), np.max(ch_a + ch_b), 40)
-#    counts_a, _ = np.histogram(ch_a, bins)
-#    counts_b, _ = np.histogram(ch_b, bins)
-#    return bins, (counts_a, counts_b)
-
 
 def make_n_state_iq_plot(rec_readout_vs_pats):
 

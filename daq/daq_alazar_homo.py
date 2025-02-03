@@ -429,11 +429,7 @@ def acquire_data_het_2q(daq_params, alazar_params, board, ssm_if_1=-0.04, ssm_if
     index_avg_start = daq_params.readout_start
     index_avg_end = daq_params.readout_start + daq_params.readout_duration - 1
 
-#    index_ch = [None]*2
-#    index_ch[0] = np.arange(0,post_trigger_samples*records_per_buffer) # channel A
-#    index_ch[1] = post_trigger_samples*records_per_buffer + np.arange(0,post_trigger_samples*records_per_buffer) # channel B
-    #print("\ndaq_alazar Troubleshoot stuck at this step 13")
-    #print("D")
+
     chA_indices = np.arange(0,post_trigger_samples*records_per_buffer)
     chB_indices = post_trigger_samples*records_per_buffer + np.arange(0,post_trigger_samples*records_per_buffer) # channel B
     indices_for_ch = [chA_indices, chB_indices]
@@ -442,25 +438,13 @@ def acquire_data_het_2q(daq_params, alazar_params, board, ssm_if_1=-0.04, ssm_if
     rec_avg_all = [None]*2
     rec_readout_1 = [[]]*2
     rec_readout_2 = [[]]*2
-    #print("\ndaq_alazar Troubleshoot stuck at this step 14")
-    # Post DMA buffers to board
-    #print("E")
-    #print(buffers)
+
     for buffer in buffers:
         board.postAsyncBuffer(buffer.addr, buffer.size_bytes)
 
     start = time.time() # Keep track of when acquisition started
     
-    ## for fast loading
-#    # begin SRS DG535 and Proteus board triggers
-#    generator.proteus_init() 
-#    generator.proteus_start_seq()
-    #print("\ndaq_alazar Troubleshoot stuck at this step 15")
-    # for original, slow loading
-    #start_from(0) #recently commented out 11/01/2023
-#    reset_proteus_clock(slotId=3)
-#    reset_proteus_clock(slotId=5)
-    #print("F")
+
     try:
         #print("\n1")
         board.startCapture() # Start the acquisition
