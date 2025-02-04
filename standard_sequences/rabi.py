@@ -5,7 +5,6 @@ from wx_programs import *
 def rabi_ge(
     qubit_rabi: object,
     qubit2: object,
-    readout: object,
     gen_vals: dict,
     num_steps=101,
     sweep_time=200,
@@ -16,7 +15,6 @@ def rabi_ge(
     Args:
         qubit_rabi (_type_): this is the qubit you are performing the rabi on
         qubit2 (_type_): this qubit exists for homodyne readout
-        readout (_type_): this object chooses ther readout parameters
         gen_vals (dict): a dictionary of general values for readout and hardware control
         num_steps (int, optional): _description_. Defaults to 101.
         sweep_time (int, optional): _description_. Defaults to 200.
@@ -31,9 +29,9 @@ def rabi_ge(
     ## channels
     pi_ge = qubit_rabi.ge_time
     ge_amp = qubit_rabi.ge_amp
-    ROIF1 = qubit_rabi.ro_freq - readout.RO_LO
-    ROIF2 = qubit2.ro_freq - readout.RO_LO
-    readout_dur = readout.ro_dur
+    ROIF1 = qubit_rabi.ro_freq - qubit_rabi.RO_LO
+    ROIF2 = qubit2.ro_freq - qubit2.RO_LO
+    readout_dur = qubit_rabi.ro_dur
     phase_offset = gen_vals["mixer_offset"]
 
     rabi_ge = Pulse(
@@ -55,7 +53,7 @@ def rabi_ge(
     main_pulse = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
-        amplitude=readout.readout_amp_1,
+        amplitude=qubit2.ro_amp,
         ssm_freq=ROIF1,
         phase=-file_length * ROIF1 * 360,
     )
@@ -65,7 +63,7 @@ def rabi_ge(
     main_pulse = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
-        amplitude=readout.readout_amp_2,
+        amplitude=qubit_rabi.ro_amp,
         ssm_freq=ROIF2,
         phase=-file_length * ROIF2 * 360,
     )
@@ -115,7 +113,6 @@ def rabi_ge(
 def rabi_ef(
     qubit_rabi: object,
     qubit2: object,
-    readout: object,
     gen_vals: dict,
     num_steps=51,
     sweep_time=200,
@@ -143,13 +140,14 @@ def rabi_ef(
 
     ## channels
     pi_ge = qubit_rabi.ge_time
-    ge_amp = qubit_rabi.ge_amp
+    pi_ef = qubit_rabi.ef_time
     ef_amp = qubit_rabi.ef_amp
+    ge_amp = qubit_rabi.ge_amp
     ssm_ge = qubit_rabi.ge_ssm
     ssm_ef = qubit_rabi.ef_ssm
-    ROIF1 = qubit_rabi.ro_freq - readout.RO_LO
-    ROIF2 = qubit2.ro_freq - readout.RO_LO
-    readout_dur = readout.ro_dur
+    ROIF1 = qubit_rabi.ro_freq - qubit_rabi.RO_LO
+    ROIF2 = qubit2.ro_freq - qubit_rabi.RO_LO
+    readout_dur = qubit_rabi.ro_dur
     phase_offset = gen_vals["mixer_offset"]
     buffer = 50
 
@@ -184,36 +182,36 @@ def rabi_ef(
         initial_pulse=rabi_ef,
     )
     
-    # second pi_ge-pulse
-    pi_ge_pulse = Pulse(
-        start=file_length - readout_dur - buffer,
-        duration=-pi_ge,
-        amplitude=ge_amp,
-        ssm_freq=ssm_ge,
-        phase=0,
-    )  # pulse is also a class p is an instance
-    ringupdown_seq.add_sweep(
-        channel=4, sweep_name="none", initial_pulse=pi_ge_pulse
-    )
+    # # second pi_ge-pulse
+    # pi_ge_pulse = Pulse(
+    #     start=file_length - readout_dur - buffer,
+    #     duration=-pi_ge,
+    #     amplitude=ge_amp,
+    #     ssm_freq=ssm_ge,
+    #     phase=0,
+    # )  # pulse is also a class p is an instance
+    # ringupdown_seq.add_sweep(
+    #     channel=4, sweep_name="none", initial_pulse=pi_ge_pulse
+    # )
    
 
-    #Q1 Readout
+    #Rabi Qubit Readout
 
     main_pulse = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
-        amplitude=readout.readout_amp_1,
+        amplitude=qubit_rabi.ro_amp,
         ssm_freq=ROIF1,
         phase=-file_length * ROIF1 * 360,
     )
     ringupdown_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse)
 
-    # Q2 Readout
+    # Other qubit Readout
 
     main_pulse = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
-        amplitude=readout.readout_amp_2,
+        amplitude=qubit2.ro_amp,
         ssm_freq=ROIF2,
         phase=-file_length * ROIF2 * 360,
     )
@@ -240,16 +238,6 @@ def rabi_ef(
         marker1 = ringupdown_seq.channel_list[0][2]
 
         channel = channel1_ch + channel3_ch + marker1
-        plt.figure()
-        plt.imshow(
-            channel[:, file_length - 3000 - 300 : file_length - 3000 + 50],
-            aspect="auto",
-        )
-        plt.show()
-
-        plt.figure()
-        plt.imshow(channel[:, :], aspect="auto")
-        plt.show()
 
     write_dir = (
         r"C:\arbsequences\strong_dispersive_withPython\test_pulse_ringupdown_bin"
