@@ -116,8 +116,8 @@ def rabi_ef(
     gen_vals: dict,
     num_steps=51,
     sweep_time=200,
-):  
-    '''
+):
+    """
     This function should run the rabi ef sequence for a qubit, using the qubit's properties.
     Args:
         qubit_rabi (object): this is the qubit you are performing the rabi on
@@ -126,8 +126,8 @@ def rabi_ef(
         gen_vals (dict): a dictionary of general values for readout and hardware control
         num_steps (int, optional): _description_. Defaults to 51.
         sweep_time (int, optional): _description_. Defaults to 200.
-    '''
-    
+    """
+
     # this is pulsed readout to ring up and ring down cavity dfor e state
     file_length = 30000
     #    num_steps = 101
@@ -151,7 +151,7 @@ def rabi_ef(
     phase_offset = gen_vals["mixer_offset"]
     buffer = 50
 
-    #Pi ge amp
+    # Pi ge amp
     pi_ge_pulse = Pulse(
         start=file_length - readout_dur - buffer,
         duration=-pi_ge,
@@ -166,7 +166,7 @@ def rabi_ef(
         stop=-sweep_time,
         initial_pulse=pi_ge_pulse,
     )
-        # drive rabi e-f
+    # drive rabi e-f
     rabi_ef = Pulse(
         start=file_length - readout_dur - buffer,
         duration=0,
@@ -181,7 +181,7 @@ def rabi_ef(
         stop=-sweep_time,
         initial_pulse=rabi_ef,
     )
-    
+
     # # second pi_ge-pulse
     # pi_ge_pulse = Pulse(
     #     start=file_length - readout_dur - buffer,
@@ -193,9 +193,8 @@ def rabi_ef(
     # ringupdown_seq.add_sweep(
     #     channel=4, sweep_name="none", initial_pulse=pi_ge_pulse
     # )
-   
 
-    #Rabi Qubit Readout
+    # Rabi Qubit Readout
 
     main_pulse = Pulse(
         start=file_length - readout_dur,
