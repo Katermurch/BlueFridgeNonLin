@@ -13,9 +13,9 @@ q1_dict = {
     "ef_time": 78.05067663337411,
     "ge_amp": 1.2,
     "ef_amp":1,
-    "IQ_angle": 240,
+    "IQ_angle": 205,
     "ro_amp": 0.5,
-    "qubit_thr": [-5000, 5000],
+    "qubit_thr": [-10000,-600],
 }
 q2_dict = {
     "qubit_id": "q2",
@@ -25,9 +25,9 @@ q2_dict = {
     "ge_time": 40.15374412400174,
     "ge_amp": 1.2,
     "ef_amp": 1,
-    "IQ_angle": 220,
+    "IQ_angle": 85,
     "ro_amp": 0.5,
-    "qubit_thr": [-5000, 5000],
+    "qubit_thr": [-10000,2500],
 }
 
 general_vals_dict = {
