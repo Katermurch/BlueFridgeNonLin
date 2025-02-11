@@ -3,7 +3,7 @@ import lightgbm as lgb
 import joblib
 
 
-classifier = joblib.load('lgb.pkl')
+classifier = joblib.load('analysis/lgb.pkl')
 
 
 def classify(data: pd.DataFrame):
@@ -23,16 +23,26 @@ def classify(data: pd.DataFrame):
     data['predicted'] = pred
     
     return data
+def reshape_for_exp(data:pd.Series,reps: int, num_steps:int ):
+    #first input is number of rows 
+    #second input is number of columns
+    total_data_size = reps*num_steps
+    data_cut = data[0:total_data_size]
+    arr = data_cut.values
+    new_arr = arr.reshape((num_steps, reps))
+    return new_arr
 
-def probabilities(data:pd.DataFrame):
+def probabilities(data: list):
     """
-    returns probabilities for each state given dataframe with unaveraged IQ1,IQ2 data
+    Returns probabilities for each state (0, 1, 2) as P_g, P_e, and P_f respectively.
     """
-    predictions = data['predicted']
-    counts = predictions.value_counts(normalize=True, ascending=True)
-    P_g = counts.iloc[0]
-    P_e = counts.iloc[1]
-    P_f = counts.iloc[2]
-
-    prob_dict = {'P_g':P_g, 'P_e':P_e, 'P_f':P_f }
+    new_dat = pd.Series(data)
+    counts = new_dat.value_counts(normalize=True)
+    
+    # Use .get() to safely fetch each probability, defaulting to 0 if the state isn't present.
+    P_g = counts.get(0, 0)
+    P_e = counts.get(1, 0)
+    P_f = counts.get(2, 0)
+    
+    prob_dict = {'P_g': P_g, 'P_e': P_e, 'P_f': P_f}
     return prob_dict

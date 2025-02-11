@@ -21,7 +21,6 @@ def rabi_ef_swap(
     ge_amp = qubit_rabi.ge_amp
     phase_offset = gen_vals['mixer_offset']
     phase_offset_ef = gen_vals['mixer_offset_ef']
-    readout_amp = qubit_rabi.ro_amp
     ROIF1 = qubit_rabi.ro_freq - qubit_rabi.RO_LO
     ROIF2 = qubit2.ro_freq - qubit2.RO_LO
     pi_ge = qubit_rabi.ge_time
@@ -48,7 +47,7 @@ def rabi_ef_swap(
     )
     # drive rabi e-f
     rabi_ef = Pulse(
-        start=file_length - readout_dur - pi_ge - buffer - swap_time,
+        start=file_length - readout_dur- pi_ge - buffer - swap_time,
         duration=0,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
@@ -58,7 +57,7 @@ def rabi_ef_swap(
         channel=4,
         sweep_name="width",
         start=0,
-        stop=-sweep_time,
+        stop=sweep_time,
         initial_pulse=rabi_ef,
     )
     
