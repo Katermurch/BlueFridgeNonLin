@@ -32,7 +32,7 @@ def rabi_ef_swap(
 
     # first pi_ge pulse
     pi_ge_pulse = Pulse(
-        start=file_length - readout_dur - pi_ge - buffer - swap_time,
+        start=file_length - readout_dur  - buffer - swap_time,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -47,7 +47,7 @@ def rabi_ef_swap(
     )
     # drive rabi e-f
     rabi_ef = Pulse(
-        start=file_length - readout_dur- pi_ge - buffer - swap_time,
+        start=file_length - readout_dur- buffer - swap_time,
         duration=0,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
@@ -57,7 +57,7 @@ def rabi_ef_swap(
         channel=4,
         sweep_name="width",
         start=0,
-        stop=sweep_time,
+        stop=-sweep_time,
         initial_pulse=rabi_ef,
     )
     

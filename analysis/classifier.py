@@ -1,9 +1,10 @@
 import pandas as pd
 import lightgbm as lgb
 import joblib
+import numpy as np
 
 
-classifier = joblib.load('analysis/lgb.pkl')
+classifier = joblib.load('analysis/lgb_spyder.pkl')
 
 
 def classify(data: pd.DataFrame):
@@ -15,7 +16,6 @@ def classify(data: pd.DataFrame):
     """
     try:
         data = data.drop(columns="Unnamed: 0")
-        #data = data.sample(frac=1).reset_index(drop=True)
     except:
         pass
 
@@ -29,7 +29,7 @@ def reshape_for_exp(data:pd.Series,reps: int, num_steps:int ):
     total_data_size = reps*num_steps
     data_cut = data[0:total_data_size]
     arr = data_cut.values
-    new_arr = arr.reshape((num_steps, reps))
+    new_arr = np.reshape(arr, (reps, num_steps))
     return new_arr
 
 def probabilities(data: list):
