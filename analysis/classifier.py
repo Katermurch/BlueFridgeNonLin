@@ -24,25 +24,43 @@ def classify(data: pd.DataFrame):
     
     return data
 def reshape_for_exp(data:pd.Series,reps: int, num_steps:int ):
+    """
+    This takes in the list of I or Q data and rearranges it such that we have num steps columns and reps rows
+    """
     #first input is number of rows 
     #second input is number of columns
     total_data_size = reps*num_steps
     data_cut = data[0:total_data_size]
     arr = data_cut.values
-    new_arr = np.reshape(arr, (reps, num_steps))
+    new_arr = np.reshape(arr, (reps, -1))
+    
     return new_arr
 
-def probabilities(data: list):
+def probabilities(arr: np.array):
     """
     Returns probabilities for each state (0, 1, 2) as P_g, P_e, and P_f respectively.
     """
-    new_dat = pd.Series(data)
-    counts = new_dat.value_counts(normalize=True)
+    # THIS TAKES AN ARRAY IN THE SHAPE (REPS, STEPS) IT AVERAGES COLUMN WISE TO AVERAGE PER STEP
+    prob = [np.mean(arr == i, axis = 0) for i in range(3)]
     
-    # Use .get() to safely fetch each probability, defaulting to 0 if the state isn't present.
-    P_g = counts.get(0, 0)
-    P_e = counts.get(1, 0)
-    P_f = counts.get(2, 0)
+    P_g = prob[0]
+    P_e = prob[1]
+    P_f = prob[2]
     
     prob_dict = {'P_g': P_g, 'P_e': P_e, 'P_f': P_f}
     return prob_dict
+
+def population(arr: np.array):
+    """
+    Returns populations for each state (0, 1, 2).
+    """
+    # THIS TAKES AN ARRAY IN THE SHAPE (REPS, STEPS) IT AVERAGES COLUMN WISE TO AVERAGE PER STEP
+    prob = [np.sum(arr == i, axis = 0) for i in range(3)]
+    
+    Pop_g = prob[0]
+    Pop_e = prob[1]
+    Pop_f = prob[2]
+    
+    pop_dict = {'Pop_g': Pop_g, 'Pop_e': Pop_e, 'Pop_f': Pop_f}
+    return pop_dict
+
