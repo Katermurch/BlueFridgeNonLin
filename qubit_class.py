@@ -67,6 +67,7 @@ class Qubit(Readout):
             "IQ_angle",
             "ro_amp",
             "qubit_thr",
+            "RO_IF"
         }
 
         # Validate and set Qubit-specific attributes
