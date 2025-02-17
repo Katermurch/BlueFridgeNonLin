@@ -71,25 +71,25 @@ def rabi_ef_swap(
     )
     ringupdown_seq.add_sweep(channel=3, sweep_name="none", initial_pulse=swap)
         
-    main_pulse = Pulse(
+    main_pulse_1 = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
         amplitude=qubit_rabi.ro_amp,
         ssm_freq=ROIF1,
         phase=-file_length * ROIF1 * 360,
     )
-    ringupdown_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse)
+    ringupdown_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse_1)
 
     # Q2 Readout
     # if q == 0:
-    main_pulse = Pulse(
+    main_pulse_2 = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
         amplitude=qubit2.ro_amp,
         ssm_freq=ROIF2,
         phase=-file_length * ROIF2 * 360,
     )
-    ringupdown_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse)
+    ringupdown_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse_2)
     #    main_pulse.phase = 90
     # main_pulse = Pulse(start = file_length- readout_dur,duration= readout_dur, amplitude= 1.3*readout_amp,ssm_freq=ROIF, phase=0 )
     # ringupdown_seq.add_sweep(channel=1, sweep_name='none',initial_pulse=main_pulse)
