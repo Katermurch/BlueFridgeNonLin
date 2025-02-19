@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import traceback
 import os
-import FPJPA_sequence_port4 as Fs
+import nonlinear_QM_FPJPA as Fs
 import wx_programs as wx
 import daq.daq_programs_homo as daq_programs_homo
 import analysis
