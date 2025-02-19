@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append(
     r"C:\Users\quantum1\Documents\Python Scripts\Important Blue Fridge Python Files\New\nonlinear_QM"
 )
@@ -131,6 +132,7 @@ def spectroscopy_ge(
     )
     return ringupdown_seq
 
+
 def spectroscopy_ef(
     qubit1: object,
     qubit2: object,
@@ -226,7 +228,7 @@ def spectroscopy_ef(
     channel = channel1_ch + channel3_ch + marker1
     ## View pulse sequence output
     if verbose:
-        
+
         plt.figure()
         plt.imshow(
             channel[:, file_length - 3000 - 300 : file_length - 3000 + 50],
@@ -239,7 +241,9 @@ def spectroscopy_ef(
         plt.show()
 
     ## Save and load sequence
-    write_dir = r"C:\arbsequences\strong_dispersive_withPython\test_pulse_ringupdown_bin"
+    write_dir = (
+        r"C:\arbsequences\strong_dispersive_withPython\test_pulse_ringupdown_bin"
+    )
     ringupdown_seq.write_sequence_to_disk(
         base_name="foo",
         file_path=write_dir,
@@ -256,4 +260,3 @@ def spectroscopy_ef(
     )
 
     return ringupdown_seq
-

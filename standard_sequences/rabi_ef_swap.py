@@ -1,12 +1,15 @@
 import sys
-sys.path.append(r'C:\Users\quantum1\Documents\Python Scripts\Important Blue Fridge Python Files\New\nonlinear_QM')
+
+sys.path.append(
+    r"C:\Users\quantum1\Documents\Python Scripts\Important Blue Fridge Python Files\New\nonlinear_QM"
+)
 from generator import *
 from wx_programs import *
 
 
 def rabi_ef_swap(
     qubit_rabi: object,
-    qubit2: object, 
+    qubit2: object,
     gen_vals: dict,
     num_steps=51,
     sweep_time=200,
@@ -19,10 +22,10 @@ def rabi_ef_swap(
         file_length, num_steps
     )  # this creates something called rabi_seq that is an instance of a sequence class
 
-    ef_amp=qubit_rabi.ef_amp
+    ef_amp = qubit_rabi.ef_amp
     ge_amp = qubit_rabi.ge_amp
-    phase_offset = gen_vals['mixer_offset']
-    phase_offset_ef = gen_vals['mixer_offset_ef']
+    phase_offset = gen_vals["mixer_offset"]
+    phase_offset_ef = gen_vals["mixer_offset_ef"]
     ROIF1 = qubit_rabi.ro_freq - qubit_rabi.RO_LO
     ROIF2 = qubit2.ro_freq - qubit2.RO_LO
     pi_ge = qubit_rabi.ge_time
@@ -33,7 +36,7 @@ def rabi_ef_swap(
 
     # first pi_ge pulse
     pi_ge_pulse = Pulse(
-        start=file_length - readout_dur  - buffer - swap_time,
+        start=file_length - readout_dur - buffer - swap_time,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -48,7 +51,7 @@ def rabi_ef_swap(
     )
     # drive rabi e-f
     rabi_ef = Pulse(
-        start=file_length - readout_dur- buffer - swap_time,
+        start=file_length - readout_dur - buffer - swap_time,
         duration=0,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
@@ -61,7 +64,7 @@ def rabi_ef_swap(
         stop=-sweep_time,
         initial_pulse=rabi_ef,
     )
-    
+
     swap = Pulse(
         start=file_length - readout_dur,
         duration=-swap_time,
@@ -70,7 +73,7 @@ def rabi_ef_swap(
         phase=0,
     )
     ringupdown_seq.add_sweep(channel=3, sweep_name="none", initial_pulse=swap)
-        
+
     main_pulse_1 = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
@@ -134,6 +137,7 @@ def rabi_ef_swap(
         ch_amp=[1, 1, 1, 1],
     )
 
+
 def rabi_ef_swap2(
     q1: object,
     q2: object,
@@ -161,7 +165,7 @@ def rabi_ef_swap2(
 
     readout_dur = q1.ro_dur
     pi_ge_pulse = Pulse(
-        start=file_length - readout_dur   - swap_time,
+        start=file_length - readout_dur - swap_time,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -245,13 +249,15 @@ def rabi_ef_swap2(
         num_offset=0,
         ch_amp=[1, 1, 1, 1],
     )
+
+
 def swap(
     qubit_rabi: object,
-    qubit2: object, 
+    qubit2: object,
     gen_vals: dict,
     num_steps=51,
     sweep_time=200,
-    ssm_swap=-.1
+    ssm_swap=-0.1,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
     file_length = 30000
     #    num_steps = 101
@@ -259,13 +265,12 @@ def swap(
         file_length, num_steps
     )  # this creates something called rabi_seq that is an instance of a sequence class
 
-
     ge_amp = qubit_rabi.ge_amp
-    phase_offset = gen_vals['mixer_offset']
-    phase_offset_ef = gen_vals['mixer_offset_ef']
+    phase_offset = gen_vals["mixer_offset"]
+    phase_offset_ef = gen_vals["mixer_offset_ef"]
     ROIF1 = qubit_rabi.ROIF
     ROIF2 = qubit2.ROIF
-    pi_ge =qubit_rabi.ge_time
+    pi_ge = qubit_rabi.ge_time
     ssm_ge = qubit_rabi.ge_ssm
     ssm_ef = qubit_rabi.ef_ssm
     readout_dur = qubit_rabi.ro_dur
@@ -273,7 +278,7 @@ def swap(
 
     # first pi_ge pulse
     pi_ge_pulse = Pulse(
-        start=file_length - readout_dur  - buffer ,
+        start=file_length - readout_dur - buffer,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -288,7 +293,7 @@ def swap(
     )
     # drive rabi e-f
     rabi_swap = Pulse(
-        start=file_length - readout_dur- buffer ,
+        start=file_length - readout_dur - buffer,
         duration=0,
         amplitude=1.7,
         ssm_freq=ssm_swap,
@@ -301,9 +306,8 @@ def swap(
         stop=-sweep_time,
         initial_pulse=rabi_swap,
     )
-    
-        
-  # HET readout
+
+    # HET readout
     # Q1 Readout
     main_pulse = Pulse(
         start=file_length - readout_dur,
@@ -350,7 +354,7 @@ def swap(
         r"C:\arbsequences\strong_dispersive_withPython\test_pulse_ringupdown_bin"
     )
     ringupdown_seq.write_sequence_to_disk(
-        base_name="foo",#rabi_oop_test
+        base_name="foo",  # rabi_oop_test
         file_path=write_dir,
         use_range_01=False,
         num_offset=0,

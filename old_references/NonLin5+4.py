@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import traceback
 import os
-import nonlinear_QM_FPJPA as Fs
+import old_references.nonlinear_QM_FPJPA as Fs
 import wx_programs as wx
 import daq.daq_programs_homo as daq_programs_homo
 import analysis

@@ -1,14 +1,17 @@
 import sys
-sys.path.append(r'C:\Users\quantum1\Documents\Python Scripts\Important Blue Fridge Python Files\New\nonlinear_QM')
+
+sys.path.append(
+    r"C:\Users\quantum1\Documents\Python Scripts\Important Blue Fridge Python Files\New\nonlinear_QM"
+)
 from generator import *
 from wx_programs import *
 
 
 def rabi_ef_no_swap(
     qubit_rabi: object,
-    qubit2: object, 
+    qubit2: object,
     gen_vals: dict,
-    ef_amp =0.1,
+    ef_amp=0.1,
     num_steps=51,
     sweep_time=200,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
@@ -18,13 +21,12 @@ def rabi_ef_no_swap(
         file_length, num_steps
     )  # this creates something called rabi_seq that is an instance of a sequence class
 
-
     ge_amp = qubit_rabi.ge_amp
-    phase_offset = gen_vals['mixer_offset']
-    phase_offset_ef = gen_vals['mixer_offset_ef']
+    phase_offset = gen_vals["mixer_offset"]
+    phase_offset_ef = gen_vals["mixer_offset_ef"]
     ROIF1 = qubit_rabi.ROIF
     ROIF2 = qubit2.ROIF
-    pi_ge =qubit_rabi.ge_time
+    pi_ge = qubit_rabi.ge_time
     ssm_ge = qubit_rabi.ge_ssm
     ssm_ef = qubit_rabi.ef_ssm
     readout_dur = qubit_rabi.ro_dur
@@ -32,7 +34,7 @@ def rabi_ef_no_swap(
 
     # first pi_ge pulse
     pi_ge_pulse = Pulse(
-        start=file_length - readout_dur  - buffer ,
+        start=file_length - readout_dur - buffer,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -47,7 +49,7 @@ def rabi_ef_no_swap(
     )
     # drive rabi e-f
     rabi_ef = Pulse(
-        start=file_length - readout_dur- buffer ,
+        start=file_length - readout_dur - buffer,
         duration=0,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
@@ -60,9 +62,8 @@ def rabi_ef_no_swap(
         stop=-sweep_time,
         initial_pulse=rabi_ef,
     )
-    
-        
-  # HET readout
+
+    # HET readout
     # Q1 Readout
     main_pulse = Pulse(
         start=file_length - readout_dur,
@@ -109,7 +110,7 @@ def rabi_ef_no_swap(
         r"C:\arbsequences\strong_dispersive_withPython\test_pulse_ringupdown_bin"
     )
     ringupdown_seq.write_sequence_to_disk(
-        base_name="foo",#rabi_oop_test
+        base_name="foo",  # rabi_oop_test
         file_path=write_dir,
         use_range_01=False,
         num_offset=0,
@@ -122,6 +123,3 @@ def rabi_ef_no_swap(
         num_offset=0,
         ch_amp=gen_vals["wx_amps"],
     )
-
-
-
