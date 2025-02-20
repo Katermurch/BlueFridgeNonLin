@@ -24,8 +24,8 @@ def full_tomo(
 
     ge_amp = q1.ge_amp
 
-    readout_amp = q1.ro_amp  # 0.5# 1
-    readout_dur = q1.ro_dur  # 8000 #13000 #1000
+    readout_amp = q1.ro_amp
+    readout_dur = q1.ro_dur
     ssm_ge = q1.ge_ssm
     pi_ge = q1.ge_time
     ROIF1 = q1.ROIF
@@ -73,7 +73,7 @@ def full_tomo(
     main_pulse_1 = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
-        amplitude=q1.ro_amp,
+        amplitude=readout_amp,
         ssm_freq=ROIF1,
         phase=-file_length * ROIF1 * 360,
     )
@@ -89,9 +89,6 @@ def full_tomo(
         phase=-file_length * ROIF2 * 360,
     )
     the_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse_2)
-    #    main_pulse.phase = 90
-    # main_pulse = Pulse(start = file_length- readout_dur,duration= readout_dur, amplitude= 1.3*readout_amp,ssm_freq=ROIF, phase=0 )
-    # ringupdown_seq.add_sweep(channel=1, sweep_name='none',initial_pulse=main_pulse)
 
     ## markers
     alazar_trigger = Pulse(
@@ -226,7 +223,7 @@ def full_tomo_ef(
     main_pulse_1 = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
-        amplitude=q1.ro_amp,
+        amplitude=readout_amp,
         ssm_freq=ROIF1,
         phase=-file_length * ROIF1 * 360,
     )
