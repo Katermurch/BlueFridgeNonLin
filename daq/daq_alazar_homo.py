@@ -4,15 +4,20 @@ Created on Sat Jan 25 12:43:51 2020
 
 @author: P. M. Harrington, 25 January 2020
 """
-
 from __future__ import division
+import sys
+import os
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
 import ctypes
 import numpy as np
 import os
 import time
 import matplotlib.pyplot as plt
 import hardware_control.atsapi as ats
-import srs_dg535
+from hardware_control import srs_dg535
 from classes.Nop_class import Nop
 
 def get_alazar_parameters(daq_params=None):

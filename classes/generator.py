@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-import tewx
+import hardware_control.tewx
 import hardware_control.wx_programs as wx_programs
 
 SAMPLE_RATE = 1e9  # Gig samples/sec
