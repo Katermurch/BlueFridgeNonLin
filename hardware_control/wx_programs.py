@@ -4,9 +4,13 @@ Created on Tue Jan 28 12:26:45 2020
 
 @author: P. M. Harrington
 """
-
-import tewx
-import hardware_control.expt_parameters as expt_parameters
+import sys
+import os
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+from . import tewx
+from . import expt_parameters as expt_parameters
 
 def get_wx_address():
     instr_addr = expt_parameters.get_instrument_address('wx')
