@@ -10,7 +10,7 @@ import ctypes
 import numpy as np
 import os, sys
 import time
-import atsapi as ats
+import hardware_control.atsapi as ats
 #import dg535_control
 from tqdm import tqdm
 #gen_path = r"C:\Users\Crow108\Documents\Python Scripts\sequence_generator"

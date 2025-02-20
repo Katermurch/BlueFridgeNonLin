@@ -11,9 +11,9 @@ import numpy as np
 import os
 import time
 import matplotlib.pyplot as plt
-import atsapi as ats
+import hardware_control.atsapi as ats
 import srs_dg535
-from Nop_class import Nop
+from classes.Nop_class import Nop
 
 def get_alazar_parameters(daq_params=None):
     alazar_params = Nop()

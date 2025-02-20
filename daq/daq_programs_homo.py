@@ -8,14 +8,14 @@ Created on Sat Jan 25 11:50:58 2020
 import numpy as np
 import matplotlib.pyplot as plt
 import analysis
-import expt_parameters
+import hardware_control.expt_parameters as expt_parameters
 #from daq_alazar_homo import *
 import daq.daq_alazar_homo as daq_alazar_homo #serra
-import atsapi as ats #serra
+import hardware_control.atsapi as ats #serra
 #from daq_processing import *
 import daq.daq_processing as daq_processing
-import wx_programs
-from Nop_class import Nop
+import hardware_control.wx_programs as wx_programs
+from classes.Nop_class import Nop
 import math
 from dataclasses import dataclass
 

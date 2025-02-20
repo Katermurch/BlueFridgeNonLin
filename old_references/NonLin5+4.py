@@ -18,7 +18,7 @@ file_dir = r"Z:\Mark"
 if file_dir not in sys.path: sys.path.append(file_dir)
 
 
-from generator import *
+from classes.generator import *
 import os
 
 import numpy as np
@@ -27,11 +27,11 @@ import pandas as pd
 import traceback
 import os
 import old_references.nonlinear_QM_FPJPA as Fs
-import wx_programs as wx
+import hardware_control.wx_programs as wx
 import daq.daq_programs_homo as daq_programs_homo
 import analysis
 import chevron
-import bnc
+import hardware_control.bnc as bnc
 
 pi = np.pi
 instrument_path = r"C:\Users\quantum1\Documents\Python\instr\analyzer"

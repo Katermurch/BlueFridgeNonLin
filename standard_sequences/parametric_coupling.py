@@ -1,5 +1,5 @@
-from generator import *
-from wx_programs import *
+from classes.generator import *
+from hardware_control.wx_programs import *
 
 
 def parametric_coupling(

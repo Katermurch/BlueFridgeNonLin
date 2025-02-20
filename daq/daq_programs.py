@@ -8,7 +8,7 @@ Created on Sat Jan 25 11:50:58 2020
 
 import daq.daq_alazar as daq_alazar 
 import daq.daq_processing as daq_processing
-import atsapi as ats 
+import hardware_control.atsapi as ats 
 import dg535_control
 import numpy as np
 

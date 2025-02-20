@@ -13,7 +13,7 @@ from scipy.optimize import curve_fit
 from scipy import integrate
 from scipy.signal import argrelextrema
 import csv
-import fit_functions as fitfun
+import analysis.fit_functions as fitfun
 from scipy.fft import fft, fftfreq
 
 
