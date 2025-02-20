@@ -3,8 +3,8 @@ import sys
 sys.path.append(
     r"C:\Users\quantum1\Documents\Python Scripts\Important Blue Fridge Python Files\New\nonlinear_QM"
 )
-from generator import *
-from wx_programs import *
+from classes.generator import *
+from hardware_control.wx_programs import *
 
 
 def full_tomo(

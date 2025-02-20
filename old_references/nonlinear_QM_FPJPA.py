@@ -9,7 +9,7 @@ if file_dir not in sys.path: sys.path.append(file_dir)
 file_dir = r"C:\Users\crow104\Documents\Python Scripts\sequence_generator\py_sequences"
 if file_dir not in sys.path: sys.path.append(file_dir)
 
-from generator import *
+from classes.generator import *
 import os
 pi = np.pi
 import pyvisa
@@ -19,7 +19,7 @@ plt.rcParams.update({'font.size': 13})
 from tkinter import Tk
 import tkinter as tki
 from tkinter.filedialog import askopenfilename, asksaveasfilename, asksaveasfile
-import wx_programs
+import hardware_control.wx_programs as wx_programs
 import scipy.io as io
 import time
 from IPython import get_ipython
@@ -358,7 +358,7 @@ def wx_ge(num_steps= 101, sweeptime = 30000, ifload = 1): #this is pulsed readou
         write_dir = r"C:\arbsequences\strong_dispersive_withPython\test_pulse_ringupdown_bin"
         ringupdown_seq.write_sequence_to_disk(base_name='foo', file_path=write_dir, use_range_01=False,num_offset=0, write_binary=True)
         ringupdown_seq.load_sequence_from_disk('128.252.134.31', base_name='foo', file_path=write_dir, num_offset=0, ch_amp=[1,1,1.5,1.5])
-        wx_programs.wx_set_and_amplitude_and_offset(amp=[1.5, 1.358, 1.5, 1.5], offset=[-0.076, 0.025 , 0.09, -0.086])
+        hardware_control.wx_programs.wx_set_and_amplitude_and_offset(amp=[1.5, 1.358, 1.5, 1.5], offset=[-0.076, 0.025 , 0.09, -0.086])
 
 
 def repeat_ramsey_ge(repnum = 20, ifsave = 0, ifrunsequence=1):

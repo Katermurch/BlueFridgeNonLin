@@ -1,5 +1,5 @@
-from generator import *
-from wx_programs import *
+from classes.generator import *
+from hardware_control.wx_programs import *
 
 ge_amp_setting = 1.2  # 1.2#1.9 for 1in driving
 ssm_ge_setting = (
