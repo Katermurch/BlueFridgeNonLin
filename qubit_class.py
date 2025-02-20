@@ -12,7 +12,6 @@ class Readout:
         self.allowed_attributes = {
             "RO_LO",
             "RO_LO_pwr",
-            "ROq3",
             "ro_dur",
         }
         # Validate and set attributes from the dictionary

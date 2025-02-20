@@ -1,7 +1,6 @@
 readout_dict = {
     "RO_LO": 6.6247,
     "RO_LO_pwr": 16,
-    "ROq3": 6.583064,
     "ro_dur": 4000,
 }
 q1_dict = {
