@@ -17,7 +17,7 @@ def spectroscopy_ge(
     ssm_stop=-0.25,
     spec_amp=0.5,
     sweep_time=200,
-    verbose=True,
+    verbose=False,
 ):
     """This function does the ef spectroscopy for the qubit by running over single sideband frequencies
 
@@ -38,23 +38,11 @@ def spectroscopy_ge(
         file_length, num_steps
     )  # this creates something called rabi_seq that is an instance of a sequence class
 
-    ## channels
-    ge_amp = qubit1.ge_amp
-    ssm_ge = qubit1.ge_ssm
-    pi_ge = qubit1.ge_time
     readout_amp = qubit1.ro_amp
     readout_dur = qubit1.ro_dur
     ROIF1 = qubit1.ROIF
-    ROIF2 = qubit2.ROIF
 
-    pi_ge_pulse = Pulse(
-        start=file_length - readout_dur - sweep_time - 10,
-        duration=-pi_ge,
-        amplitude=ge_amp,
-        ssm_freq=ssm_ge,
-        phase=0,
-    )  # pulse is also a class p is an instance
-    ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=pi_ge_pulse)
+
 
     rabi_ge = Pulse(
         start=file_length - readout_dur - 10,

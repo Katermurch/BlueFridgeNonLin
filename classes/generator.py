@@ -1,9 +1,17 @@
-import os
 import sys
+import os
+
+# Get the directory containing the current file (classes)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# Get the parent directory (which should contain hardware_control)
+parent_dir = os.path.abspath(os.path.join(current_dir, '..'))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-import hardware_control.tewx
+import hardware_control.tewx as tewx
 import hardware_control.wx_programs as wx_programs
 
 SAMPLE_RATE = 1e9  # Gig samples/sec
