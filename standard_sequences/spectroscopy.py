@@ -11,7 +11,6 @@ wx_addr = get_wx_address()
 
 def spectroscopy_ge(
     qubit1: object,
-    qubit2: object,
     gen_vals: dict,
     ssm_start=-0.15,
     ssm_stop=-0.25,

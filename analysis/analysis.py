@@ -4,7 +4,12 @@ Created on Mon Jan 27 11:18:02 2020
 
 @author: P. M. Harrington, 27 January 2020
 """
+import sys
+import os
 
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 import numpy as np
 import os
 import datetime
@@ -13,7 +18,7 @@ from scipy.optimize import curve_fit
 from scipy import integrate
 from scipy.signal import argrelextrema
 import csv
-import analysis.fit_functions as fitfun
+import analysis.fit_functions as fitfuncs
 from scipy.fft import fft, fftfreq
 
 
