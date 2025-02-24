@@ -41,8 +41,6 @@ def spectroscopy_ge(
     readout_dur = qubit1.ro_dur
     ROIF1 = qubit1.ROIF
 
-
-
     rabi_ge = Pulse(
         start=file_length - readout_dur - 10,
         duration=-sweep_time,

@@ -8,7 +8,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import analysis.analysis as analysis
 import analysis.fit_functions as fitfuncs
+from scipy.optimize import curve_fit
 
 
 def get_IQ_averages(values):
@@ -18,7 +20,18 @@ def get_IQ_averages(values):
     I1 = values.rec_avg_vs_pats_1[0]
     Q1 = values.rec_avg_vs_pats_1[1]
     I2 = values.rec_avg_vs_pats_2[0]
-    Q2 = values.rec_avg_vs_pats_1[1]
+    Q2 = values.rec_avg_vs_pats_2[1]
+
+    return pd.DataFrame({"I1": I1, "Q1": Q1, "I2": I2, "Q2": Q2})
+
+def get_IQ_raw(values):
+    """
+    This function takes the values input, returns your IQ averages
+    """
+    I1 = values.rec_readout_vs_pats_1[0]
+    Q1 = values.rec_readout_vs_pats_2[1]
+    I2 = values.rec_readout_vs_pats_2[0]
+    Q2 = values.rec_readout_vs_pats_2[1]
 
     return pd.DataFrame({"I1": I1, "Q1": Q1, "I2": I2, "Q2": Q2})
 
@@ -84,15 +97,96 @@ def rabi_plot(sweep_time, num_steps, values, qubit_num=1):
     Irange = abs(np.max(I) - np.min(I))
     if Qrange > Irange:
         times = np.linspace(0, sweep_time / 1000, num_steps)
-        pi_ge_fit_vals, _, _, _ = fitfuncs.fit_sine_decay(
+        pi_ge_fit_vals, _, _, _ = analysis.fit_sine_decay(
             times, Q, guess_vals=[11, 0.3, np.abs(np.max(Q) - np.min(Q)), 38, Q[0]]
         )
         pi_ge = abs((1 / 2 / pi_ge_fit_vals[0]) * 1000)
         print("\u03C0_ge time = {} ns".format(pi_ge))
     else:
         times = np.linspace(0, sweep_time / 1000, num_steps)
-        pi_ge_fit_vals, _, _, _ = fitfuncs.fit_sine_decay(
+        pi_ge_fit_vals, _, _, _ = analysis.fit_sine_decay(
             times, I, guess_vals=[11, 0.3, np.abs(np.max(I) - np.min(I)), 38, I[0]]
         )
         pi_ge = abs((1 / 2 / pi_ge_fit_vals[0]) * 1000)
         print("\u03C0_ge time = {} ns".format(pi_ge))
+
+
+
+def gaussian(x, mu, std, A):
+    """Gaussian function for curve fitting."""
+    return A * np.exp(-((x - mu) ** 2) / (2 * std**2))
+
+def fit_gaussian(data, bins):
+    """Fit a Gaussian to the data and return mu, std, and the fit curve."""
+    counts, bin_edges = np.histogram(data, bins=bins)
+    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+    p0 = [np.mean(data), np.std(data), np.max(counts)]  # Initial guess for mu, std, A
+    popt, _ = curve_fit(gaussian, bin_centers, counts, p0=p0)
+    return popt[0], popt[1], gaussian(bin_centers, *popt)  # mu, std, fit curve
+
+def plot_IQ_histograms(readout_vs_pats, qubit_num):
+    """
+    Plot I vs Q histograms for both ground (g) and excited (e) states on the same plot.
+    Returns fit parameters (mu, std) for each distribution.
+    """
+    # Unpack the data
+    I_g = readout_vs_pats[0, :, 0]  # I ground state
+    I_e = readout_vs_pats[0, :, 1]  # I excited state
+    Q_g = readout_vs_pats[1, :, 0]  # Q ground state
+    Q_e = readout_vs_pats[1, :, 1]  # Q excited state
+
+    # Create figure and axes
+    fig, axs = plt.subplots(1, 2, figsize=(12, 4), dpi=150)
+
+    # Plot I histograms
+    axs[0].hist(I_g, bins=200, histtype='step', label=f'I{qubit_num} (g)', color='blue')
+    axs[0].hist(I_e, bins=200, histtype='step', label=f'I{qubit_num} (e)', color='red')
+    axs[0].set_title(f"Qubit {qubit_num} I-channel Histogram")
+    axs[0].set_xlabel("I Value")
+    axs[0].set_ylabel("Counts")
+    axs[0].legend()
+
+    # Plot Q histograms
+    axs[1].hist(Q_g, bins=200, histtype='step', label=f'Q{qubit_num} (g)', color='blue')
+    axs[1].hist(Q_e, bins=200, histtype='step', label=f'Q{qubit_num} (e)', color='red')
+    axs[1].set_title(f"Qubit {qubit_num} Q-channel Histogram")
+    axs[1].set_xlabel("Q Value")
+    axs[1].set_ylabel("Counts")
+    axs[1].legend()
+
+    plt.tight_layout()
+    plt.show()
+
+    # Fit Gaussians to the data
+    mu_I_g, std_I_g, _ = fit_gaussian(I_g, bins=200)
+    mu_I_e, std_I_e, _ = fit_gaussian(I_e, bins=200)
+    mu_Q_g, std_Q_g, _ = fit_gaussian(Q_g, bins=200)
+    mu_Q_e, std_Q_e, _ = fit_gaussian(Q_e, bins=200)
+
+    # Return fit parameters
+    fit_params = {
+        'I_g': {'mu': mu_I_g, 'std': std_I_g},
+        'I_e': {'mu': mu_I_e, 'std': std_I_e},
+        'Q_g': {'mu': mu_Q_g, 'std': std_Q_g},
+        'Q_e': {'mu': mu_Q_e, 'std': std_Q_e},
+    }
+    return fit_params
+
+def calculate_SNR(fit_params):
+    """
+    Calculate the Signal-to-Noise Ratio (SNR) using the fit parameters.
+    """
+    mu_I_g = fit_params['I_g']['mu']
+    mu_I_e = fit_params['I_e']['mu']
+    mu_Q_g = fit_params['Q_g']['mu']
+    mu_Q_e = fit_params['Q_e']['mu']
+    std_I_g = fit_params['I_g']['std']
+    std_I_e = fit_params['I_e']['std']
+    std_Q_g = fit_params['Q_g']['std']
+    std_Q_e = fit_params['Q_e']['std']
+
+    signal = np.sqrt((mu_I_g - mu_I_e)**2 + (mu_Q_g - mu_Q_e)**2)
+    noise = (np.abs(std_I_g) + np.abs(std_I_e) + np.abs(std_Q_g) + np.abs(std_Q_e)) / 4
+    SNR = signal / noise
+    return SNR
+
