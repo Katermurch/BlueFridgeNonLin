@@ -158,7 +158,6 @@ def rabi_ef(
 
     ## channels
     pi_ge = qubit_rabi.ge_time
-    pi_ef = qubit_rabi.ef_time
     ef_amp = qubit_rabi.ef_amp
     ge_amp = qubit_rabi.ge_amp
     ssm_ge = qubit_rabi.ge_ssm
@@ -167,11 +166,11 @@ def rabi_ef(
     ROIF2 = qubit2.ro_freq - qubit_rabi.RO_LO
     readout_dur = qubit_rabi.ro_dur
     phase_offset = gen_vals["mixer_offset"]
-    buffer = 50
+    buffer = 0
 
     # Pi ge amp
     pi_ge_pulse = Pulse(
-        start=file_length - readout_dur - buffer,
+        start=file_length - readout_dur - 100,  # the 100 is the match the buffer below
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -186,7 +185,9 @@ def rabi_ef(
     )
     # drive rabi e-f
     rabi_ef = Pulse(
-        start=file_length - readout_dur - buffer,
+        start=file_length
+        - readout_dur
+        - 100,  # buffer here to make sure rabi doesnt bleed into readout
         duration=0,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
@@ -199,18 +200,6 @@ def rabi_ef(
         stop=-sweep_time,
         initial_pulse=rabi_ef,
     )
-
-    # # second pi_ge-pulse
-    # pi_ge_pulse = Pulse(
-    #     start=file_length - readout_dur - buffer,
-    #     duration=-pi_ge,
-    #     amplitude=ge_amp,
-    #     ssm_freq=ssm_ge,
-    #     phase=0,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=4, sweep_name="none", initial_pulse=pi_ge_pulse
-    # )
 
     # Rabi Qubit Readout
 
@@ -246,9 +235,7 @@ def rabi_ef(
 
     ## view output
     if True:
-        channel1_ch = ringupdown_seq.channel_list[0][
-            0
-        ]  # [channel name -1][0:channel, 1:marker 1, 2:marker 2]
+        channel1_ch = ringupdown_seq.channel_list[0][0]
         channel2_ch = ringupdown_seq.channel_list[1][0]
         channel3_ch = ringupdown_seq.channel_list[2][0]
         channel4_ch = ringupdown_seq.channel_list[3][0]

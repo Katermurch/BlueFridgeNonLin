@@ -7,8 +7,8 @@ q1_dict = {
     "qubit_id": "q1",
     "ro_freq": 6.727420,
     "ge_ssm": -0.114,
-    "ef_ssm": -0.186,
-    "ge_time":  66.625,
+    "ef_ssm": -0.1859,
+    "ge_time":  66.83921813916868,
     "ef_time": 77,
     "ge_amp": .5,
     "ef_amp":1,
@@ -21,7 +21,7 @@ q2_dict = {
     "ro_freq": 6.6556,
     "ge_ssm": -0.154,
     "ef_ssm": -0.224,
-    "ge_time": 40.15374412400174,
+    "ge_time": 23.610582067254867,
     "ge_amp": 1,
     "ef_amp": 1,
     "IQ_angle": 85,
@@ -34,6 +34,7 @@ q3_dict = {
     "ge_amp": 1,
     "ef_amp": 1,
     "ro_amp": 0.4,
+    'RO_LO': 6.4804
 }
 q4_dict = {
     "qubit_id": "q4",
