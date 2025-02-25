@@ -7,7 +7,7 @@ q1_dict = {
     "qubit_id": "q1",
     "ro_freq": 6.727420,
     "ge_ssm": -0.114,
-    "ef_ssm": -0.1859,
+    "ef_ssm": -0.257,
     "ge_time":  66.83921813916868,
     "ef_time": 77,
     "ge_amp": .5,
@@ -54,7 +54,7 @@ q5_dict = {
 general_vals_dict = {
     "mixer_offset": 0,
     "mixer_offset_ef": 20,
-    "wx_amps": [1.0, 1, 0.5, 1],
+    "wx_amps": [1.0, .5, 1.9, 1], #maximum 1.9
     "coupler_off_value": 0.7,
     "wx_offs": [0.7, 0, 0, 0],
     "qubit_bnc": 4.6,

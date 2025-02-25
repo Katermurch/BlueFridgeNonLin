@@ -47,8 +47,8 @@ def rabi_ge(
     ## channels
     pi_ge = qubit_rabi.ge_time
     ge_amp = qubit_rabi.ge_amp
-    ROIF1 = qubit_rabi.ro_freq - qubit_rabi.RO_LO
-    ROIF2 = qubit2.ro_freq - qubit2.RO_LO
+    ROIF1 = qubit_rabi.ROIF
+    ROIF2 = qubit2.ROIF
     readout_dur = qubit_rabi.ro_dur
     phase_offset = gen_vals["mixer_offset"]
 
@@ -162,8 +162,8 @@ def rabi_ef(
     ge_amp = qubit_rabi.ge_amp
     ssm_ge = qubit_rabi.ge_ssm
     ssm_ef = qubit_rabi.ef_ssm
-    ROIF1 = qubit_rabi.ro_freq - qubit_rabi.RO_LO
-    ROIF2 = qubit2.ro_freq - qubit_rabi.RO_LO
+    ROIF1 = qubit_rabi.ROIF
+    ROIF2 = qubit2.ROIF
     readout_dur = qubit_rabi.ro_dur
     phase_offset = gen_vals["mixer_offset"]
     buffer = 0
