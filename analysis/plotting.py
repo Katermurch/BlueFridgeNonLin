@@ -135,33 +135,11 @@ def plot_IQ_histograms(readout_vs_pats, qubit_num):
     Q_g = readout_vs_pats[1, :, 0]  # Q ground state
     Q_e = readout_vs_pats[1, :, 1]  # Q excited state
 
-    # Create figure and axes
-    fig, axs = plt.subplots(1, 2, figsize=(12, 4), dpi=150)
-
-    # Plot I histograms
-    axs[0].hist(I_g, bins=200, histtype='step', label=f'I{qubit_num} (g)', color='blue')
-    axs[0].hist(I_e, bins=200, histtype='step', label=f'I{qubit_num} (e)', color='red')
-    axs[0].set_title(f"Qubit {qubit_num} I-channel Histogram")
-    axs[0].set_xlabel("I Value")
-    axs[0].set_ylabel("Counts")
-    axs[0].legend()
-
-    # Plot Q histograms
-    axs[1].hist(Q_g, bins=200, histtype='step', label=f'Q{qubit_num} (g)', color='blue')
-    axs[1].hist(Q_e, bins=200, histtype='step', label=f'Q{qubit_num} (e)', color='red')
-    axs[1].set_title(f"Qubit {qubit_num} Q-channel Histogram")
-    axs[1].set_xlabel("Q Value")
-    axs[1].set_ylabel("Counts")
-    axs[1].legend()
-
-    plt.tight_layout()
-    plt.show()
-
     # Fit Gaussians to the data
-    mu_I_g, std_I_g, _ = fit_gaussian(I_g, bins=200)
-    mu_I_e, std_I_e, _ = fit_gaussian(I_e, bins=200)
-    mu_Q_g, std_Q_g, _ = fit_gaussian(Q_g, bins=200)
-    mu_Q_e, std_Q_e, _ = fit_gaussian(Q_e, bins=200)
+    mu_I_g, std_I_g, fit_Ig = fit_gaussian(I_g, bins=200)
+    mu_I_e, std_I_e, fit_Ie = fit_gaussian(I_e, bins=200)
+    mu_Q_g, std_Q_g, fit_Qg = fit_gaussian(Q_g, bins=200)
+    mu_Q_e, std_Q_e, fit_Qe = fit_gaussian(Q_e, bins=200)
 
     # Return fit parameters
     fit_params = {
@@ -170,6 +148,34 @@ def plot_IQ_histograms(readout_vs_pats, qubit_num):
         'Q_g': {'mu': mu_Q_g, 'std': std_Q_g},
         'Q_e': {'mu': mu_Q_e, 'std': std_Q_e},
     }
+
+    # Create figure and axes
+    fig, axs = plt.subplots(1, 2, figsize=(12, 4), dpi=150)
+
+    # Plot I histograms
+    axs[0].hist(I_g, bins=200, histtype='step', label=f'I{qubit_num} (g)', color='blue')
+    axs[0].hist(I_e, bins=200, histtype='step', label=f'I{qubit_num} (e)', color='red')
+    axs[0].plot(I_g,fit_Ig,color='blue')
+    axs[0].plot(I_e,fit_Ie,color='red')
+    axs[0].set_title(f"Qubit {qubit_num} I-channel Histogram")
+    axs[0].set_xlabel("I Value")
+    axs[0].set_ylabel("Counts")
+    axs[0].legend()
+
+    # Plot Q histograms
+    axs[1].hist(Q_g, bins=200, histtype='step', label=f'Q{qubit_num} (g)', color='blue')
+    axs[1].hist(Q_e, bins=200, histtype='step', label=f'Q{qubit_num} (e)', color='red')
+    axs[1].plot(Q_g,fit_Qg,color='blue')
+    axs[1].plot(Q_e,fit_Qe,color='red')
+    axs[1].set_title(f"Qubit {qubit_num} Q-channel Histogram")
+    axs[1].set_xlabel("Q Value")
+    axs[1].set_ylabel("Counts")
+    axs[1].legend()
+
+    plt.tight_layout()
+    plt.show()
+
+    
     return fit_params
 
 def calculate_SNR(fit_params):
