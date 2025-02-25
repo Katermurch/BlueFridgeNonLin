@@ -40,7 +40,7 @@ def parametric_coupling_time_domain(
     readout_amp1 = qubit1.ro_amp
     readout_amp2 = qubit2.ro_amp
     readout_dur = qubit1.ro_dur
-    pi_ge = qubit1.pi_ge
+    pi_ge = qubit1.ge_time
     ssm_ge = qubit1.ge_ssm
     ROIF1 = qubit1.ROIF
     ROIF2 = qubit2.ROIF
