@@ -10,6 +10,7 @@ def parametric_coupling_time_domain(
     ssm_para=0,
     spec_amp=0.5,
     sweep_time=0,
+    phase = 0,
     verbose=True,
 ):
     """
@@ -68,7 +69,7 @@ def parametric_coupling_time_domain(
         duration=0,  # Initially zero, swept in time
         amplitude=spec_amp,
         ssm_freq=ssm_para,
-        phase=0,
+        phase=phase,
     )
     ringupdown_seq.add_sweep(
         channel=3,
