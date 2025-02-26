@@ -122,7 +122,7 @@ def fit_gaussian(data, bins):
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
     p0 = [np.mean(data), np.std(data), np.max(counts)]  # Initial guess for mu, std, A
     popt, _ = curve_fit(gaussian, bin_centers, counts, p0=p0)
-    return popt[0], popt[1], gaussian(bin_centers, *popt)  # mu, std, fit curve
+    return popt[0], popt[1], gaussian(bin_centers, *popt), bin_centers  # mu, std, fit curve
 
 def plot_IQ_histograms(readout_vs_pats, qubit_num):
     """
@@ -136,10 +136,10 @@ def plot_IQ_histograms(readout_vs_pats, qubit_num):
     Q_e = readout_vs_pats[1, :, 1]  # Q excited state
 
     # Fit Gaussians to the data
-    mu_I_g, std_I_g, fit_Ig = fit_gaussian(I_g, bins=200)
-    mu_I_e, std_I_e, fit_Ie = fit_gaussian(I_e, bins=200)
-    mu_Q_g, std_Q_g, fit_Qg = fit_gaussian(Q_g, bins=200)
-    mu_Q_e, std_Q_e, fit_Qe = fit_gaussian(Q_e, bins=200)
+    mu_I_g, std_I_g, fit_Ig ,bin_centers_Ig = fit_gaussian(I_g, bins=50)
+    mu_I_e, std_I_e, fit_Ie ,bin_centers_Ie  = fit_gaussian(I_e, bins=50)
+    mu_Q_g, std_Q_g, fit_Qg ,bin_centers_Qg = fit_gaussian(Q_g, bins=50)
+    mu_Q_e, std_Q_e, fit_Qe ,bin_centers_Qe = fit_gaussian(Q_e, bins=50)
 
     # Return fit parameters
     fit_params = {
@@ -155,8 +155,8 @@ def plot_IQ_histograms(readout_vs_pats, qubit_num):
     # Plot I histograms
     axs[0].hist(I_g, bins=200, histtype='step', label=f'I{qubit_num} (g)', color='blue')
     axs[0].hist(I_e, bins=200, histtype='step', label=f'I{qubit_num} (e)', color='red')
-    axs[0].plot(I_g,fit_Ig,color='blue')
-    axs[0].plot(I_e,fit_Ie,color='red')
+    axs[0].plot(bin_centers_Ig,fit_Ig,color='blue')
+    axs[0].plot(bin_centers_Ie,fit_Ie,color='red')
     axs[0].set_title(f"Qubit {qubit_num} I-channel Histogram")
     axs[0].set_xlabel("I Value")
     axs[0].set_ylabel("Counts")
@@ -165,8 +165,8 @@ def plot_IQ_histograms(readout_vs_pats, qubit_num):
     # Plot Q histograms
     axs[1].hist(Q_g, bins=200, histtype='step', label=f'Q{qubit_num} (g)', color='blue')
     axs[1].hist(Q_e, bins=200, histtype='step', label=f'Q{qubit_num} (e)', color='red')
-    axs[1].plot(Q_g,fit_Qg,color='blue')
-    axs[1].plot(Q_e,fit_Qe,color='red')
+    axs[1].plot(bin_centers_Qg,fit_Qg,color='blue')
+    axs[1].plot(bin_centers_Qe,fit_Qe,color='red')
     axs[1].set_title(f"Qubit {qubit_num} Q-channel Histogram")
     axs[1].set_xlabel("Q Value")
     axs[1].set_ylabel("Counts")

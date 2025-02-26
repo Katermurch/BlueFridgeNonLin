@@ -32,7 +32,7 @@ def pi_nopi_ge(
 
     # channel 4 is for qubit control
     rabi_ge = Pulse(
-        start=file_length - readout_dur - coef * pi_ge,
+        start=file_length - readout_dur,
         duration=pi_ge * coef,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -369,9 +369,9 @@ def pi_nopi_swap(
     swap = Pulse(
         start=file_length - readout_dur,
         duration=-swap_time * coswap,
-        amplitude=1.7,
+        amplitude=1.8,
         ssm_freq=swap_freq,
-        phase=0,
+        phase=215,
     )
     ringupdown_seq.add_sweep(channel=3, sweep_name="none", initial_pulse=swap)
 
