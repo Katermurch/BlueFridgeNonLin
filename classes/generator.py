@@ -44,7 +44,7 @@ class Pulse:
             self.phase = phase
         else:
             self.ssm_bool = False
-        # self.waveform = self.make() ## make is currently not working.
+        #self.waveform = self.make() ## make is currently not working.
 
         # FUTURE FEATURES:
         self.gaussian_bool = gaussian_bool
@@ -738,16 +738,6 @@ def gen_pulse(dest_wave, pulse):
 
 
 # END gen_pulse
-
-
-def some_Fun():
-    """
-    DESCRIPTION:
-    INPUT:
-    OUTPUT:
-    TODO:
-    """
-    pass
 
 
 def create_gate(seq_matrix, width=5):
