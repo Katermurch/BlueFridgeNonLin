@@ -88,6 +88,88 @@ def spectroscopy_plot(
     plt.tight_layout()
     plt.show()
 
+def mod_spectroscopy_plot(
+    freq_list: list, values: dict, vert_line_value: list = None
+):
+    """
+    For a givencoupler spectroscopy, plot the IQ values on side-by-side subplots with optional vertical lines.
+
+    Args:
+        freq_list: list of frequencies used in spectroscopy.
+        values: dictionary from readout.
+        vert_line_value: optional list with two values. The first is the vertical line position for the I channel,
+                         and the second is for the Q channel.
+        qubit_num: qubit number to run spectroscopy on.
+    """
+    IQ_vals = get_IQ_averages(values)
+    IQ_vals["freq"] = freq_list
+
+    # Create a figure with two side-by-side subplots
+    fig, axs = plt.subplots(2, 2, figsize=(12, 8), dpi=150)
+
+    # Plot the I channel on the first subplot
+    sns.lineplot(data=IQ_vals, x="freq", y=f"I{1}", ax=axs[0,0])
+    axs[0,0].set_title(f"Qubit {1} I-channel")
+    axs[0,0].set_xlabel("Frequency")
+    axs[0,0].set_ylabel("I Value")
+
+    # Optionally add a vertical line to the I channel plot
+    if vert_line_value[0] is not None and len(vert_line_value) > 0:
+        axs[0,0].axvline(
+            x=vert_line_value[0],
+            color="red",
+            linestyle="--",
+            label=f"ssm = {vert_line_value[0]}",
+        )
+
+    # Plot the Q channel on the second subplot
+    sns.lineplot(data=IQ_vals, x="freq", y=f"Q{1}", ax=axs[1,0])
+    axs[1,0].set_title(f"Qubit {1} Q-channel")
+    axs[1,0].set_xlabel("Frequency")
+    axs[1,0].set_ylabel("Q Value")
+
+    # Optionally add a vertical line to the Q channel plot
+    if vert_line_value[1] is not None and len(vert_line_value) > 0:
+        axs[1,0].axvline(
+            x=vert_line_value[1],
+            color="red",
+            linestyle="--",
+            label=f"ssm = {vert_line_value[1]}",
+        )
+
+    # Plot the I channel on the first subplot
+    sns.lineplot(data=IQ_vals, x="freq", y=f"I{2}", ax=axs[0,1])
+    axs[0,1].set_title(f"Qubit {2} I-channel")
+    axs[0,1].set_xlabel("Frequency")
+    axs[0,1].set_ylabel("I Value")
+
+    # Optionally add a vertical line to the I channel plot
+    if vert_line_value[0] is not None and len(vert_line_value) > 0:
+        axs[0,1].axvline(
+            x=vert_line_value[0],
+            color="red",
+            linestyle="--",
+            label=f"ssm = {vert_line_value[0]}",
+        )
+
+    # Plot the Q channel on the second subplot
+    sns.lineplot(data=IQ_vals, x="freq", y=f"Q{2}", ax=axs[1,1])
+    axs[1,1].set_title(f"Qubit {2} Q-channel")
+    axs[1,1].set_xlabel("Frequency")
+    axs[1,1].set_ylabel("Q Value")
+
+    # Optionally add a vertical line to the Q channel plot
+    if vert_line_value[1] is not None and len(vert_line_value) > 1:
+        axs[1,1].axvline(
+            x=vert_line_value[1],
+            color="red",
+            linestyle="--",
+            label=f"ssm = {vert_line_value[1]}",
+        )
+
+    plt.tight_layout()
+    plt.show()
+
 
 def rabi_plot(sweep_time, num_steps, values, qubit_num=1):
     IQ_data = get_IQ_averages(values)

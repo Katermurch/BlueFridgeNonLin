@@ -331,6 +331,7 @@ def pi_nopi_swap(
     num_steps=3,
     swap_freq=0,
     swap_time=60,
+    phase = 0,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
     file_length = 16000
     num_steps = num_steps
@@ -371,7 +372,7 @@ def pi_nopi_swap(
         duration=-swap_time * coswap,
         amplitude=1.8,
         ssm_freq=swap_freq,
-        phase=215,
+        phase=phase,
     )
     ringupdown_seq.add_sweep(channel=3, sweep_name="none", initial_pulse=swap)
 
