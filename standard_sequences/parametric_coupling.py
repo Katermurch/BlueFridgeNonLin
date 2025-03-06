@@ -10,7 +10,7 @@ def parametric_coupling_time_domain(
     ssm_para=0,
     spec_amp=0.5,
     sweep_time=0,
-    phase = 0,
+    phase=0,
     verbose=True,
 ):
     """

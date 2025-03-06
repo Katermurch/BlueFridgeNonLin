@@ -254,7 +254,7 @@ def mod_spectroscopy(
     mod_start=-0.15,
     mod_stop=-0.25,
     spec_amp=0.5,
-    phase = 0,
+    phase=0,
     sweep_time=200,
     verbose=True,
 ):
@@ -308,7 +308,6 @@ def mod_spectroscopy(
         stop=mod_stop,
         initial_pulse=swap,
     )
-
 
     ## Readout pulses for Q1 and Q2
     main_pulse_q1 = Pulse(

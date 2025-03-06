@@ -35,7 +35,7 @@ def rabi_ef_swap(
     buffer = 0
 
     # first pi_ge pulse
-    
+
     pi_ge_pulse = Pulse(
         start=file_length - readout_dur - buffer - swap_time,
         duration=-pi_ge,
@@ -138,6 +138,7 @@ def rabi_ef_swap(
         ch_amp=[1, 1, 1, 1],
     )
 
+
 def rabi_ef_swap_f(
     qubit_rabi: object,
     qubit2: object,
@@ -167,9 +168,9 @@ def rabi_ef_swap_f(
     buffer = 0
 
     # first pi_ge pulse
-    
+
     pi_ge_pulse = Pulse(
-        start=file_length - readout_dur - buffer - swap_time-pi_ef,
+        start=file_length - readout_dur - buffer - swap_time - pi_ef,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
