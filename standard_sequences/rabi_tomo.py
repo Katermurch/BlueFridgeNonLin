@@ -40,12 +40,18 @@ def rabi_ef_swap_tomo(
     if 'z' == tomo_comp:
         tomo_time = 0
     else:
-        tomo_time = qubit_rabi.ef_time + 5  # This adds a buffer for the tomography
-    a_to_J = ((2 * np.pi) / (2 * (2 * qubit_rabi.ef_time * 10**-3))) / 1.5
-    # if J is in units of rad/micros
-    J_to_a = 1 / a_to_J
-    ef_amp = drive_amp_J * J_to_a
-    qubit_rabi.ef_amp = ef_amp
+        tomo_time = qubit_rabi.ef_time/2  # This adds a buffer for the tomography
+    
+    ###########
+
+    #comment this back in when we have found EP
+
+    ##########
+    # a_to_J = ((2 * np.pi) / (2 * (2 * qubit_rabi.ef_time * 10**-3))) / 1.5
+    # # if J is in units of rad/micros
+    # J_to_a = 1 / a_to_J
+    # ef_amp = drive_amp_J * J_to_a
+    # qubit_rabi.ef_amp = ef_amp
 
     # first pi_ge pulse
 
@@ -98,8 +104,8 @@ def rabi_ef_swap_tomo(
     elif tomo_comp == "x":
         tomo_pulse = Pulse(
             start=file_length - readout_dur - buffer - swap_time,
-            duration=qubit_rabi.ef_time,
-            amplitude=ef_amp / 2,
+            duration=-qubit_rabi.ef_time/2,
+            amplitude=ef_amp ,
             ssm_freq=ssm_ef,
             phase=0,
         )
@@ -107,10 +113,10 @@ def rabi_ef_swap_tomo(
     elif tomo_comp == "y":
         tomo_pulse = Pulse(
             start=file_length - readout_dur - buffer - swap_time,
-            duration=qubit_rabi.ef_time,
-            amplitude=ef_amp / 2,
+            duration=-qubit_rabi.ef_time/2,
+            amplitude=ef_amp,
             ssm_freq=ssm_ef,
-            phase=90,
+            phase=65,
         )
         ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=tomo_pulse)
     else:
