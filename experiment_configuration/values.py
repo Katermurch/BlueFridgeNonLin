@@ -6,12 +6,12 @@ readout_dict = {
 q1_dict = {
     "qubit_id": "q1",
     "ro_freq": 6.72745,
-    "ge_ssm": -0.114,
-    "ef_ssm": -0.259,
-    "ge_time":  67.19789394714729,
-    "ef_time": 74.1982640369346,
-    "ge_amp": .5,#.5
-    "ef_amp":.5,
+    "ge_ssm": -0.1145,
+    "ef_ssm": -0.2568,
+    "ge_time": 81.17534608287957,
+    "ef_time": 49.13671850689116,
+    "ge_amp": .8,#.5
+    "ef_amp":1.5,
     "IQ_angle": 205,
     "ro_amp": 1,
     "qubit_thr": [-10000,-600],
@@ -22,7 +22,7 @@ q2_dict = {
     "ge_ssm": -0.154,
     "ef_ssm": -0.2962,
     "ge_time": 45.047198597262124,
-    "ge_amp": 0.5,
+    "ge_amp": 0.8,
     "ef_amp": 1,
     "IQ_angle": 85,
     "ro_amp": 1.5,
@@ -54,7 +54,7 @@ q5_dict = {
 general_vals_dict = {
     "mixer_offset": 0,
     "mixer_offset_ef": 20,
-    "wx_amps": [1.0, .2, 1.9, 1], #maximum 1.9
+    "wx_amps": [1.0, .2, 1.95, .5], #maximum 1.9
     "coupler_off_value": 0.7,
     "wx_offs": [0.7, 0, 0, 0],
     "qubit_bnc": 4.6,
@@ -66,6 +66,6 @@ bnc_address = {
     "big_agilent": "GPIB0::30::INSTR",
     "agilent_function_generator": 'GPIB0::30::INSTR',
     "target_bnc_6":"USB0::0x03EB::0xAFFF::411-433500000-0753::INSTR",
-    "wx_address": '128.252.134.31'
+    "wx_address": '128.252.134.31',
 
 }
