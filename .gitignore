@@ -2,6 +2,9 @@
 *.csv
 *.pkl
 
+
+# But track this specific model
+!classifiers/lgb.pkl
 # Ignore specific folders (if needed)
 classifiers/training_and_test_data/*.csv
 sweep_J_data/values/*.pkl
