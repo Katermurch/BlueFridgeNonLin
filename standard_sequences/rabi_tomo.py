@@ -99,7 +99,7 @@ def rabi_ef_swap_tomo(
         tomo_pulse = Pulse(
             start=file_length - readout_dur - buffer - swap_time,
             duration=qubit_rabi.ef_time,
-            amplitude=ef_amp / 2,
+            amplitude=qubit_rabi.ef_amp / 2,
             ssm_freq=ssm_ef,
             phase=0,
         )
@@ -108,7 +108,7 @@ def rabi_ef_swap_tomo(
         tomo_pulse = Pulse(
             start=file_length - readout_dur - buffer - swap_time,
             duration=qubit_rabi.ef_time,
-            amplitude=ef_amp / 2,
+            amplitude=qubit_rabi.ef_amp / 2,
             ssm_freq=ssm_ef,
             phase=90,
         )
