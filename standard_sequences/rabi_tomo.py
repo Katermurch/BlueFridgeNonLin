@@ -67,7 +67,7 @@ def rabi_ef_swap_tomo(
         start=file_length - readout_dur - buffer - swap_time - tomo_time,
         duration=-pi_ef,
         amplitude=ef_amp,
-        ssm_freq=ssm_ge,
+        ssm_freq=ssm_ef,
         phase=0,
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
