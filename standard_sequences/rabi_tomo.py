@@ -40,7 +40,7 @@ def rabi_ef_swap_tomo(
     if 'z' == tomo_comp:
         tomo_time = 0
     else:
-        tomo_time = qubit_rabi.ef_time + 5  # This adds a buffer for the tomography
+        tomo_time = qubit_rabi.ef_time/2 + 5  # This adds a buffer for the tomography
     a_to_J = ((2 * np.pi) / (2 * (2 * qubit_rabi.ef_time * 10**-3))) / 1.5
     # if J is in units of rad/micros
     J_to_a = 1 / a_to_J
@@ -98,8 +98,8 @@ def rabi_ef_swap_tomo(
     elif tomo_comp == "x":
         tomo_pulse = Pulse(
             start=file_length - readout_dur - buffer - swap_time,
-            duration=qubit_rabi.ef_time,
-            amplitude=qubit_rabi.ef_amp / 2,
+            duration=qubit_rabi.ef_time/2,
+            amplitude=qubit_rabi.ef_amp,
             ssm_freq=ssm_ef,
             phase=0,
         )
@@ -107,8 +107,8 @@ def rabi_ef_swap_tomo(
     elif tomo_comp == "y":
         tomo_pulse = Pulse(
             start=file_length - readout_dur - buffer - swap_time,
-            duration=qubit_rabi.ef_time,
-            amplitude=qubit_rabi.ef_amp / 2,
+            duration=qubit_rabi.ef_time/2,
+            amplitude=qubit_rabi.ef_amp,
             ssm_freq=ssm_ef,
             phase=90,
         )
