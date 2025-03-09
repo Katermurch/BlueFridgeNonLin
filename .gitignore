@@ -1,6 +1,7 @@
 # Ignore all CSV and PKL files
 *.csv
 *.pkl
+*.txt
 
 
 # But track this specific model
