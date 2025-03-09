@@ -350,10 +350,10 @@ def pi_nopi_swap(
     pi_ef = q1.ef_time
     pi_ge = q1.ge_time
     ef_amp = q1.ef_amp
-
+    buffer = 500
     readout_dur = q1.ro_dur
     pi_ge_pulse = Pulse(
-        start=file_length - readout_dur - copief * pi_ef - coswap * swap_time,
+        start=file_length - readout_dur - copief * pi_ef - coswap * swap_time-buffer,
         duration=-pi_ge * copige,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -361,7 +361,7 @@ def pi_nopi_swap(
     )
     ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=pi_ge_pulse)
     pi_ef_pulse = Pulse(
-        start=file_length - readout_dur - coswap * swap_time,
+        start=file_length - readout_dur - coswap * swap_time-buffer,
         duration=-pi_ef * copief,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
@@ -370,7 +370,7 @@ def pi_nopi_swap(
     ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=pi_ef_pulse)
 
     swap = Pulse(
-        start=file_length - readout_dur,
+        start=file_length - readout_dur-buffer,
         duration=-swap_time * coswap,
         amplitude=swap_amp,
         ssm_freq=swap_freq,
@@ -382,7 +382,7 @@ def pi_nopi_swap(
 
     # HET
     main_pulse = Pulse(
-        start=file_length - readout_dur,
+        start=file_length - readout_dur-buffer,
         duration=readout_dur,
         amplitude=readout_amp_1,
         ssm_freq=ROIF1,
@@ -392,7 +392,7 @@ def pi_nopi_swap(
 
     # Q2 Readout
     main_pulse = Pulse(
-        start=file_length - readout_dur,
+        start=file_length - readout_dur-buffer,
         duration=readout_dur,
         amplitude=readout_amp_2,
         ssm_freq=ROIF2,
@@ -401,7 +401,7 @@ def pi_nopi_swap(
     ringupdown_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse)
     ## markers
     alazar_trigger = Pulse(
-        start=file_length - readout_dur - 1000, duration=1000, amplitude=1
+        start=file_length - readout_dur-buffer - 1000, duration=1000, amplitude=1
     )
     ringupdown_seq.add_sweep(
         channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger

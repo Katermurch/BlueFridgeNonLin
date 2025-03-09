@@ -46,10 +46,11 @@ def parametric_coupling_time_domain(
     ROIF1 = qubit1.ROIF
     ROIF2 = qubit2.ROIF
     phase_offset = gen_vals["mixer_offset"]
+    buffer=500
 
     # Apply π pulse on the selected qubit
     pi_ge_pulse = Pulse(
-        start=file_length - readout_dur,
+        start=file_length - readout_dur-buffer,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -65,7 +66,7 @@ def parametric_coupling_time_domain(
 
     # Apply parametric drive with duration sweep
     parametric_drive = Pulse(
-        start=file_length - readout_dur,
+        start=file_length - readout_dur-buffer,
         duration=0,  # Initially zero, swept in time
         amplitude=spec_amp,
         ssm_freq=ssm_para,
@@ -81,7 +82,7 @@ def parametric_coupling_time_domain(
 
     # Readout pulses for both qubits
     readout_pulse_q1 = Pulse(
-        start=file_length - readout_dur,
+        start=file_length - readout_dur-buffer,
         duration=readout_dur,
         amplitude=readout_amp1,
         ssm_freq=ROIF1,
@@ -92,7 +93,7 @@ def parametric_coupling_time_domain(
     )
 
     readout_pulse_q2 = Pulse(
-        start=file_length - readout_dur,
+        start=file_length - readout_dur-buffer,
         duration=readout_dur,
         amplitude=readout_amp2,
         ssm_freq=ROIF2,
@@ -104,7 +105,7 @@ def parametric_coupling_time_domain(
 
     # Trigger for Alazar data acquisition
     alazar_trigger = Pulse(
-        start=file_length - readout_dur - 1000, duration=1000, amplitude=1
+        start=file_length - readout_dur - 1000-buffer, duration=1000, amplitude=1
     )
     ringupdown_seq.add_sweep(
         channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger

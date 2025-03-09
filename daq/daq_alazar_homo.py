@@ -485,7 +485,7 @@ def acquire_data_het_2q(daq_params, alazar_params, board, ssm_if_1=-0.04, ssm_if
             # print("\n")
             # print(buffers[2].addr)
             # print("\nb")
-            board.waitAsyncBufferComplete(buffer.addr, timeout_ms=5000) #5000
+            board.waitAsyncBufferComplete(buffer.addr, timeout_ms=6000) #5000
             #print("bb")#timeout_ms = 5000 earlier
             #print("\nc")
             buffersCompleted += 1

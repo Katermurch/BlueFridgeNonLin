@@ -3,13 +3,18 @@ readout_dict = {
     "RO_LO_pwr": 16,
     "ro_dur": 4000,
 }
+swap_gate = {
+    'swap_freq': 0,
+    'swap_amp': 0,
+    'swap_time': 0,
+}
 q1_dict = {
     "qubit_id": "q1",
     "ro_freq": 6.72745,
     "ge_ssm": -0.1145,
     "ef_ssm": -0.25684,
-    "ge_time": 80.7564244023277,
-    "ef_time": 49.34842949889268,
+    "ge_time": 81.06104804214716 ,
+    "ef_time": 48.99547631778931,
     "ge_amp": .8,#.5
     "ef_amp":1.5,
     "IQ_angle": 205,
@@ -54,7 +59,7 @@ q5_dict = {
 general_vals_dict = {
     "mixer_offset": 0,
     "mixer_offset_ef": 20,
-    "wx_amps": [1.0, .2, 1.95, .5], #maximum 1.9
+    "wx_amps": [1.0, .2, 1.7, .5], #maximum 1.9
     "coupler_off_value": 0.7,
     "wx_offs": [0.7, 0, 0, 0],
     "qubit_bnc": 4.6,
