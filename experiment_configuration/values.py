@@ -1,7 +1,7 @@
 readout_dict = {
     "RO_LO": 6.6247,
     "RO_LO_pwr": 16,
-    "ro_dur": 4000,
+    "ro_dur": 5000,
 }
 swap_gate = {
     'swap_freq': 0,
@@ -10,24 +10,24 @@ swap_gate = {
 }
 q1_dict = {
     "qubit_id": "q1",
-    "ro_freq": 6.72745,
-    "ge_ssm": -0.1145,
-    "ef_ssm": -0.25684,
-    "ge_time": 81.06104804214716 ,
-    "ef_time": 48.99547631778931,
-    "ge_amp": .8,#.5
-    "ef_amp":1.5,
+    "ro_freq": 6.72739,
+    "ge_ssm": -0.1144,
+    "ef_ssm": -0.2568,
+    "ge_time": 81,
+    "ef_time": 49,
+    "ge_amp": .82,#.5
+    "ef_amp":1.51,
     "IQ_angle": 205,
     "ro_amp": 1,
     "qubit_thr": [-10000,-600],
 }
 q2_dict = {
     "qubit_id": "q2",
-    "ro_freq": 6.6556,
+    "ro_freq": 6.65554,
     "ge_ssm": -0.154,
     "ef_ssm": -0.2962,
-    "ge_time": 45.047198597262124,
-    "ge_amp": 0.8,
+    "ge_time": 45,
+    "ge_amp": 0.82,
     "ef_amp": 1,
     "IQ_angle": 85,
     "ro_amp": 1.5,

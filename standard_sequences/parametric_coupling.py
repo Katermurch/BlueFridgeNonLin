@@ -46,7 +46,7 @@ def parametric_coupling_time_domain(
     ROIF1 = qubit1.ROIF
     ROIF2 = qubit2.ROIF
     phase_offset = gen_vals["mixer_offset"]
-    buffer=500
+    buffer=0
 
     # Apply π pulse on the selected qubit
     pi_ge_pulse = Pulse(
