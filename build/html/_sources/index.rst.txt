@@ -5,8 +5,13 @@
 
 BlueFridgeNonLin documentation
 ==============================
+Welcome to the BlueFridgeNonLin project. This is the documentation built for the blue fridge non-Hermitian 4+5 qubit setup when we are still using gpib and the wx.
+We are using the `Sphinx <https://www.sphinx-doc.org/en/master/>`_ documentation tool to build this documentation. This is our first step towards 
+object orientation and modularization of the code for multi qubit experiments. We are aiming to use qubit and gate objects to ensure
+that the code will be maintable, scalable to other experimental setups, and consistent across different experiments. 
 
-Add your content using ``reStructuredText`` syntax. See the
+
+Add more content using ``reStructuredText`` syntax. See the
 `reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
 documentation for details.
 
