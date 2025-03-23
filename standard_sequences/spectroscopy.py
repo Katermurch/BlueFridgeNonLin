@@ -6,7 +6,6 @@ sys.path.append(
 from classes.generator import *
 from hardware_control.wx_programs import *
 
-wx_addr = get_wx_address()
 
 
 def spectroscopy_ge(

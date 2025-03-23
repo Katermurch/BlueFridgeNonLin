@@ -9,29 +9,32 @@ classes.Nop\_class module
 
 .. automodule:: classes.Nop_class
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 classes.generator module
 ------------------------
 
 .. automodule:: classes.generator
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
+
 
 classes.qubit\_class module
 ---------------------------
 
 .. automodule:: classes.qubit_class
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------
 
 .. automodule:: classes
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
+

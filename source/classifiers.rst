@@ -9,13 +9,14 @@ classifiers.classifier module
 
 .. automodule:: classifiers.classifier
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------
 
 .. automodule:: classifiers
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
+
