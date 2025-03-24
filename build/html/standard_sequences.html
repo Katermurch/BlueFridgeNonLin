@@ -45,8 +45,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="standard_sequences.parametric_coupling.parametric_coupling_time_domain">
 <span class="sig-prename descclassname"><span class="pre">standard_sequences.parametric_coupling.</span></span><span class="sig-name descname"><span class="pre">parametric_coupling_time_domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">101</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssm_para</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec_amp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standard_sequences.parametric_coupling.parametric_coupling_time_domain" title="Link to this definition">¶</a></dt>
-<dd><p>Performs a time-domain parametric coupling experiment between qubits by applying
-a drive pulse and varying its duration.</p>
+<dd><p>Performs a time-domain parametric coupling experiment between qubits by
+applying a drive pulse and varying its duration.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -78,25 +78,27 @@ a drive pulse and varying its duration.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="standard_sequences.rabi.rabi_ef">
 <span class="sig-prename descclassname"><span class="pre">standard_sequences.rabi.</span></span><span class="sig-name descname"><span class="pre">rabi_ef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit_rabi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">51</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standard_sequences.rabi.rabi_ef" title="Link to this definition">¶</a></dt>
-<dd><p>This function should run the rabi ef sequence for a qubit, using the qubit's properties.
-:param qubit_rabi: this is the qubit you are performing the rabi on
-:type qubit_rabi: object
-:param qubit2: this qubit exists for homodyne readout
-:type qubit2: object
-:param readout: this object chooses ther readout parameters
-:type readout: object
-:param gen_vals: a dictionary of general values for readout and hardware control
-:type gen_vals: dict
-:param num_steps: _description_. Defaults to 51.
-:type num_steps: int, optional
-:param sweep_time: _description_. Defaults to 200.
-:type sweep_time: int, optional</p>
+<dd><p>This function should run the rabi ef sequence for a qubit, using the
+qubit's properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qubit_rabi</strong> (<em>object</em>) -- this is the qubit you are performing the rabi on</p></li>
+<li><p><strong>qubit2</strong> (<em>object</em>) -- this qubit exists for homodyne readout</p></li>
+<li><p><strong>readout</strong> (<em>object</em>) -- this object chooses ther readout parameters</p></li>
+<li><p><strong>gen_vals</strong> (<em>dict</em>) -- a dictionary of general values for readout and hardware control</p></li>
+<li><p><strong>num_steps</strong> (<em>int</em><em>, </em><em>optional</em>) -- _description_. Defaults to 51.</p></li>
+<li><p><strong>sweep_time</strong> (<em>int</em><em>, </em><em>optional</em>) -- _description_. Defaults to 200.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="standard_sequences.rabi.rabi_ge">
 <span class="sig-prename descclassname"><span class="pre">standard_sequences.rabi.</span></span><span class="sig-name descname"><span class="pre">rabi_ge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit_rabi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">101</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standard_sequences.rabi.rabi_ge" title="Link to this definition">¶</a></dt>
-<dd><p>This function should run the rabi ge sequence for a qubit, using the qubit's properties.</p>
+<dd><p>This function should run the rabi ge sequence for a qubit, using the
+qubit's properties.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -175,7 +177,8 @@ a drive pulse and varying its duration.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="standard_sequences.ramsey.ramsey_quantum_efficiency">
 <span class="sig-prename descclassname"><span class="pre">standard_sequences.ramsey.</span></span><span class="sig-name descname"><span class="pre">ramsey_quantum_efficiency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">101</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssm_ge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pi_ge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ROIF</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RO_ram_amp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standard_sequences.ramsey.ramsey_quantum_efficiency" title="Link to this definition">¶</a></dt>
-<dd><p>Performs a Ramsey experiment with an additional readout pulse to measure quantum efficiency.</p>
+<dd><p>Performs a Ramsey experiment with an additional readout pulse to measure
+quantum efficiency.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -236,7 +239,8 @@ a drive pulse and varying its duration.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="standard_sequences.spectroscopy.spectroscopy_ef">
 <span class="sig-prename descclassname"><span class="pre">standard_sequences.spectroscopy.</span></span><span class="sig-name descname"><span class="pre">spectroscopy_ef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssm_stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec_amp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standard_sequences.spectroscopy.spectroscopy_ef" title="Link to this definition">¶</a></dt>
-<dd><p>Performs EF spectroscopy for the qubit by sweeping over single sideband frequencies.</p>
+<dd><p>Performs EF spectroscopy for the qubit by sweeping over single sideband
+frequencies.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -256,7 +260,8 @@ a drive pulse and varying its duration.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="standard_sequences.spectroscopy.spectroscopy_ge">
 <span class="sig-prename descclassname"><span class="pre">standard_sequences.spectroscopy.</span></span><span class="sig-name descname"><span class="pre">spectroscopy_ge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubit1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssm_stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec_amp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#standard_sequences.spectroscopy.spectroscopy_ge" title="Link to this definition">¶</a></dt>
-<dd><p>This function does the ef spectroscopy for the qubit by running over single sideband frequencies</p>
+<dd><p>This function does the ef spectroscopy for the qubit by running over single
+sideband frequencies.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

@@ -16,8 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # =========================================================================
-
-'''tewx -- Tabor-Electronics WX-Instruments Controller (Without VISA-NI)
+"""tewx -- Tabor-Electronics WX-Instruments Controller (Without VISA-NI)
 
 Please refer to our website's tutorials section under MATLAB/How To Manage Tabor AWG's Memory.
 Where you will find detailed information of how to use all binary data transfer SCPI commands.
@@ -27,310 +26,309 @@ Where you will find detailed information of how to use all binary data transfer 
 @license:    GPL
 @copyright:  2016 Tabor-Electronics Ltd.
 @contact:    <http://www.taborelec.com/>
-'''
+"""
 from __future__ import print_function
 from builtins import input, str
-#import sys
+
+# import sys
 import socket
 import struct
 import copy
 import numpy as np
 import warnings
 
-#import os
-#import sys
+# import os
+# import sys
 import time
 import posixpath
-#import unicodedata
 
-#try:
+# import unicodedata
+
+# try:
 import usbtmc
+
 _usbtmc_supported = True
 
 import usb
-#except:
+
+# except:
 #    _usbtmc_supported = False
 
-__version__    = '1.0.1'
-__revision__   = '$Rev: 3512 $'
-__docformat__  = 'reStructuredText'
+__version__ = "1.0.1"
+__revision__ = "$Rev: 3512 $"
+__docformat__ = "reStructuredText"
 
-__all__ = [ 'get_device_properties', 'list_usb_devices', 'TEWXAwg']
+__all__ = ["get_device_properties", "list_usb_devices", "TEWXAwg"]
 
 
 # WX2184 Properties
 _wx2184_properties = {
-    'model_name'      : 'WX2184', # the model name
-    'num_parts'       : 2,        # number of instrument parts
-    'chan_per_part'   : 2,        # number of channels per part
-    'seg_quantum'     : 16,       # segment-length quantum
-    'min_seg_len'     : 192,      # minimal segment length
-    'max_arb_mem'     : 32E6,     # maximal arbitrary-memory (points per channel)
-    'min_dac_val'     : 0,        # minimal DAC value
-    'max_dac_val'     : 2**14-1,  # maximal DAC value
-    'max_num_segs'    : 32E+3,    # maximal number of segments
-    'max_seq_len'     : 48*1024-2,# maximal sequencer-table length (# rows)
-    'min_seq_len'     : 3,        # minimal sequencer-table length (# rows)
-    'max_num_seq'     : 1000,     # maximal number of sequencer-table
-    'max_aseq_len'    : 48*1024-2,# maximal advanced-sequencer table length
-    'min_aseq_len'    : 2,        # minimal advanced-sequencer table length
-    'min_sclk'        : 75e6,     # minimal sampling-rate (samples/seconds)
-    'max_sclk'        : 2300e6,   # maximal sampling-rate (samples/seconds)
-    'digital_support' : False,    # is digital-wave supported?
-    }
+    "model_name": "WX2184",  # the model name
+    "num_parts": 2,  # number of instrument parts
+    "chan_per_part": 2,  # number of channels per part
+    "seg_quantum": 16,  # segment-length quantum
+    "min_seg_len": 192,  # minimal segment length
+    "max_arb_mem": 32e6,  # maximal arbitrary-memory (points per channel)
+    "min_dac_val": 0,  # minimal DAC value
+    "max_dac_val": 2**14 - 1,  # maximal DAC value
+    "max_num_segs": 32e3,  # maximal number of segments
+    "max_seq_len": 48 * 1024 - 2,  # maximal sequencer-table length (# rows)
+    "min_seq_len": 3,  # minimal sequencer-table length (# rows)
+    "max_num_seq": 1000,  # maximal number of sequencer-table
+    "max_aseq_len": 48 * 1024 - 2,  # maximal advanced-sequencer table length
+    "min_aseq_len": 2,  # minimal advanced-sequencer table length
+    "min_sclk": 75e6,  # minimal sampling-rate (samples/seconds)
+    "max_sclk": 2300e6,  # maximal sampling-rate (samples/seconds)
+    "digital_support": False,  # is digital-wave supported?
+}
 
 # WX1284 Definitions
 _wx1284_properties = {
-    'model_name'      : 'WX1284', # the model name
-    'num_parts'       : 2,        # number of instrument parts
-    'chan_per_part'   : 2,        # number of channels per part
-    'seg_quantum'     : 16,       # segment-length quantum
-    'min_seg_len'     : 192,      # minimal segment length
-    'max_arb_mem'     : 32E6,     # maximal arbitrary-memory (points per channel)
-    'min_dac_val'     : 0,        # minimal DAC value
-    'max_dac_val'     : 2**14-1,  # maximal DAC value
-    'max_num_segs'    : 32E+3,    # maximal number of segments
-    'max_seq_len'     : 48*1024-2,# maximal sequencer-table length (# rows)
-    'min_seq_len'     : 3,        # minimal sequencer-table length (# rows)
-    'max_num_seq'     : 1000,     # maximal number of sequencer-table
-    'max_aseq_len'    : 48*1024-2,# maximal advanced-sequencer table length
-    'min_aseq_len'    : 2,        # minimal advanced-sequencer table length
-    'min_sclk'        : 75e6,     # minimal sampling-rate (samples/seconds)
-    'max_sclk'        : 1250e6,   # maximal sampling-rate (samples/seconds)
-    'digital_support' : False,    # is digital-wave supported?
-    }
+    "model_name": "WX1284",  # the model name
+    "num_parts": 2,  # number of instrument parts
+    "chan_per_part": 2,  # number of channels per part
+    "seg_quantum": 16,  # segment-length quantum
+    "min_seg_len": 192,  # minimal segment length
+    "max_arb_mem": 32e6,  # maximal arbitrary-memory (points per channel)
+    "min_dac_val": 0,  # minimal DAC value
+    "max_dac_val": 2**14 - 1,  # maximal DAC value
+    "max_num_segs": 32e3,  # maximal number of segments
+    "max_seq_len": 48 * 1024 - 2,  # maximal sequencer-table length (# rows)
+    "min_seq_len": 3,  # minimal sequencer-table length (# rows)
+    "max_num_seq": 1000,  # maximal number of sequencer-table
+    "max_aseq_len": 48 * 1024 - 2,  # maximal advanced-sequencer table length
+    "min_aseq_len": 2,  # minimal advanced-sequencer table length
+    "min_sclk": 75e6,  # minimal sampling-rate (samples/seconds)
+    "max_sclk": 1250e6,  # maximal sampling-rate (samples/seconds)
+    "digital_support": False,  # is digital-wave supported?
+}
 
 # WX2182C Definitions
 _wx2182C_properties = {
-    'model_name'      : 'WX2182C',# the model name
-    'num_parts'       : 2,        # number of instrument parts
-    'chan_per_part'   : 1,        # number of channels per part
-    'seg_quantum'     : 16,       # segment-length quantum
-    'min_seg_len'     : 192,      # minimal segment length
-    'max_arb_mem'     : 32E6,     # maximal arbitrary-memory (points per channel)
-    'min_dac_val'     : 0,        # minimal DAC value
-    'max_dac_val'     : 2**14-1,  # maximal DAC value
-    'max_num_segs'    : 32E+3,    # maximal number of segments
-    'max_seq_len'     : 48*1024-2,# maximal sequencer-table length (# rows)
-    'min_seq_len'     : 3,        # minimal sequencer-table length (# rows)
-    'max_num_seq'     : 1000,     # maximal number of sequencer-table
-    'max_aseq_len'    : 48*1024-2,# maximal advanced-sequencer table length
-    'min_aseq_len'    : 2,        # minimal advanced-sequencer table length
-    'min_sclk'        : 10e6,     # minimal sampling-rate (samples/seconds)
-    'max_sclk'        : 2.3e9,    # maximal sampling-rate (samples/seconds)
-    'digital_support' : False,    # is digital-wave supported?
-    }
+    "model_name": "WX2182C",  # the model name
+    "num_parts": 2,  # number of instrument parts
+    "chan_per_part": 1,  # number of channels per part
+    "seg_quantum": 16,  # segment-length quantum
+    "min_seg_len": 192,  # minimal segment length
+    "max_arb_mem": 32e6,  # maximal arbitrary-memory (points per channel)
+    "min_dac_val": 0,  # minimal DAC value
+    "max_dac_val": 2**14 - 1,  # maximal DAC value
+    "max_num_segs": 32e3,  # maximal number of segments
+    "max_seq_len": 48 * 1024 - 2,  # maximal sequencer-table length (# rows)
+    "min_seq_len": 3,  # minimal sequencer-table length (# rows)
+    "max_num_seq": 1000,  # maximal number of sequencer-table
+    "max_aseq_len": 48 * 1024 - 2,  # maximal advanced-sequencer table length
+    "min_aseq_len": 2,  # minimal advanced-sequencer table length
+    "min_sclk": 10e6,  # minimal sampling-rate (samples/seconds)
+    "max_sclk": 2.3e9,  # maximal sampling-rate (samples/seconds)
+    "digital_support": False,  # is digital-wave supported?
+}
 
 # WX1282C Definitions
 _wx1282C_properties = {
-    'model_name'      : 'WX1282C',# the model name
-    'num_parts'       : 2,        # number of instrument parts
-    'chan_per_part'   : 1,        # number of channels per part
-    'seg_quantum'     : 16,       # segment-length quantum
-    'min_seg_len'     : 192,      # minimal segment length
-    'max_arb_mem'     : 32E6,     # maximal arbitrary-memory (points per channel)
-    'min_dac_val'     : 0,        # minimal DAC value
-    'max_dac_val'     : 2**14-1,  # maximal DAC value
-    'max_num_segs'    : 32E+3,    # maximal number of segments
-    'max_seq_len'     : 48*1024-2,# maximal sequencer-table length (# rows)
-    'min_seq_len'     : 3,        # minimal sequencer-table length (# rows)
-    'max_num_seq'     : 1000,     # maximal number of sequencer-table
-    'max_aseq_len'    : 48*1024-2,# maximal advanced-sequencer table length
-    'min_aseq_len'    : 2,        # minimal advanced-sequencer table length
-    'min_sclk'        : 10e6,     # minimal sampling-rate (samples/seconds)
-    'max_sclk'        : 1.25e9,   # maximal sampling-rate (samples/seconds)
-    'digital_support' : False,    # is digital-wave supported?
-    }
+    "model_name": "WX1282C",  # the model name
+    "num_parts": 2,  # number of instrument parts
+    "chan_per_part": 1,  # number of channels per part
+    "seg_quantum": 16,  # segment-length quantum
+    "min_seg_len": 192,  # minimal segment length
+    "max_arb_mem": 32e6,  # maximal arbitrary-memory (points per channel)
+    "min_dac_val": 0,  # minimal DAC value
+    "max_dac_val": 2**14 - 1,  # maximal DAC value
+    "max_num_segs": 32e3,  # maximal number of segments
+    "max_seq_len": 48 * 1024 - 2,  # maximal sequencer-table length (# rows)
+    "min_seq_len": 3,  # minimal sequencer-table length (# rows)
+    "max_num_seq": 1000,  # maximal number of sequencer-table
+    "max_aseq_len": 48 * 1024 - 2,  # maximal advanced-sequencer table length
+    "min_aseq_len": 2,  # minimal advanced-sequencer table length
+    "min_sclk": 10e6,  # minimal sampling-rate (samples/seconds)
+    "max_sclk": 1.25e9,  # maximal sampling-rate (samples/seconds)
+    "digital_support": False,  # is digital-wave supported?
+}
 
 
 # dictionary of supported-models' properties
 model_properties_dict = {
-    'WX2184'  : _wx2184_properties,
-    'WX2184C' : _wx2184_properties,
-    'WX1284'  : _wx2184_properties,
-    'WX1284C' : _wx2184_properties,
-    'WX2182C' : _wx2182C_properties,
-    'WX1282C' : _wx1282C_properties,
-    }
+    "WX2184": _wx2184_properties,
+    "WX2184C": _wx2184_properties,
+    "WX1284": _wx2184_properties,
+    "WX1284C": _wx2184_properties,
+    "WX2182C": _wx2182C_properties,
+    "WX1282C": _wx1282C_properties,
+}
 
 # Maps SCPI data commands to file-type IDs
 # (used by send_load_file_cmd())
 _file_types_dict = {
     # Analog Wave Data:
-    'TRACE:DATA' : 1,
-    'TRAC:DATA'  : 1,
-    'TRACE'      : 1,
-    'TRAC'       : 1,
-
+    "TRACE:DATA": 1,
+    "TRAC:DATA": 1,
+    "TRACE": 1,
+    "TRAC": 1,
     # Digital Wave Data:
-    'DIGITAL:DATA' : 2,
-    'DIG:DATA'     : 2,
-
+    "DIGITAL:DATA": 2,
+    "DIG:DATA": 2,
     # Segment Lengths List:
-    'SEGMENT:DATA' : 3,
-    'SEGM:DATA'    : 3,
-    'SEGMENT'      : 3,
-    'SEGM'         : 3,
-
+    "SEGMENT:DATA": 3,
+    "SEGM:DATA": 3,
+    "SEGMENT": 3,
+    "SEGM": 3,
     # Sequencer-Table (of the active sequencer):
-    'SEQUENCE:DATA' : 4,
-    'SEQ:DATA'      : 4,
-    'SEQUENCE'      : 4,
-    'SEQ'           : 4,
-
+    "SEQUENCE:DATA": 4,
+    "SEQ:DATA": 4,
+    "SEQUENCE": 4,
+    "SEQ": 4,
     # Sequencer-Lines (of all sequencers):
-    'SEQUENCE:DATA:ALL' : 5,
-    'SEQ:DATA:ALL'      : 5,
-    'SEQUENCE:ALL'      : 5,
-    'SEQ:ALL'           : 5,
-
+    "SEQUENCE:DATA:ALL": 5,
+    "SEQ:DATA:ALL": 5,
+    "SEQUENCE:ALL": 5,
+    "SEQ:ALL": 5,
     # Advanced-Sequencer Table:
-    'ASEQUENCE:DATA' : 6,
-    'ASEQ:DATA'      : 6,
-    'ASEQUENCE'      : 6,
-    'ASEQ'           : 6,
-
+    "ASEQUENCE:DATA": 6,
+    "ASEQ:DATA": 6,
+    "ASEQUENCE": 6,
+    "ASEQ": 6,
     # Pattern-Composer Fast (DC) Pattern Table:
-    'PATTERN:COMPOSER:FAST:DATA' : 7,
-    'PATTERN:COMPOSER:FAST'      : 7,
-    'PATTERN:COMP:FAST:DATA'     : 7,
-    'PATTERN:COMP:FAST'          : 7,
-    'PATT:COMPOSER:FAST:DATA'    : 7,
-    'PATT:COMPOSER:FAST'         : 7,
-    'PATT:COMP:FAST:DATA'        : 7,
-    'PATT:COMP:FAST'             : 7,
-
+    "PATTERN:COMPOSER:FAST:DATA": 7,
+    "PATTERN:COMPOSER:FAST": 7,
+    "PATTERN:COMP:FAST:DATA": 7,
+    "PATTERN:COMP:FAST": 7,
+    "PATT:COMPOSER:FAST:DATA": 7,
+    "PATT:COMPOSER:FAST": 7,
+    "PATT:COMP:FAST:DATA": 7,
+    "PATT:COMP:FAST": 7,
     # Pattern-Composer Linear Pattern Table
-    'PATTERN:COMPOSER:LINEAR:DATA' : 8,
-    'PATTERN:COMPOSER:LINEAR'      : 8,
-    'PATTERN:COMPOSER:LIN:DATA'    : 8,
-    'PATTERN:COMPOSER:LIN'         : 8,
-    'PATTERN:COMP:LINEAR:DATA'     : 8,
-    'PATTERN:COMP:LINEAR'          : 8,
-    'PATTERN:COMP:LIN:DATA'        : 8,
-    'PATTERN:COMP:LIN'             : 8,
-    'PATT:COMPOSER:LINEAR:DATA'    : 8,
-    'PATT:COMPOSER:LINEAR'         : 8,
-    'PATT:COMPOSER:LIN:DATA'       : 8,
-    'PATT:COMPOSER:LIN'            : 8,
-    'PATT:COMP:LINEAR:DATA'        : 8,
-    'PATT:COMP:LINEAR'             : 8,
-    'PATT:COMP:LIN:DATA'           : 8,
-    'PATT:COMP:LIN'                : 8,
-
+    "PATTERN:COMPOSER:LINEAR:DATA": 8,
+    "PATTERN:COMPOSER:LINEAR": 8,
+    "PATTERN:COMPOSER:LIN:DATA": 8,
+    "PATTERN:COMPOSER:LIN": 8,
+    "PATTERN:COMP:LINEAR:DATA": 8,
+    "PATTERN:COMP:LINEAR": 8,
+    "PATTERN:COMP:LIN:DATA": 8,
+    "PATTERN:COMP:LIN": 8,
+    "PATT:COMPOSER:LINEAR:DATA": 8,
+    "PATT:COMPOSER:LINEAR": 8,
+    "PATT:COMPOSER:LIN:DATA": 8,
+    "PATT:COMPOSER:LIN": 8,
+    "PATT:COMP:LINEAR:DATA": 8,
+    "PATT:COMP:LINEAR": 8,
+    "PATT:COMP:LIN:DATA": 8,
+    "PATT:COMP:LIN": 8,
     # Pattern Predefined Data:
-    'PATTERN:PREDEFINED:DATA' : 9,
-    'PATTERN:PRED:DATA'       : 9,
-    'PATTERN:DATA'            : 9,
-    'PATT:PREDEFINED:DATA'    : 9,
-    'PATT:PRED:DATA'          : 9,
-    'PATT:DATA'               : 9,
-
+    "PATTERN:PREDEFINED:DATA": 9,
+    "PATTERN:PRED:DATA": 9,
+    "PATTERN:DATA": 9,
+    "PATT:PREDEFINED:DATA": 9,
+    "PATT:PRED:DATA": 9,
+    "PATT:DATA": 9,
     # Digital-Pod Parameters
-    'DIGITAL:PARAMETERS' : 10,
-    'DIGITAL:PAR'        : 10,
-    'DIG:PARAMETERS'     : 10,
-    'DIG:PAR'            : 10,
-
+    "DIGITAL:PARAMETERS": 10,
+    "DIGITAL:PAR": 10,
+    "DIG:PARAMETERS": 10,
+    "DIG:PAR": 10,
     # ASK Table:
-    'ASK:DATA' : 11,
-
+    "ASK:DATA": 11,
     # FSK Table:
-    'FSK:DATA' : 12,
-
+    "FSK:DATA": 12,
     # FHOP Fixed-Time Table:
-    'FHOPPING:FIXED:DATA' : 13,
-    'FHOPPING:FIX:DATA'   : 13,
-    'FHOP:FIXED:DATA'     : 13,
-    'FHOP:FIX:DATA'       : 13,
-
+    "FHOPPING:FIXED:DATA": 13,
+    "FHOPPING:FIX:DATA": 13,
+    "FHOP:FIXED:DATA": 13,
+    "FHOP:FIX:DATA": 13,
     # FHOP Variable-Time Table:
-    'FHOPPING:VARIABLE:DATA' : 14,
-    'FHOPPING:VAR:DATA'      : 14,
-    'FHOP:VARIABLE:DATA'     : 14,
-    'FHOP:VAR:DATA'          : 14,
-
+    "FHOPPING:VARIABLE:DATA": 14,
+    "FHOPPING:VAR:DATA": 14,
+    "FHOP:VARIABLE:DATA": 14,
+    "FHOP:VAR:DATA": 14,
     # AHOP Fixed-Time Table:
-    'AHOPPING:FIXED:DATA' : 15,
-    'AHOPPING:FIX:DATA'   : 15,
-    'AHOP:FIXED:DATA'     : 15,
-    'AHOP:FIX:DATA'       : 15,
-
+    "AHOPPING:FIXED:DATA": 15,
+    "AHOPPING:FIX:DATA": 15,
+    "AHOP:FIXED:DATA": 15,
+    "AHOP:FIX:DATA": 15,
     # AHOP Variable-Time Table:
-    'AHOPPING:VARIABLE:DATA' : 16,
-    'AHOPPING:VAR:DATA'      : 16,
-    'AHOP:VARIABLE:DATA'     : 16,
-    'AHOP:VAR:DATA'          : 16,
-
+    "AHOPPING:VARIABLE:DATA": 16,
+    "AHOPPING:VAR:DATA": 16,
+    "AHOP:VARIABLE:DATA": 16,
+    "AHOP:VAR:DATA": 16,
     # PSK Table:
-    'PSK:DATA' : 17,
-
+    "PSK:DATA": 17,
     # PSK User-Defined Phases:
-    'PSK:USER:DATA' : 18,
-
+    "PSK:USER:DATA": 18,
     # (N)QAM Table:
-    'QAM:DATA' : 19,
-
+    "QAM:DATA": 19,
     # (N)QAM User-Defined Constellation Table:
-    'QAM:USER:DATA' : 20,
-
+    "QAM:USER:DATA": 20,
     # Firmware-Update File:
-    'SYSTEM:FIRMWARE:DATA' : 21,
-    'SYSTEM:FIRM:DATA'     : 21,
-    'SYST:FIRMWARE:DATA'   : 21,
-    'SYST:FIRM:DATA'       : 21,
-    }
+    "SYSTEM:FIRMWARE:DATA": 21,
+    "SYSTEM:FIRM:DATA": 21,
+    "SYST:FIRMWARE:DATA": 21,
+    "SYST:FIRM:DATA": 21,
+}
+
 
 def get_device_properties(idn_str, opt_str):
-    '''Get the device-properties dictionary according to its *IDN? and *OPT?
+    """
+    Get the device-properties dictionary according to its *IDN? and *OPT?
 
     :param idn_str: the instrument's answer to '*IDN?' query.
     :param opt_str: the instrument's answer to '*OPT?' query.
     :returns: dictionary of the device properties.
-    '''
+    """
 
     dev_props = None
-    idn_parts = idn_str.split(',')
+    idn_parts = idn_str.split(",")
     if len(idn_parts) == 4 and idn_parts[1] in model_properties_dict:
         model_name = idn_parts[1]
         d = model_properties_dict[model_name]
         dev_props = copy.deepcopy(d)
-        dev_props['model_name'] = model_name
+        dev_props["model_name"] = model_name
 
-        if model_name in ('WX2184', 'WX2184C', 'WX1284', 'WX1284C'):
-            dev_props['max_arb_mem'] = int(opt_str[2:4]) * 1E6
-        elif opt_str.startswith('1M', 1):
-            dev_props['max_arb_mem'] = 1E6
-        elif opt_str.startswith('2M', 1):
-            dev_props['max_arb_mem'] = 2E6
-        elif opt_str.startswith('8M', 1):
-            dev_props['max_arb_mem'] = 8E6
-        elif opt_str.startswith('16M', 1):
-            dev_props['max_arb_mem'] = 16E6
-        elif opt_str.startswith('32M', 1):
-            dev_props['max_arb_mem'] = 32E6
-        elif opt_str.startswith('64M', 1):
-            dev_props['max_arb_mem'] = 64E6
-        elif opt_str.startswith('512K', 1):
-            dev_props['max_arb_mem'] = 512E3
-        elif opt_str.startswith('116') or opt_str.startswith('216') or opt_str.startswith('416'):
-            dev_props['max_arb_mem'] = 16E6
-        elif opt_str.startswith('132') or opt_str.startswith('232') or opt_str.startswith('432'):
-            dev_props['max_arb_mem'] = 32E6
-        elif opt_str.startswith('164') or opt_str.startswith('264') or opt_str.startswith('464'):
-            dev_props['max_arb_mem'] = 64E6
+        if model_name in ("WX2184", "WX2184C", "WX1284", "WX1284C"):
+            dev_props["max_arb_mem"] = int(opt_str[2:4]) * 1e6
+        elif opt_str.startswith("1M", 1):
+            dev_props["max_arb_mem"] = 1e6
+        elif opt_str.startswith("2M", 1):
+            dev_props["max_arb_mem"] = 2e6
+        elif opt_str.startswith("8M", 1):
+            dev_props["max_arb_mem"] = 8e6
+        elif opt_str.startswith("16M", 1):
+            dev_props["max_arb_mem"] = 16e6
+        elif opt_str.startswith("32M", 1):
+            dev_props["max_arb_mem"] = 32e6
+        elif opt_str.startswith("64M", 1):
+            dev_props["max_arb_mem"] = 64e6
+        elif opt_str.startswith("512K", 1):
+            dev_props["max_arb_mem"] = 512e3
+        elif (
+            opt_str.startswith("116")
+            or opt_str.startswith("216")
+            or opt_str.startswith("416")
+        ):
+            dev_props["max_arb_mem"] = 16e6
+        elif (
+            opt_str.startswith("132")
+            or opt_str.startswith("232")
+            or opt_str.startswith("432")
+        ):
+            dev_props["max_arb_mem"] = 32e6
+        elif (
+            opt_str.startswith("164")
+            or opt_str.startswith("264")
+            or opt_str.startswith("464")
+        ):
+            dev_props["max_arb_mem"] = 64e6
 
-        if opt_str.endswith('D'):
-            dev_props['digital_support'] = True
+        if opt_str.endswith("D"):
+            dev_props["digital_support"] = True
 
     return dev_props
 
 
 def list_usb_devices():
-    '''List devices available via USB interface
+    """
+    List devices available via USB interface.
 
     :returns: list of the devices connection-string (NI-VISA format).
-    '''
+    """
     resource_names = []
 
     try:
@@ -359,29 +357,36 @@ def list_usb_devices():
                     continue
 
                 if iSerial is None:
-                    resource_name = 'USB::0x{0:02x}::0x{1:02x}::INSTR'.format(idVendor, idProduct)
+                    resource_name = "USB::0x{0:02x}::0x{1:02x}::INSTR".format(
+                        idVendor, idProduct
+                    )
                     resource_names.append(resource_name)
                 else:
-                    resource_name = 'USB::0x{0:02x}::0x{1:02x}::{2}::INSTR'.format(idVendor, idProduct, iSerial)
+                    resource_name = "USB::0x{0:02x}::0x{1:02x}::{2}::INSTR".format(
+                        idVendor, idProduct, iSerial
+                    )
                     resource_names.append(resource_name)
 
     except:
         pass
 
-
     return resource_names
 
+
 class CommIntfType:
-    '''The supported communication interface types '''
+    """The supported communication interface types."""
+
     NIL = 0
     LAN = 1
     USB = 2
 
-class TEWXAwg(object):
-    '''Tabor-Electronics WX-Instrument Controller (Without VISA-NI)'''
 
-    def __init__(self, instr_addr='128.252.134.31', tcp_timeout=5.0, paranoia_level=1):
-        ''' Initialize this `TEWWAwg` instance.
+class TEWXAwg(object):
+    """Tabor-Electronics WX-Instrument Controller (Without VISA-NI)"""
+
+    def __init__(self, instr_addr="128.252.134.31", tcp_timeout=5.0, paranoia_level=1):
+        """
+        Initialize this `TEWWAwg` instance.
 
         The given `instr_address` defines the instrument-address.
         It can be either
@@ -406,13 +411,13 @@ class TEWXAwg(object):
         :param instr_addr: the instrument address
         :param tcp_timeout: TCP-Socket time-out (in seconds)
         :param paranoia_level: the `paranoia_level` (0,1 or 2)
-        '''
+        """
 
         self._tcp_sock = None
         self._usb_sock = None
         self._intf_type = CommIntfType.NIL
 
-        self._model_name = ''
+        self._model_name = ""
 
         self._ip_addr = None
         self._usb_addr = None
@@ -432,9 +437,9 @@ class TEWXAwg(object):
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-
     def open(self, instr_addr=None, tcp_timeout=None):
-        '''Open/Reopen Connection
+        """
+        Open/Reopen Connection.
 
         The given `instr_address` defines the instrument-address.
         It can be either
@@ -459,7 +464,7 @@ class TEWXAwg(object):
 
         :param instr_addr: the instrument's address.
         :param tcp_timeout: TCP-Socket time-out (in seconds)
-        '''
+        """
         self.close()
         self._dev_props = None
 
@@ -470,7 +475,9 @@ class TEWXAwg(object):
 
         if self._ip_addr is not None:
             # Open TCP-IP Socket:
-            self._tcp_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+            self._tcp_sock = socket.socket(
+                socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP
+            )
             self._tcp_sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             self._tcp_sock.settimeout(self._tcp_timeout)
             self._tcp_sock.connect((self._ip_addr, self._tcp_port_nb))
@@ -478,25 +485,27 @@ class TEWXAwg(object):
         elif self._usb_addr is not None:
             self._usb_sock = usbtmc.Instrument(self._usb_addr)
             if self._usb_sock is None:
-                warn_msg ='Failed to open USB-TMC Instrument at "{0}".'.format(self._usb_addr)
+                warn_msg = 'Failed to open USB-TMC Instrument at "{0}".'.format(
+                    self._usb_addr
+                )
                 warnings.warn(warn_msg)
             else:
                 self._intf_type = CommIntfType.USB
 
-        idn = self.send_query('*IDN?')
-        opt = self.send_query('*OPT?')
+        idn = self.send_query("*IDN?")
+        opt = self.send_query("*OPT?")
 
         self._dev_props = get_device_properties(idn, opt)
         if self._dev_props is None and self._paranoia_level >= 2:
-            warn_msg = 'unsupported model: {0}.'.format(idn)
+            warn_msg = "unsupported model: {0}.".format(idn)
             warnings.warn(warn_msg)
 
-        self._model_name = self.get_dev_property('model_name', '')
+        self._model_name = self.get_dev_property("model_name", "")
 
     def close(self):
-        '''Close Connection'''
+        """Close Connection."""
         if self._tcp_sock is not None:
-            self._tcp_sock.close();
+            self._tcp_sock.close()
             self._tcp_sock = None
         if self._usb_sock is not None:
             self._usb_sock.close()
@@ -505,64 +514,69 @@ class TEWXAwg(object):
 
     @property
     def intf_type(self):
-        '''Get the communication-interface type '''
+        """Get the communication-interface type."""
         return self._intf_type
 
     @property
     def tcp_sock(self):
-        '''Get the tcp-ip socket '''
+        """Get the tcp-ip socket."""
         return self._tcp_sock
 
     @property
     def usb_sock(self):
-        '''Get the usb-tmc socket '''
+        """Get the usb-tmc socket."""
         return self._usb_sock
 
     @property
     def instr_address(self):
-        '''Get the instrument address '''
+        """Get the instrument address."""
         return self._instr_addr
 
     @property
     def dev_properties(self):
-        '''Get dictionary of the device properties '''
+        """Get dictionary of the device properties."""
         return self._dev_props
 
     def get_dev_property(self, property_name, default_value=None):
-        '''Get the value of the specified device-property
+        """
+        Get the value of the specified device-property.
 
         :param property_name: the property name.
-        :param default_value: default value (if the specified property is missing)
-        :returns: the specified property, or the default-value if it's not defined.
-        '''
+        :param default_value: default value (if the specified property
+            is missing)
+        :returns: the specified property, or the default-value if it's
+            not defined.
+        """
         if self._dev_props is not None and property_name in self._dev_props:
             return self._dev_props[property_name]
         return default_value
 
     @property
     def model_name(self):
-        '''Get the model name '''
+        """Get the model name."""
         return self._model_name
 
     @property
     def paranoia_level(self):
-        '''Get the (default) paranoia-level
+        """
+        Get the (default) paranoia-level.
 
         The paranoia-level indicates whether and which additional query
         should be sent after sending SCPI-Command to the instrument:
          - 0: do not send any additional query
          - 1: send '*OPC?' (recommended).
          - 2: send ':SYST:ERR?' and validate the response (for debug).
-        '''
+        """
         return self._paranoia_level
 
     @paranoia_level.setter
     def paranoia_level(self, value):
-        '''Set the (default) paranoia-level (0, 1 or 2)'''
+        """Set the (default) paranoia-level (0, 1 or 2)"""
         self._paranoia_level = int(value)
 
     def send_cmd(self, cmd_str, paranoia_level=None):
-        '''Send the given command to the instrument
+        """
+        Send the given command to the instrument.
 
         The paranoia-level indicates whether and which additional query
         should be sent after sending the SCPI-Command to the instrument:
@@ -573,8 +587,8 @@ class TEWXAwg(object):
 
         :param cmd_str: the command string (SCPI statement).
         :param paranoia_level: the paranoia-level (optional)
-        '''
-        assert (self._intf_type != CommIntfType.NIL)
+        """
+        assert self._intf_type != CommIntfType.NIL
 
         if paranoia_level is None:
             paranoia_level = self._paranoia_level
@@ -582,40 +596,43 @@ class TEWXAwg(object):
         if paranoia_level == 1:
             ask_str = cmd_str.rstrip()
             if len(ask_str) > 0:
-                ask_str += '; *OPC?'
+                ask_str += "; *OPC?"
             else:
-                ask_str += '*OPC?'
+                ask_str += "*OPC?"
             _ = self.send_query(ask_str)
         elif paranoia_level >= 2:
             ask_str = cmd_str.rstrip()
             if len(ask_str) > 0:
-                ask_str += '; :SYST:ERR?'
+                ask_str += "; :SYST:ERR?"
             else:
-                ask_str += ':SYST:ERR?'
-            syst_err = self.send_query( ask_str)
-            if not syst_err.startswith('0'):
-                wrn_msg = 'CMD: \"{0}\", ERR: \"{1}\"'.format(cmd_str.rstrip(), syst_err.rstrip())
+                ask_str += ":SYST:ERR?"
+            syst_err = self.send_query(ask_str)
+            if not syst_err.startswith("0"):
+                wrn_msg = 'CMD: "{0}", ERR: "{1}"'.format(
+                    cmd_str.rstrip(), syst_err.rstrip()
+                )
                 warnings.warn(wrn_msg)
-                _ = self.send_query('*CLS; *OPC?')
+                _ = self.send_query("*CLS; *OPC?")
         elif self._intf_type == CommIntfType.LAN:
-            if not cmd_str.endswith('\n'):
-                cmd_str = cmd_str + '\n'
+            if not cmd_str.endswith("\n"):
+                cmd_str = cmd_str + "\n"
             self._tcp_sock.sendall(cmd_str)
         elif self._intf_type == CommIntfType.USB:
             self._usb_sock.write(cmd_str)
 
     def send_query(self, query_str):
-        '''Send the given query to the instrument and read the response
+        """
+        Send the given query to the instrument and read the response.
 
         :param query_str: the query string (SCPI statement).
         :returns: the instrument's response.
-        '''
+        """
         resp = None
-        assert (self._intf_type != CommIntfType.NIL)
+        assert self._intf_type != CommIntfType.NIL
 
         if self._intf_type == CommIntfType.LAN:
-            if not query_str.endswith('\n'):
-                query_str = query_str + '\n'
+            if not query_str.endswith("\n"):
+                query_str = query_str + "\n"
             if isinstance(query_str, str):
                 query_str = np.fromstring(query_str, dtype=np.uint8)
             self._tcp_sock.sendall(query_str)
@@ -628,44 +645,45 @@ class TEWXAwg(object):
         return resp
 
     def read_resp(self):
-        '''Read response from the instrument. '''
+        """Read response from the instrument."""
 
         resp = None
-        assert (self._intf_type != CommIntfType.NIL)
+        assert self._intf_type != CommIntfType.NIL
 
         if self._intf_type == CommIntfType.LAN:
             ret = []
             ch = self._tcp_sock.recv(1)
-            while b'\n' != ch and u'\n' != ch:
-                if b'\r' != ch and u'\r' != ch:
+            while b"\n" != ch and "\n" != ch:
+                if b"\r" != ch and "\r" != ch:
                     try:
-                        ch = ch.decode('utf-8')
+                        ch = ch.decode("utf-8")
                     except:
                         pass
                     ret.append(ch)
                 ch = self._tcp_sock.recv(1)
-            resp = ''.join(ret)
+            resp = "".join(ret)
         elif self._intf_type == CommIntfType.USB:
             resp = self._usb_sock.read()
             try:
-                resp = resp.decode('utf-8')
+                resp = resp.decode("utf-8")
             except:
                 pass
 
         return resp
 
     def send_binary_data(self, pref, bin_dat, paranoia_level=None):
-        '''Send the given binary-data to the instrument.
+        """
+        Send the given binary-data to the instrument.
 
         :param pref: binary-data header prefix (e.g. ':TRAC:DATA')
         :param bin_dat: the binary-data to send (a `numpy.ndarray`)
         :param paranoia_level: paranoia-level (that overrides the default one)
-        '''
-        assert(isinstance(bin_dat, np.ndarray))
-        assert (self._intf_type != CommIntfType.NIL)
+        """
+        assert isinstance(bin_dat, np.ndarray)
+        assert self._intf_type != CommIntfType.NIL
 
         if pref is None:
-            pref = ''
+            pref = ""
 
         bin_dat_header = self._make_bin_dat_header(pref, bin_dat.nbytes)
 
@@ -673,7 +691,7 @@ class TEWXAwg(object):
             paranoia_level = self._paranoia_level
 
         if paranoia_level >= 1:
-            bin_dat_header = '*OPC?; ' + bin_dat_header
+            bin_dat_header = "*OPC?; " + bin_dat_header
 
         if isinstance(bin_dat_header, str):
             bin_dat_header = np.fromstring(bin_dat_header, dtype=np.uint8)
@@ -686,18 +704,25 @@ class TEWXAwg(object):
         _ = self._send_raw_bin_dat(bin_dat)
 
         if paranoia_level >= 1:
-            _ = self.read_resp() # read the response to the *OPC? that was sent with the header
+            _ = (
+                self.read_resp()
+            )  # read the response to the *OPC? that was sent with the header
 
         if paranoia_level >= 2:
-            syst_err = self.send_query(':SYST:ERR?')
-            if not syst_err.startswith('0'):
+            syst_err = self.send_query(":SYST:ERR?")
+            if not syst_err.startswith("0"):
                 syst_err = syst_err.rstrip()
-                wrn_msg = 'ERR: "{0}" After Sending Binary-Data (pref="{1}" datLen={2}).'.format(syst_err, pref, len(bin_dat))
+                wrn_msg = 'ERR: "{0}" After Sending Binary-Data (pref="{1}" datLen={2}).'.format(
+                    syst_err, pref, len(bin_dat)
+                )
                 warnings.warn(wrn_msg)
-                _ = self.send_query('*CLS; *OPC?')
+                _ = self.send_query("*CLS; *OPC?")
 
-    def download_segment_lengths(self, seg_len_list, pref=':SEGM:DATA', paranoia_level=None):
-        '''Download Segments-Lengths Table to Instrument
+    def download_segment_lengths(
+        self, seg_len_list, pref=":SEGM:DATA", paranoia_level=None
+    ):
+        """
+        Download Segments-Lengths Table to Instrument.
 
         :param seg_len_list: the list of segments-lengths.
         :param pref: the binary-data-header prefix.
@@ -721,7 +746,7 @@ class TEWXAwg(object):
             >>>     # Download the appropriate segment-lengths list:
             >>>     seg_lengths = [ 1024, 1024, 384, 4096, 8192 ]
             >>>     inst.download_segment_lengths(seg_lengths)
-        '''
+        """
         if isinstance(seg_len_list, np.ndarray):
             if seg_len_list.ndim != 1:
                 seg_len_list = seg_len_list.flatten()
@@ -734,8 +759,11 @@ class TEWXAwg(object):
 
         self.send_binary_data(pref, seg_len_list, paranoia_level=paranoia_level)
 
-    def download_sequencer_table(self, seq_table, pref=':SEQ:DATA', paranoia_level=None):
-        '''Download Sequencer-Table to Instrument
+    def download_sequencer_table(
+        self, seq_table, pref=":SEQ:DATA", paranoia_level=None
+    ):
+        """
+        Download Sequencer-Table to Instrument.
 
         The sequencer-table, `seq_table`, is a list of 3-tuples
         of the form: (<repeats>, <segment no.>, <jump-flag>)
@@ -755,13 +783,14 @@ class TEWXAwg(object):
             >>> with TEWXAwg('192.168.0.170') as inst:
             >>>     inst.send_cmd(':SEQ:SELect 1')
             >>>     inst.download_sequencer_table(sequencer_table)
-        '''
+        """
 
         m = self.pack_sequencer_table(seq_table)
         self.send_binary_data(pref, m, paranoia_level=paranoia_level)
 
-    def download_adv_seq_table(self, seq_table, pref=':ASEQ:DATA', paranoia_level=None):
-        '''Download Advanced-Sequencer-Table to Instrument
+    def download_adv_seq_table(self, seq_table, pref=":ASEQ:DATA", paranoia_level=None):
+        """
+        Download Advanced-Sequencer-Table to Instrument.
 
         The sequencer-table, `seq_table`, is a list of 3-tuples
         of the form: (<repeats>, <sequence no.>, <jump-flag>)
@@ -780,13 +809,16 @@ class TEWXAwg(object):
             >>> # Download it to instrument
             >>> with TEWXAwg('192.168.0.170') as inst:
             >>>     inst.download_adv_seq_table(adv_sequencer_table)
-        '''
+        """
 
         m = self.pack_sequencer_table(seq_table)
         self.send_binary_data(pref, m, paranoia_level=paranoia_level)
 
-    def download_fast_pattern_table(self, patt_table, pref=':PATT:COMP:FAST:DATA', paranoia_level=None):
-        '''Download Fast (Piecewise-flat) Pulse-Pattern Table  to Instrument
+    def download_fast_pattern_table(
+        self, patt_table, pref=":PATT:COMP:FAST:DATA", paranoia_level=None
+    ):
+        """
+        Download Fast (Piecewise-flat) Pulse-Pattern Table  to Instrument.
 
         The pattern-table, `patt_table`, is a list of 2-tuples
         of the form: (<voltage-level (volt)>, <dwell-time (sec)>)
@@ -821,15 +853,15 @@ class TEWXAwg(object):
             >>> inst.download_fast_pattern_table(pattern_table)
             >>>
             >>> inst.close()
-        '''
+        """
         try:
             tbl_len = len(patt_table)
         except:
             patt_table = list(patt_table)
             tbl_len = len(patt_table)
-        s = struct.Struct('< f d')
+        s = struct.Struct("< f d")
         s_size = s.size
-        m = np.empty(s_size * tbl_len, dtype='uint8')
+        m = np.empty(s_size * tbl_len, dtype="uint8")
         for n in range(tbl_len):
             volt_level, dwel_time = patt_table[n]
             volt_level = float(volt_level)
@@ -838,8 +870,11 @@ class TEWXAwg(object):
 
         self.send_binary_data(pref, m, paranoia_level=paranoia_level)
 
-    def download_linear_pattern_table(self, patt_table, start_level, pref=':PATT:COMP:LIN:DATA', paranoia_level=None):
-        '''Download Piecewise-Linear Pulse-Pattern to Instrument
+    def download_linear_pattern_table(
+        self, patt_table, start_level, pref=":PATT:COMP:LIN:DATA", paranoia_level=None
+    ):
+        """
+        Download Piecewise-Linear Pulse-Pattern to Instrument.
 
         The pattern-table, `patt_table`, is a list of 2-tuples
         of the form: (<voltage-level (volt)>, <dwell-time (sec)>).
@@ -879,15 +914,15 @@ class TEWXAwg(object):
             >>> inst.download_linear_pattern_table(pattern_table, start_level)
             >>>
             >>> inst.close()
-        '''
+        """
         try:
             tbl_len = len(patt_table)
         except:
             patt_table = list(patt_table)
             tbl_len = len(patt_table)
-        s = struct.Struct('< f d')
+        s = struct.Struct("< f d")
         s_size = s.size
-        m = np.empty(s_size * tbl_len, dtype='uint8')
+        m = np.empty(s_size * tbl_len, dtype="uint8")
         for n in range(tbl_len):
             volt_level, dwel_time = patt_table[n]
             volt_level = float(volt_level)
@@ -896,20 +931,21 @@ class TEWXAwg(object):
 
         if start_level is not None:
             start_level = float(start_level)
-            self.send_cmd(':PATT:COMP:LIN:STARt {0:f}'.format(start_level))
+            self.send_cmd(":PATT:COMP:LIN:STARt {0:f}".format(start_level))
 
         self.download_binary_data(pref, m, paranoia_level=paranoia_level)
 
     def send_load_file_cmd(self, file_type, file_path, paranoia_level=None):
-        '''Send Load-File Command to Instrument
+        """
+        Send Load-File Command to Instrument.
 
         The `file_type` is either a file-type number or a corresponding SCPI string.
 
         :param file_type: the file-type.
         :param file_path: the file-path (relative to the disk-on-key)
-        '''
+        """
 
-        assert (self._intf_type != CommIntfType.NIL)
+        assert self._intf_type != CommIntfType.NIL
 
         if paranoia_level is None:
             paranoia_level = self._paranoia_level
@@ -919,11 +955,11 @@ class TEWXAwg(object):
             file_type = int(file_type)
         except:
             file_type = file_type.upper()
-            if file_type.startswith(':'):
+            if file_type.startswith(":"):
                 file_type = file_type[1:]
-            if file_type.startswith('SOURCE:'):
+            if file_type.startswith("SOURCE:"):
                 file_type = file_type[7:]
-            elif file_type.startswith('SOUR:'):
+            elif file_type.startswith("SOUR:"):
                 file_type = file_type[5:]
             if file_type in _file_types_dict:
                 file_type = _file_types_dict[file_type]
@@ -931,16 +967,16 @@ class TEWXAwg(object):
                 file_type = 0
 
         file_path = str(file_path)
-        file_path = posixpath.join(*file_path.split('\\'))
-        #if type(file_path) is unicode:
+        file_path = posixpath.join(*file_path.split("\\"))
+        # if type(file_path) is unicode:
         #    file_path = unicodedata.normalize('NFKD', file_path).encode('ascii','ignore')
 
         if paranoia_level == 1:
-            cmd_str = 'LOAD {0:d},\'{1:s}\';*OPC?\n'.format(file_type, file_path)
+            cmd_str = "LOAD {0:d},'{1:s}';*OPC?\n".format(file_type, file_path)
         elif paranoia_level >= 2:
-            cmd_str = 'LOAD {0:d},\'{1:s}\';:SYST:ERR?\n'.format(file_type, file_path)
+            cmd_str = "LOAD {0:d},'{1:s}';:SYST:ERR?\n".format(file_type, file_path)
         else:
-            cmd_str = 'LOAD {0:d},\'{1:s}\'\n'.format(file_type, file_path)
+            cmd_str = "LOAD {0:d},'{1:s}'\n".format(file_type, file_path)
 
         if isinstance(cmd_str, str):
             cmd_str = np.fromstring(cmd_str, dtype=np.uint8)
@@ -951,7 +987,7 @@ class TEWXAwg(object):
             self._usb_sock.write_raw(cmd_str)
 
         if paranoia_level > 0:
-            rsep_str = ''
+            rsep_str = ""
             t0 = time.clock()
             while True:
                 try:
@@ -963,14 +999,18 @@ class TEWXAwg(object):
                         raise
 
             if paranoia_level >= 2:
-                if not rsep_str.startswith('0'):
-                    wrn_msg = 'CMD: \"{0}\", ERR: \"{1}\"'.format(cmd_str.rstrip(), rsep_str.rstrip())
+                if not rsep_str.startswith("0"):
+                    wrn_msg = 'CMD: "{0}", ERR: "{1}"'.format(
+                        cmd_str.rstrip(), rsep_str.rstrip()
+                    )
                     warnings.warn(wrn_msg)
-                    _ = self.send_query('*CLS; *OPC?')
+                    _ = self.send_query("*CLS; *OPC?")
 
-
-    def build_sine_wave(self, cycle_len, num_cycles=1, phase_degree=0, low_level=0, high_level=2**14-1):
-        '''Build Sine Wave
+    def build_sine_wave(
+        self, cycle_len, num_cycles=1, phase_degree=0, low_level=0, high_level=2**14 - 1
+    ):
+        """
+        Build Sine Wave.
 
         :param cycle_len: cycle length (in points).
         :param num_cycles: number of cycles.
@@ -978,20 +1018,22 @@ class TEWXAwg(object):
         :param low_level: the sine low level.
         :param high_level: the sine high level.
         :returns: `numpy.array` with the wave data (DAC values)
-        '''
+        """
         cycle_len = int(cycle_len)
         num_cycles = int(num_cycles)
 
         if cycle_len <= 0 or num_cycles <= 0:
             return None
 
-        dac_min = self.get_dev_property('min_dac_val', 0)
-        dac_max = self.get_dev_property('max_dac_val', 2**14-1)
+        dac_min = self.get_dev_property("min_dac_val", 0)
+        dac_max = self.get_dev_property("max_dac_val", 2**14 - 1)
 
         wav_len = cycle_len * num_cycles
 
         phase = float(phase_degree) * np.pi / 180.0
-        x = np.linspace(start=phase, stop=phase+2*np.pi, num=cycle_len, endpoint=False)
+        x = np.linspace(
+            start=phase, stop=phase + 2 * np.pi, num=cycle_len, endpoint=False
+        )
 
         zero_val = (low_level + high_level) / 2.0
         amplitude = (high_level - low_level) / 2.0
@@ -1007,8 +1049,11 @@ class TEWXAwg(object):
 
         return wav
 
-    def build_triangle_wave(self, cycle_len, num_cycles=1, phase_degree=0, low_level=0, high_level=2**14-1):
-        '''Build Triangle Wave
+    def build_triangle_wave(
+        self, cycle_len, num_cycles=1, phase_degree=0, low_level=0, high_level=2**14 - 1
+    ):
+        """
+        Build Triangle Wave.
 
         :param cycle_len: cycle length (in points).
         :param num_cycles: number of cycles.
@@ -1016,20 +1061,22 @@ class TEWXAwg(object):
         :param low_level: the triangle low level.
         :param high_level: the triangle high level.
         :returns: `numpy.array` with the wave data (DAC values)
-        '''
+        """
         cycle_len = int(cycle_len)
         num_cycles = int(num_cycles)
 
         if cycle_len <= 0 or num_cycles <= 0:
             return None
 
-        dac_min = self.get_dev_property('min_dac_val', 0)
-        dac_max = self.get_dev_property('max_dac_val', 2**14-1)
+        dac_min = self.get_dev_property("min_dac_val", 0)
+        dac_max = self.get_dev_property("max_dac_val", 2**14 - 1)
 
         wav_len = cycle_len * num_cycles
 
         phase = float(phase_degree) * np.pi / 180.0
-        x = np.linspace(start=phase, stop=phase+2*np.pi, num=cycle_len, endpoint=False)
+        x = np.linspace(
+            start=phase, stop=phase + 2 * np.pi, num=cycle_len, endpoint=False
+        )
 
         zero_val = (low_level + high_level) / 2.0
         amplitude = (high_level - low_level) / 2.0
@@ -1046,8 +1093,17 @@ class TEWXAwg(object):
 
         return wav
 
-    def build_square_wave(self, cycle_len, num_cycles=1, duty_cycle=50.0, phase_degree=0, low_level=0, high_level=2**14-1):
-        '''Build Square Wave
+    def build_square_wave(
+        self,
+        cycle_len,
+        num_cycles=1,
+        duty_cycle=50.0,
+        phase_degree=0,
+        low_level=0,
+        high_level=2**14 - 1,
+    ):
+        """
+        Build Square Wave.
 
         :param cycle_len: cycle length (in points).
         :param num_cycles: number of cycles.
@@ -1056,15 +1112,15 @@ class TEWXAwg(object):
         :param low_level: the triangle low level.
         :param high_level: the triangle high level.
         :returns: `numpy.array` with the wave data (DAC values)
-        '''
+        """
         cycle_len = int(cycle_len)
         num_cycles = int(num_cycles)
 
         if cycle_len <= 0 or num_cycles <= 0:
             return None
 
-        dac_min = self.get_dev_property('min_dac_val', 0)
-        dac_max = self.get_dev_property('max_dac_val', 2**14-1)
+        dac_min = self.get_dev_property("min_dac_val", 0)
+        dac_max = self.get_dev_property("max_dac_val", 2**14 - 1)
 
         wav_len = cycle_len * num_cycles
 
@@ -1075,7 +1131,9 @@ class TEWXAwg(object):
         high_level = np.uint16(high_level)
 
         phase = float(phase_degree) * np.pi / 180.0
-        x = np.linspace(start=phase, stop=phase+2*np.pi, num=cycle_len, endpoint=False)
+        x = np.linspace(
+            start=phase, stop=phase + 2 * np.pi, num=cycle_len, endpoint=False
+        )
         x = x <= 2 * np.pi * duty_cycle / 100.0
         y = np.full(x.shape, low_level, dtype=np.uint16)
         y[x] = high_level
@@ -1088,8 +1146,18 @@ class TEWXAwg(object):
 
         return wav
 
-    def add_markers(self, dat_buff, marker_pos, marker_width, marker_bit1, marker_bit2, dat_offs=0, dat_len=None):
-        """Add markers bits to the wave-data in the given buffer.
+    def add_markers(
+        self,
+        dat_buff,
+        marker_pos,
+        marker_width,
+        marker_bit1,
+        marker_bit2,
+        dat_offs=0,
+        dat_len=None,
+    ):
+        """
+        Add markers bits to the wave-data in the given buffer.
 
         Note that in case of 4-channels devices, the markers bits
         are both added to the 1st channel of each channels-pair.
@@ -1118,19 +1186,19 @@ class TEWXAwg(object):
             if marker_bit2:
                 marker_bits |= 0x8000
 
-            assert(marker_pos % 2 == 0)
-            assert(marker_width % 2 == 0)
-            assert(dat_len % 16 == 0 and dat_len >= 16)
+            assert marker_pos % 2 == 0
+            assert marker_width % 2 == 0
+            assert dat_len % 16 == 0 and dat_len >= 16
 
             seg_pos = (marker_pos + shift_pts) % dat_len
-            seg_pos = (seg_pos//16)*16 + 8 + (seg_pos%16)//2
+            seg_pos = (seg_pos // 16) * 16 + 8 + (seg_pos % 16) // 2
 
             while marker_width > 0:
                 if seg_pos >= dat_len:
                     seg_pos = 8
 
                 buf_index = (dat_offs + seg_pos) % len(dat_buff)
-                dat_buff[buf_index] &= 0x3fff
+                dat_buff[buf_index] &= 0x3FFF
                 dat_buff[buf_index] |= marker_bits
 
                 marker_width -= 2
@@ -1139,8 +1207,11 @@ class TEWXAwg(object):
                     seg_pos += 8
 
     @staticmethod
-    def make_combined_wave(wav1, wav2, dest_array, dest_array_offset=0, add_idle_pts=False, quantum=16):
-        '''Make 2-channels combined wave from the 2 given waves
+    def make_combined_wave(
+        wav1, wav2, dest_array, dest_array_offset=0, add_idle_pts=False, quantum=16
+    ):
+        """
+        Make 2-channels combined wave from the 2 given waves.
 
         The destination-array, `dest_array`, is either a `numpy.array` with `dtype=uint16`, or `None`.
         If it is `None` then only the next destination-array's write-offset offset is calculated.
@@ -1155,8 +1226,8 @@ class TEWXAwg(object):
         :param add_idle_pts: should add idle-points (segment-prefix)?
         :param quantum: the combined-wave quantum (usually 16 points)
         :returns: the next destination-array's write-offset.
-        '''
-        len1, len2 = 0,0
+        """
+        len1, len2 = 0, 0
         if wav1 is not None:
             len1 = len(wav1)
 
@@ -1187,7 +1258,9 @@ class TEWXAwg(object):
 
             while rd_offs < len2 and wr_offs < dest_len:
                 chunk_len = min((quantum, len2 - rd_offs, dest_len - wr_offs))
-                dest_array[wr_offs : wr_offs + chunk_len] = wav2[rd_offs : rd_offs + chunk_len]
+                dest_array[wr_offs : wr_offs + chunk_len] = wav2[
+                    rd_offs : rd_offs + chunk_len
+                ]
                 rd_offs = rd_offs + chunk_len
                 wr_offs = wr_offs + chunk_len + quantum
 
@@ -1206,7 +1279,9 @@ class TEWXAwg(object):
 
             while rd_offs < len1 and wr_offs < dest_len:
                 chunk_len = min((quantum, len1 - rd_offs, dest_len - wr_offs))
-                dest_array[wr_offs : wr_offs + chunk_len] = wav1[rd_offs : rd_offs + chunk_len]
+                dest_array[wr_offs : wr_offs + chunk_len] = wav1[
+                    rd_offs : rd_offs + chunk_len
+                ]
                 rd_offs = rd_offs + chunk_len
                 wr_offs = wr_offs + chunk_len + quantum
 
@@ -1221,12 +1296,13 @@ class TEWXAwg(object):
 
     @staticmethod
     def packed_seq_table_line_size():
-        '''Get the size of packed sequencer table line (in bytes)'''
+        """Get the size of packed sequencer table line (in bytes)"""
         return 8
 
     @staticmethod
     def pack_sequencer_table(unpacked_seq_table, set_end_of_seq_bit=False):
-        '''Pack sequencer-table as binary-data (ready to be sent to instrument)
+        """
+        Pack sequencer-table as binary-data (ready to be sent to instrument)
 
         The unpacked-sequencer-table is a list of 3-tuples
         of the form: (<repeats>, <segment no.>, <jump-flag>).
@@ -1265,19 +1341,25 @@ class TEWXAwg(object):
             >>>     seq_tbl3 = inst.pack_sequencer_table(seq_tbl3, True)
             >>>     bin_dat = np.concatenate((seq_tbl1, seq_tbl2, seq_tbl3))
             >>>     inst.send_binary_data(':SEQ:ALL', bin_dat)
-        '''
+        """
         try:
             tbl_len = len(unpacked_seq_table)
         except:
             unpacked_seq_table = list(unpacked_seq_table)
             tbl_len = len(unpacked_seq_table)
 
-        s = struct.Struct('< L H B x')
+        s = struct.Struct("< L H B x")
         s_size = s.size
-        m = np.empty(s_size * tbl_len, dtype='uint8')
+        m = np.empty(s_size * tbl_len, dtype="uint8")
         for n in range(tbl_len):
             repeats, seg_nb, jump_flag = unpacked_seq_table[n]
-            s.pack_into(m, n * s_size, np.uint32(repeats), np.uint16(seg_nb), np.uint8(jump_flag))
+            s.pack_into(
+                m,
+                n * s_size,
+                np.uint32(repeats),
+                np.uint16(seg_nb),
+                np.uint8(jump_flag),
+            )
 
         if set_end_of_seq_bit:
             m[-2] = np.bitwise_or(m[-2], 128)
@@ -1286,26 +1368,27 @@ class TEWXAwg(object):
 
     @staticmethod
     def _make_bin_dat_header(pref, bin_dat_size):
-        '''make binary-data-header '''
-        size_str = '{0:d}'.format(bin_dat_size)
+        """Make binary-data-header."""
+        size_str = "{0:d}".format(bin_dat_size)
         if pref is None:
-            pref = ''
-        bin_dat_header = '{0}#{1:d}{2:s}'.format(pref, len(size_str), size_str)
+            pref = ""
+        bin_dat_header = "{0}#{1:d}{2:s}".format(pref, len(size_str), size_str)
         return bin_dat_header
 
     def _send_raw_bin_dat(self, bin_data):
-        '''Send the given binary-data (`numpy.ndarray`) through the tcp socket (no binary-data-header is added) '''
+        """Send the given binary-data (`numpy.ndarray`) through the tcp socket
+        (no binary-data-header is added)"""
 
-        assert (self._intf_type != CommIntfType.NIL)
+        assert self._intf_type != CommIntfType.NIL
 
         if bin_data.ndim > 1:
             bin_data = bin_data.flatten()
 
         if self._intf_type == CommIntfType.USB:
-            #self._usb_sock.write_raw(bin_data.tobytes())
+            # self._usb_sock.write_raw(bin_data.tobytes())
             MAX_CHUNK_LEN = 4096
             if MAX_CHUNK_LEN // bin_data.itemsize < 1:
-                bin_data = np.frombuffer(bin_data.data, dtype='uint8')
+                bin_data = np.frombuffer(bin_data.data, dtype="uint8")
             num_items = len(bin_data)
             item_size = bin_data.itemsize
             chunk_len = MAX_CHUNK_LEN // item_size
@@ -1314,12 +1397,14 @@ class TEWXAwg(object):
                 if offset + chunk_len >= num_items:
                     chunk_len = num_items - offset
                 # send the packet:
-                self._usb_sock.write_raw(bin_data[offset : offset + chunk_len].tobytes())
+                self._usb_sock.write_raw(
+                    bin_data[offset : offset + chunk_len].tobytes()
+                )
                 offset = offset + chunk_len
         elif self._intf_type == CommIntfType.LAN:
             MAX_CHUNK_LEN = 4096
             if MAX_CHUNK_LEN // bin_data.itemsize < 1:
-                bin_data = np.frombuffer(bin_data.data, dtype='uint8')
+                bin_data = np.frombuffer(bin_data.data, dtype="uint8")
             num_items = len(bin_data)
             item_size = bin_data.itemsize
             chunk_len = MAX_CHUNK_LEN // item_size
@@ -1332,7 +1417,8 @@ class TEWXAwg(object):
                 offset = offset + chunk_len
 
     def _set_instr_address(self, instr_addr):
-        '''Set the instrument address
+        """
+        Set the instrument address.
 
         The given `instr_addr` can be either
          - An empty string or None (meaning no address)
@@ -1345,7 +1431,7 @@ class TEWXAwg(object):
            (for example: 'USB::0x168b::0x2184::0000214991::INSTR')
 
         :param instr_addr: the instrument address (string)
-        '''
+        """
 
         self._ip_addr = None
         self._usb_addr = None
@@ -1359,28 +1445,28 @@ class TEWXAwg(object):
         try:
             packed_ip = socket.inet_aton(instr_addr)
             ip_str = socket.inet_ntoa(packed_ip)
-            self._ip_addr =  ip_str
-            self._tcp_port_nb = 5025 # this is the default port number for wx devices
+            self._ip_addr = ip_str
+            self._tcp_port_nb = 5025  # this is the default port number for wx devices
             self._instr_addr = "TCPIP::{0}::5025::SOCKET".format(ip_str)
             return
         except:
             pass
 
-        addr_parts = instr_addr.split('::')
+        addr_parts = instr_addr.split("::")
         for n in range(len(addr_parts)):
             addr_parts[n] = addr_parts[n].upper()
 
-        if len(addr_parts) >= 1 and addr_parts[0].startswith('USB'):
+        if len(addr_parts) >= 1 and addr_parts[0].startswith("USB"):
             self._usb_addr = instr_addr
             self._instr_addr = instr_addr
             return
 
-        if len(addr_parts) == 4 and addr_parts[0].startswith('TCPIP'):
+        if len(addr_parts) == 4 and addr_parts[0].startswith("TCPIP"):
             try:
                 packed_ip = socket.inet_aton(addr_parts[1])
                 ip_str = socket.inet_ntoa(packed_ip)
                 port_nb = int(addr_parts[2])
-                self._ip_addr =  ip_str
+                self._ip_addr = ip_str
                 self._tcp_port_nb = port_nb
                 self._instr_addr = instr_addr
                 return
@@ -1390,44 +1476,45 @@ class TEWXAwg(object):
         self._instr_addr = instr_addr
 
 
-
-
 def wx_istrument_example():
-    '''Example of use
+    """
+    Example of use.
 
-    Connect to WX-Instrument, download 3 segments
-    and define (simple) sequence based on those 3 segments.
-    '''
+    Connect to WX-Instrument, download 3 segments and define (simple)
+    sequence based on those 3 segments.
+    """
     print()
-    ip_addr = input('Please enter the instrument\'s IP-Address (for example: 192.168.0.199): ')
+    ip_addr = input(
+        "Please enter the instrument's IP-Address (for example: 192.168.0.199): "
+    )
     print()
 
     with TEWXAwg(ip_addr, paranoia_level=2) as inst:
 
-        idn = inst.send_query('*IDN?')
-        print('connected to {0}\n'.format(idn))
+        idn = inst.send_query("*IDN?")
+        print("connected to {0}\n".format(idn))
 
         # reset instrument and clear error-list
-        inst.send_cmd('*CLS; *RST')
+        inst.send_cmd("*CLS; *RST")
 
         # select active channel
-        inst.send_cmd(':INST:SEL 1')
+        inst.send_cmd(":INST:SEL 1")
 
         # set  function-mode: 'USER' (arbitrary-wave)
-        inst.send_cmd('FUNCtion:MODE USER')
+        inst.send_cmd("FUNCtion:MODE USER")
 
         # delete previously defined segments (not really necessary after *RST)
-        inst.send_cmd(':TRACE:DEL:ALL')
+        inst.send_cmd(":TRACE:DEL:ALL")
 
         # set sampling-rate
-        inst.send_cmd(':SOUR:FREQ:RAST 1.0e9')
+        inst.send_cmd(":SOUR:FREQ:RAST 1.0e9")
 
         # ---------------------------------------------------------------------
         # download sine-wave with cycle-length of  1024 points to segment 1
         # ---------------------------------------------------------------------
 
         print()
-        print('downloading sine-wave with cycle-length of 1024 points to segment 1 ...')
+        print("downloading sine-wave with cycle-length of 1024 points to segment 1 ...")
 
         seg_nb = 1
         cycle_len = 1024
@@ -1436,22 +1523,23 @@ def wx_istrument_example():
         wav_dat = inst.build_sine_wave(cycle_len, num_cycles)
 
         # define the length of segment 1
-        inst.send_cmd(':TRAC:DEF {0:d},{1:d}'.format(seg_nb, seg_len))
+        inst.send_cmd(":TRAC:DEF {0:d},{1:d}".format(seg_nb, seg_len))
 
         # select segment 1 as the active segment
         # (the one to which binary-data is downloaded)
-        inst.send_cmd(':TRAC:SEL {0:d}'.format(seg_nb))
+        inst.send_cmd(":TRAC:SEL {0:d}".format(seg_nb))
 
         # download the binary wave data:
-        inst.send_binary_data(pref=':TRAC:DATA', bin_dat=wav_dat)
-
+        inst.send_binary_data(pref=":TRAC:DATA", bin_dat=wav_dat)
 
         # ---------------------------------------------------------------------
         # download triangle-wave with cycle-length of 1024 points to segment 2
         # ---------------------------------------------------------------------
 
         print()
-        print('downloading triangle-wave with cycle-length of 1024 points to segment 2 ...')
+        print(
+            "downloading triangle-wave with cycle-length of 1024 points to segment 2 ..."
+        )
 
         seg_nb = 2
         cycle_len = 1024
@@ -1460,21 +1548,23 @@ def wx_istrument_example():
         wav_dat = inst.build_triangle_wave(cycle_len, num_cycles)
 
         # define the length of segment 1
-        inst.send_cmd(':TRAC:DEF {0:d},{1:d}'.format(seg_nb, seg_len))
+        inst.send_cmd(":TRAC:DEF {0:d},{1:d}".format(seg_nb, seg_len))
 
         # select segment 1 as the active segment
         # (the one to which binary-data is downloaded)
-        inst.send_cmd(':TRAC:SEL {0:d}'.format(seg_nb))
+        inst.send_cmd(":TRAC:SEL {0:d}".format(seg_nb))
 
         # download the binary wave data:
-        inst.send_binary_data(pref=':TRAC:DATA', bin_dat=wav_dat)
+        inst.send_binary_data(pref=":TRAC:DATA", bin_dat=wav_dat)
 
         # ---------------------------------------------------------------------
         # download square-wave with cycle-length of 1024 points to segment 3
         # ---------------------------------------------------------------------
 
         print()
-        print('downloading square-wave with cycle-length of 1024 points to segment 3 ...')
+        print(
+            "downloading square-wave with cycle-length of 1024 points to segment 3 ..."
+        )
 
         seg_nb = 3
         cycle_len = 1024
@@ -1483,69 +1573,46 @@ def wx_istrument_example():
         wav_dat = inst.build_square_wave(cycle_len, num_cycles)
 
         # define the length of segment 1
-        inst.send_cmd(':TRAC:DEF {0:d},{1:d}'.format(seg_nb, seg_len))
+        inst.send_cmd(":TRAC:DEF {0:d},{1:d}".format(seg_nb, seg_len))
 
         # select segment 1 as the active segment
         # (the one to which binary-data is downloaded)
-        inst.send_cmd(':TRAC:SEL {0:d}'.format(seg_nb))
+        inst.send_cmd(":TRAC:SEL {0:d}".format(seg_nb))
 
         # download the binary wave data:
-        inst.send_binary_data(pref=':TRAC:DATA', bin_dat=wav_dat)
+        inst.send_binary_data(pref=":TRAC:DATA", bin_dat=wav_dat)
 
-        wav_dat = None # let the garbage-collecteor free it
+        wav_dat = None  # let the garbage-collecteor free it
 
         # ---------------------------------------------------------------------
         # define sequence based on those three segments:
         # ---------------------------------------------------------------------
 
         print()
-        print('define sequencer based on those 3 segments ..')
+        print("define sequencer based on those 3 segments ..")
         # create sequencer table:
-        seg_num  = [2, 1, 2, 3, 1 ]
-        repeats  = [5, 4, 3, 2, 1 ]
-        jump     = [0, 0, 0, 0, 0 ]
+        seg_num = [2, 1, 2, 3, 1]
+        repeats = [5, 4, 3, 2, 1]
+        jump = [0, 0, 0, 0, 0]
         seq_table = zip(repeats, seg_num, jump)
 
         # select sequencer 1 as the active sequencer (the one that being editted)
-        inst.send_cmd(':SEQ:SELect 1')
+        inst.send_cmd(":SEQ:SELect 1")
 
         # download the sequencer table:
         inst.download_sequencer_table(seq_table)
 
         # set  function-mode: 'SEQ' (simple sequencer)
-        inst.send_cmd('FUNCtion:MODE SEQ')
+        inst.send_cmd("FUNCtion:MODE SEQ")
 
         # turn on the active-channel's output:
-        inst.send_cmd(':OUTP ON')
+        inst.send_cmd(":OUTP ON")
 
-        syst_err = inst.send_query(':SYST:ERR?')
+        syst_err = inst.send_query(":SYST:ERR?")
         print()
-        print('End of the example - status: {0}'.format(syst_err))
+        print("End of the example - status: {0}".format(syst_err))
         print()
 
 
 if __name__ == "__main__":
     wx_istrument_example()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -7,7 +7,6 @@ from classes.generator import *
 from hardware_control.wx_programs import *
 
 
-
 def spectroscopy_ge(
     qubit1: object,
     gen_vals: dict,
@@ -17,7 +16,9 @@ def spectroscopy_ge(
     sweep_time=200,
     verbose=False,
 ):
-    """This function does the ef spectroscopy for the qubit by running over single sideband frequencies
+    """
+    This function does the ef spectroscopy for the qubit by running over single
+    sideband frequencies.
 
     Args:
         qubit (object): qubit that we perform the spectroscopy on
@@ -127,7 +128,9 @@ def spectroscopy_ef(
     sweep_time=200,
     verbose=True,
 ):
-    """Performs EF spectroscopy for the qubit by sweeping over single sideband frequencies.
+    """
+    Performs EF spectroscopy for the qubit by sweeping over single sideband
+    frequencies.
 
     Args:
         qubit1 (object): Qubit for spectroscopy.

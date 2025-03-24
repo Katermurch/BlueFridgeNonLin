@@ -43,7 +43,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="classifiers.classifier.classify">
 <span class="sig-prename descclassname"><span class="pre">classifiers.classifier.</span></span><span class="sig-name descname"><span class="pre">classify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classifiers.classifier.classify" title="Link to this definition">¶</a></dt>
-<dd><p>Performs state classification using I1Q1,I2Q2 data. Returns labels
+<dd><p>Performs state classification using I1Q1,I2Q2 data.</p>
+<p>Returns labels
 0: ground
 1: excited
 2: f</p>
@@ -58,13 +59,15 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="classifiers.classifier.probabilities">
 <span class="sig-prename descclassname"><span class="pre">classifiers.classifier.</span></span><span class="sig-name descname"><span class="pre">probabilities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classifiers.classifier.probabilities" title="Link to this definition">¶</a></dt>
-<dd><p>Returns probabilities for each state (0, 1, 2) as P_g, P_e, and P_f respectively.</p>
+<dd><p>Returns probabilities for each state (0, 1, 2) as P_g, P_e, and P_f
+respectively.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="classifiers.classifier.reshape_for_exp">
 <span class="sig-prename descclassname"><span class="pre">classifiers.classifier.</span></span><span class="sig-name descname"><span class="pre">reshape_for_exp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classifiers.classifier.reshape_for_exp" title="Link to this definition">¶</a></dt>
-<dd><p>This takes in the list of I or Q data and rearranges it such that we have num steps columns and reps rows</p>
+<dd><p>This takes in the list of I or Q data and rearranges it such that we
+have num steps columns and reps rows.</p>
 </dd></dl>
 
 </section>

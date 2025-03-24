@@ -166,7 +166,8 @@ def ramsey_quantum_efficiency(
     verbose=True,
 ):
     """
-    Performs a Ramsey experiment with an additional readout pulse to measure quantum efficiency.
+    Performs a Ramsey experiment with an additional readout pulse to measure
+    quantum efficiency.
 
     Args:
         qubit1 (object): The qubit under test.

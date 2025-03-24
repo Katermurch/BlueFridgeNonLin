@@ -1,9 +1,11 @@
 import sys
 import os
+
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 import hardware_control.wx_programs as wx
+
 main_directory = r"C:\Users\quantum1\Documents"
 
 hardware_paths = {
@@ -23,7 +25,7 @@ bnc_address = {
     "big_agilent": "GPIB0::30::INSTR",
     "agilent_function_generator": "GPIB0::10::INSTR",
     "target_bnc_6": "USB0::0x03EB::0xAFFF::411-433500000-0753::INSTR",
-    "wx_address": wx.get_wx_address()
+    "wx_address": wx.get_wx_address(),
 }
 
 add_paths_to_sys()

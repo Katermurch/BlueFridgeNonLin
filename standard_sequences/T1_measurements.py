@@ -128,8 +128,8 @@ def T1_ef(
     qubit1: object, qubit2: object, gen_vals: dict, sweep_time=15000, verbose=True
 ):
     """
-    Measures the T1 relaxation time of the e → f transition by applying a π_ge and π_ef pulse,
-    then varying the wait time before readout.
+    Measures the T1 relaxation time of the e → f transition by applying a π_ge
+    and π_ef pulse, then varying the wait time before readout.
 
     Args:
         qubit1 (object): The qubit under test.

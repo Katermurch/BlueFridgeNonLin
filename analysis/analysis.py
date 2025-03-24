@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jan 27 11:18:02 2020
+Created on Mon Jan 27 11:18:02 2020.
 
 @author: P. M. Harrington, 27 January 2020
 """
 import sys
 import os
+
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)

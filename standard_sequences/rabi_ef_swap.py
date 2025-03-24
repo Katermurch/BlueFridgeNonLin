@@ -15,7 +15,7 @@ def rabi_ef_swap(
     sweep_time=200,
     swap_freq=-0.21,
     swap_time=213.58765318403013,
-    swap_amp = 1.23,
+    swap_amp=1.23,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
     file_length = 30000
     #    num_steps = 101
@@ -33,7 +33,7 @@ def rabi_ef_swap(
     ssm_ge = qubit_rabi.ge_ssm
     ssm_ef = qubit_rabi.ef_ssm
     readout_dur = qubit_rabi.ro_dur
-    buffer =0
+    buffer = 0
 
     # first pi_ge pulse
 
@@ -68,7 +68,7 @@ def rabi_ef_swap(
     )
 
     swap = Pulse(
-        start=file_length - buffer- readout_dur,
+        start=file_length - buffer - readout_dur,
         duration=-swap_time,
         amplitude=swap_amp,
         ssm_freq=swap_freq,
@@ -77,7 +77,7 @@ def rabi_ef_swap(
     ringupdown_seq.add_sweep(channel=3, sweep_name="none", initial_pulse=swap)
 
     main_pulse_1 = Pulse(
-        start=file_length - buffer- readout_dur,
+        start=file_length - buffer - readout_dur,
         duration=readout_dur,
         amplitude=qubit_rabi.ro_amp,
         ssm_freq=ROIF1,
@@ -88,7 +88,7 @@ def rabi_ef_swap(
     # Q2 Readout
     # if q == 0:
     main_pulse_2 = Pulse(
-        start=file_length - buffer- readout_dur,
+        start=file_length - buffer - readout_dur,
         duration=readout_dur,
         amplitude=qubit2.ro_amp,
         ssm_freq=ROIF2,
@@ -101,7 +101,7 @@ def rabi_ef_swap(
 
     ## markers
     alazar_trigger = Pulse(
-        start=file_length - buffer- readout_dur - 1000, duration=1000, amplitude=1
+        start=file_length - buffer - readout_dur - 1000, duration=1000, amplitude=1
     )
     ringupdown_seq.add_sweep(
         channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger

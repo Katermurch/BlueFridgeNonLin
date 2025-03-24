@@ -28,7 +28,8 @@ def rabi_ge(
     sweep_time=200,
 ):
     """
-    This function should run the rabi ge sequence for a qubit, using the qubit's properties.
+    This function should run the rabi ge sequence for a qubit, using the
+    qubit's properties.
 
     Args:
         qubit_rabi (_type_): this is the qubit you are performing the rabi on
@@ -51,9 +52,9 @@ def rabi_ge(
     ROIF2 = qubit2.ROIF
     readout_dur = qubit_rabi.ro_dur
     phase_offset = gen_vals["mixer_offset"]
-    buffer=500
+    buffer = 500
     rabi_ge = Pulse(
-        start=file_length - readout_dur - buffer -100,
+        start=file_length - readout_dur - buffer - 100,
         duration=0,
         amplitude=ge_amp,
         ssm_freq=qubit_rabi.ge_ssm,
@@ -69,7 +70,7 @@ def rabi_ge(
     # HET readout
     # Q1 Readout
     main_pulse = Pulse(
-        start=file_length - buffer-readout_dur,
+        start=file_length - buffer - readout_dur,
         duration=readout_dur,
         amplitude=qubit_rabi.ro_amp,
         ssm_freq=ROIF1,
@@ -79,7 +80,7 @@ def rabi_ge(
 
     # Q2 Readout
     main_pulse = Pulse(
-        start=file_length - buffer-readout_dur,
+        start=file_length - buffer - readout_dur,
         duration=readout_dur,
         amplitude=qubit2.ro_amp,
         ssm_freq=ROIF2,
@@ -89,7 +90,7 @@ def rabi_ge(
 
     ## markers
     alazar_trigger = Pulse(
-        start=file_length - buffer-readout_dur - 1000, duration=50, amplitude=1
+        start=file_length - buffer - readout_dur - 1000, duration=50, amplitude=1
     )
     ringupdown_seq.add_sweep(
         channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger
@@ -136,7 +137,9 @@ def rabi_ef(
     sweep_time=200,
 ):
     """
-    This function should run the rabi ef sequence for a qubit, using the qubit's properties.
+    This function should run the rabi ef sequence for a qubit, using the
+    qubit's properties.
+
     Args:
         qubit_rabi (object): this is the qubit you are performing the rabi on
         qubit2 (object): this qubit exists for homodyne readout
@@ -170,7 +173,9 @@ def rabi_ef(
 
     # Pi ge amp
     pi_ge_pulse = Pulse(
-        start=file_length - readout_dur-buffer ,  # the 100 is the match the buffer below
+        start=file_length
+        - readout_dur
+        - buffer,  # the 100 is the match the buffer below
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -204,7 +209,7 @@ def rabi_ef(
     # Rabi Qubit Readout
 
     main_pulse = Pulse(
-        start=file_length - readout_dur-buffer,
+        start=file_length - readout_dur - buffer,
         duration=readout_dur,
         amplitude=qubit_rabi.ro_amp,
         ssm_freq=ROIF1,
@@ -215,7 +220,7 @@ def rabi_ef(
     # Other qubit Readout
 
     main_pulse = Pulse(
-        start=file_length - readout_dur-buffer,
+        start=file_length - readout_dur - buffer,
         duration=readout_dur,
         amplitude=qubit2.ro_amp,
         ssm_freq=ROIF2,
@@ -225,7 +230,7 @@ def rabi_ef(
 
     ## markers
     alazar_trigger = Pulse(
-        start=file_length - readout_dur-buffer - 1000, duration=1000, amplitude=1
+        start=file_length - readout_dur - buffer - 1000, duration=1000, amplitude=1
     )
     ringupdown_seq.add_sweep(
         channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger
