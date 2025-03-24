@@ -15,8 +15,8 @@ q1_dict = {
     "ef_ssm": -0.2568,
     "ge_time": 81,
     "ef_time": 49,
-    "ge_amp": .82,#.5
-    "ef_amp":1.51,
+    "ge_amp": .874,#.5
+    "ef_amp":1.50,
     "IQ_angle": 205,
     "ro_amp": 1,
     "qubit_thr": [-10000,-600],

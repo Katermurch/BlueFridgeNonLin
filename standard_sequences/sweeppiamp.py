@@ -7,7 +7,7 @@ from classes.generator import *
 from hardware_control.wx_programs import *
 
 
-def hpi_ge_amp(
+def pi_ge_amp(
     qubit1: object,
     qubit2: object,
     gen_vals: dict,
@@ -26,16 +26,17 @@ def hpi_ge_amp(
     ssm_ge = qubit1.ge_ssm
     readout_dur = qubit1.ro_dur
     buffer= 3
-   
+    
+
     
     #phase_offset_ef = mixer_offset_ef
-    hpi_ge_1 = Pulse(start=file_length-readout_dur-4*buffer-3*pi_ge-swap_time, duration=-pi_ge-swap_time, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
+    hpi_ge_1 = Pulse(start=file_length-readout_dur-4*buffer-3*pi_ge-swap_time, duration=-pi_ge, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
     ringupdown_seq.add_sweep(channel=4, sweep_name='none',initial_pulse=hpi_ge_1)
     
-    hpi_ge_2 = Pulse(start=file_length-readout_dur-3*buffer-2*pi_ge-swap_time, duration=-pi_ge-swap_time, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
+    hpi_ge_2 = Pulse(start=file_length-readout_dur-3*buffer-2*pi_ge-swap_time, duration=-pi_ge, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
     ringupdown_seq.add_sweep(channel=4, sweep_name='none',initial_pulse=hpi_ge_2)
     
-    hpi_ge_3 = Pulse(start=file_length-readout_dur-2*buffer-1*pi_ge-swap_time, duration=-pi_ge-swap_time, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
+    hpi_ge_3 = Pulse(start=file_length-readout_dur-2*buffer-1*pi_ge-swap_time, duration=-pi_ge, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
     ringupdown_seq.add_sweep(channel=4, sweep_name='none',initial_pulse=hpi_ge_3)
     
     hpi_ge_4 = Pulse(start=file_length-readout_dur-1*buffer-0*pi_ge-swap_time, duration=-pi_ge, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
