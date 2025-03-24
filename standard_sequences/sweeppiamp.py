@@ -11,36 +11,50 @@ def pi_ge_amp(
     qubit1: object,
     qubit2: object,
     gen_vals: dict,
-    num_steps = 3,
+    num_steps=3,
     amp=0.8,
     pi_ge=24,
     swap_freq=-0.21,
     swap_time=213.58765318403013,
-    ): #this is pulsed readout to ring up and ring down cavity dfor e state
-    #(coef=0,coefpief=0,off=0,ro_dur=8000,ro_amp=1,pi_ge=24,pi_ef=20,ssm_ge = -0.04575,ssm_ef=-0.04575-0.15)
-    #(num_steps = 3,coef=0,coefpief=0,coefpifh=0,off=0,ro_dur=8000,ro_amp=1,pi_ge=24,pi_ef=20,pi_fh=20,ssm_ge = -0.04,ssm_ef=-0.04-0.15,ssm_fh=-0.04-0.3,phase_offset=0,phase_offset_ef=0)
+):  # this is pulsed readout to ring up and ring down cavity dfor e state
+    # (coef=0,coefpief=0,off=0,ro_dur=8000,ro_amp=1,pi_ge=24,pi_ef=20,ssm_ge = -0.04575,ssm_ef=-0.04575-0.15)
+    # (num_steps = 3,coef=0,coefpief=0,coefpifh=0,off=0,ro_dur=8000,ro_amp=1,pi_ge=24,pi_ef=20,pi_fh=20,ssm_ge = -0.04,ssm_ef=-0.04-0.15,ssm_fh=-0.04-0.3,phase_offset=0,phase_offset_ef=0)
     file_length = 16000
-    ringupdown_seq = Sequence(file_length, num_steps) #this creates something called rabi_seq that is an instance of a sequence class
+    ringupdown_seq = Sequence(
+        file_length, num_steps
+    )  # this creates something called rabi_seq that is an instance of a sequence class
     ROIF1 = qubit1.ro_freq - qubit1.RO_LO
     ROIF2 = qubit2.ro_freq - qubit2.RO_LO
     ssm_ge = qubit1.ge_ssm
     readout_dur = qubit1.ro_dur
     buffer= 3
-    
-
+    pi_ge = qubit1.ge_time
+    ge_amp = qubit1.ge_amp
+    pi_ge_pulse = Pulse(
+        start=file_length-readout_dur-swap_time,#-4*buffer-4*pi_ge
+        duration=-pi_ge,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=0,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="none",
+        initial_pulse=pi_ge_pulse,
+    )
     
     #phase_offset_ef = mixer_offset_ef
-    hpi_ge_1 = Pulse(start=file_length-readout_dur-4*buffer-3*pi_ge-swap_time, duration=-pi_ge, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
-    ringupdown_seq.add_sweep(channel=4, sweep_name='none',initial_pulse=hpi_ge_1)
+    # pi_ge_1 = Pulse(start=file_length-readout_dur-4*buffer-3*pi_ge-swap_time, duration=-pi_ge, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
+    # ringupdown_seq.add_sweep(channel=4, sweep_name='none',initial_pulse=pi_ge_1)
     
-    hpi_ge_2 = Pulse(start=file_length-readout_dur-3*buffer-2*pi_ge-swap_time, duration=-pi_ge, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
-    ringupdown_seq.add_sweep(channel=4, sweep_name='none',initial_pulse=hpi_ge_2)
+    # pi_ge_2 = Pulse(start=file_length-readout_dur-3*buffer-2*pi_ge-swap_time, duration=-pi_ge, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
+    # ringupdown_seq.add_sweep(channel=4, sweep_name='none',initial_pulse=pi_ge_2)
     
-    hpi_ge_3 = Pulse(start=file_length-readout_dur-2*buffer-1*pi_ge-swap_time, duration=-pi_ge, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
-    ringupdown_seq.add_sweep(channel=4, sweep_name='none',initial_pulse=hpi_ge_3)
+    # pi_ge_3 = Pulse(start=file_length-readout_dur-2*buffer-1*pi_ge-swap_time, duration=-pi_ge, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
+    # ringupdown_seq.add_sweep(channel=4, sweep_name='none',initial_pulse=pi_ge_3)
     
-    hpi_ge_4 = Pulse(start=file_length-readout_dur-1*buffer-0*pi_ge-swap_time, duration=-pi_ge, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
-    ringupdown_seq.add_sweep(channel=4, sweep_name='none',initial_pulse=hpi_ge_4)
+    # pi_ge_4 = Pulse(start=file_length-readout_dur-1*buffer-0*pi_ge-swap_time, duration=-pi_ge, amplitude=amp, ssm_freq=ssm_ge, phase=0) 
+    # ringupdown_seq.add_sweep(channel=4, sweep_name='none',initial_pulse=pi_ge_4)
     
     swap = Pulse(
         start=file_length - readout_dur,
@@ -50,10 +64,10 @@ def pi_ge_amp(
         phase=0,
     )
     ringupdown_seq.add_sweep(channel=3, sweep_name="none", initial_pulse=swap)
-    
-    #Readout
-    
-     #HET 
+
+    # Readout
+
+    # HET
     main_pulse_1 = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
@@ -74,11 +88,14 @@ def pi_ge_amp(
     )
     ringupdown_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse_2)
 
-    
     ## markers
-    alazar_trigger = Pulse(start=file_length-readout_dur-1000, duration=1000, amplitude=1)
-    ringupdown_seq.add_sweep(channel=3, marker=1, sweep_name='none', initial_pulse=alazar_trigger )
-    
+    alazar_trigger = Pulse(
+        start=file_length - readout_dur - 1000, duration=1000, amplitude=1
+    )
+    ringupdown_seq.add_sweep(
+        channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger
+    )
+
     ##create the gate for ch1 an ch2
 
     ## view output
@@ -109,7 +126,8 @@ def pi_ge_amp(
         file_path=write_dir,
         num_offset=0,
         ch_amp=[1, 1, 1, 1],
-    )    
+    )
+
 
 def rabi_ef_swap(
     qubit_rabi: object,
@@ -119,7 +137,7 @@ def rabi_ef_swap(
     sweep_time=200,
     swap_freq=-0.21,
     swap_time=213.58765318403013,
-    swap_amp = 1.23,
+    swap_amp=1.23,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
     file_length = 30000
     #    num_steps = 101
@@ -137,7 +155,7 @@ def rabi_ef_swap(
     ssm_ge = qubit_rabi.ge_ssm
     ssm_ef = qubit_rabi.ef_ssm
     readout_dur = qubit_rabi.ro_dur
-    buffer =0
+    buffer = 0
 
     # first pi_ge pulse
 
@@ -172,7 +190,7 @@ def rabi_ef_swap(
     )
 
     swap = Pulse(
-        start=file_length - buffer- readout_dur,
+        start=file_length - buffer - readout_dur,
         duration=-swap_time,
         amplitude=swap_amp,
         ssm_freq=swap_freq,
@@ -205,7 +223,7 @@ def rabi_ef_swap(
 
     ## markers
     alazar_trigger = Pulse(
-        start=file_length - buffer- readout_dur - 1000, duration=1000, amplitude=1
+        start=file_length - buffer - readout_dur - 1000, duration=1000, amplitude=1
     )
     ringupdown_seq.add_sweep(
         channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger

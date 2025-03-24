@@ -17,7 +17,7 @@ def rabi_ef_swap_tomo(
     swap_time=213.58765318403013,
     drive_amp_J=1,
     tomo_comp="z",
-    y_ph = 0,
+    y_ph=0,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
     file_length = 30000
     #    num_steps = 101
@@ -45,7 +45,7 @@ def rabi_ef_swap_tomo(
     y_ph = y_ph
     ###########
 
-    #comment this back in when we have found EP
+    # comment this back in when we have found EP
 
     ##########
     # a_to_J = ((2 * np.pi) / (2 * (2 * qubit_rabi.ef_time * 10**-3))) / 1.5
@@ -61,7 +61,7 @@ def rabi_ef_swap_tomo(
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
-        phase=y_ph-90,
+        phase=y_ph - 90,
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
         channel=4,
@@ -155,7 +155,7 @@ def rabi_ef_swap_tomo(
 
     ## markers
     alazar_trigger = Pulse(
-        start=file_length - readout_dur  - 1000, duration=1000, amplitude=1
+        start=file_length - readout_dur - 1000, duration=1000, amplitude=1
     )
     ringupdown_seq.add_sweep(
         channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger

@@ -4,7 +4,7 @@ import os
 # Get the directory containing the current file (classes)
 current_dir = os.path.dirname(os.path.abspath(__file__))
 # Get the parent directory (which should contain hardware_control)
-parent_dir = os.path.abspath(os.path.join(current_dir, '..'))
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
@@ -44,7 +44,7 @@ class Pulse:
             self.phase = phase
         else:
             self.ssm_bool = False
-        #self.waveform = self.make() ## make is currently not working.
+        # self.waveform = self.make() ## make is currently not working.
 
         # FUTURE FEATURES:
         self.gaussian_bool = gaussian_bool
@@ -588,9 +588,7 @@ class Sequence:
         DESCRIPTION: Loads sequences from self.binary_file (created by self.write_sequence)
         INPUT: String name of insturment (eg IP address)
         """
-        """
-        Jump flags?
-        """
+        """Jump flags?"""
         file_length = self.sequence_length
         num_steps = self.num_steps
 

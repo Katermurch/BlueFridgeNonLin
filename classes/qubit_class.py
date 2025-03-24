@@ -1,7 +1,8 @@
 class Readout:
     def __init__(self, config):
         """
-        Initialize a Readout instance with specific properties from a dictionary.
+        Initialize a Readout instance with specific properties from a
+        dictionary.
 
         Args:
             config (dict): A dictionary containing key-value pairs for the Readout properties.
@@ -36,9 +37,9 @@ class Readout:
 class Qubit(Readout):
     def __init__(self, qubit_config, readout_config):
         """
-        Initialize a Qubit instance with both Qubit- and Readout-related configuration.
-        The Qubit class inherits from Readout so that the readout parameters are automatically
-        initialized via a super() call.
+        Initialize a Qubit instance with both Qubit- and Readout-related
+        configuration. The Qubit class inherits from Readout so that the
+        readout parameters are automatically initialized via a super() call.
 
         If the Qubit configuration does not include 'ROIF', it is automatically computed as:
             ROIF = ro_freq - RO_LO
@@ -66,7 +67,7 @@ class Qubit(Readout):
             "IQ_angle",
             "ro_amp",
             "qubit_thr",
-            "RO_IF"
+            "RO_IF",
         }
 
         # Validate and set Qubit-specific attributes
@@ -84,12 +85,16 @@ class Qubit(Readout):
         # Automatically compute ROIF if not provided.
         # (Since ROIF is not a Qubit-specific allowed attribute, it will be computed here.)
         if self.ro_freq is None or self.RO_LO is None:
-            raise ValueError("Cannot compute ROIF because either 'ro_freq' or 'RO_LO' is missing.")
+            raise ValueError(
+                "Cannot compute ROIF because either 'ro_freq' or 'RO_LO' is missing."
+            )
         self.ROIF = self.ro_freq - self.RO_LO
 
     def __repr__(self):
         # Combine both Qubit and Readout attributes plus the computed ROIF
-        combined_attrs = self.allowed_qubit_attributes.union(self.allowed_attributes).union({"ROIF"})
+        combined_attrs = self.allowed_qubit_attributes.union(
+            self.allowed_attributes
+        ).union({"ROIF"})
         attributes = ", ".join(
             f"{attr}={getattr(self, attr)}" for attr in combined_attrs
         )

@@ -8,7 +8,8 @@ def pi_nopi_ge(
     coef: float, offset: float, qubit: object, qubit2: object, gen_vals: dict
 ):
     """
-    This function should run the pi nopi sequence for a qubit on the ge manifold, using the qubit's properties.
+    This function should run the pi nopi sequence for a qubit on the ge
+    manifold, using the qubit's properties.
 
     Args:
         coef (float): coefficient for the pi pulse
@@ -88,7 +89,8 @@ def pi_nopi_ef(
     coef: float, offset: float, qubit: object, qubit2: object, gen_vals: dict
 ):
     """
-    This function should run the pi nopi sequence for a qubit on the ef manifold, using the qubit's properties.
+    This function should run the pi nopi sequence for a qubit on the ef
+    manifold, using the qubit's properties.
 
     Args:
         coef (float): coefficient for the pi pulse
@@ -229,7 +231,8 @@ def pipi_pi_nopi(
     gen_vals: dict,
 ):
     """
-    This function should run the pipi pi nopi sequence (three state) for a qubit using the qubit's properties.
+    This function should run the pipi pi nopi sequence (three state) for a
+    qubit using the qubit's properties.
 
     Args:
         coef (float): coefficient for the pi pulse
@@ -353,7 +356,11 @@ def pi_nopi_swap(
     buffer = 3
     readout_dur = q1.ro_dur
     pi_ge_pulse = Pulse(
-        start=file_length - readout_dur - copief * pi_ef - coswap * swap_time-2*buffer,
+        start=file_length
+        - readout_dur
+        - copief * pi_ef
+        - coswap * swap_time
+        - 2 * buffer,
         duration=-pi_ge * copige,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -361,7 +368,7 @@ def pi_nopi_swap(
     )
     ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=pi_ge_pulse)
     pi_ef_pulse = Pulse(
-        start=file_length - readout_dur - coswap * swap_time-buffer,
+        start=file_length - readout_dur - coswap * swap_time - buffer,
         duration=-pi_ef * copief,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
