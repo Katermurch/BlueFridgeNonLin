@@ -111,8 +111,8 @@ def get_daq_parameters(ro_dur=7000, IQangle=90):
     ]  # [151.19329501588203, 160] #[153.2, 161.60] # [146.9, 157.86]
     # [147.8, 159.2] before power outage Apr 23, 2020
     # note: daq_alazar sets the clock to 250 MS/s
-    daq_params.readout_start = 1500  # 1500#2300 #1100
-    daq_params.readout_duration = 4000  # 4000#2000 #120#200# 140 #1000
+    daq_params.readout_start = 1000  # 1500#2300 #1100
+    daq_params.readout_duration = 3000  # 4000#2000 #120#200# 140 #1000
 
     return daq_params
 

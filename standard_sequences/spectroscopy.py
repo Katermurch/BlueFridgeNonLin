@@ -9,6 +9,7 @@ from hardware_control.wx_programs import *
 
 def spectroscopy_ge(
     qubit1: object,
+    qubit2: object,
     gen_vals: dict,
     ssm_start=-0.15,
     ssm_stop=-0.25,
@@ -31,7 +32,7 @@ def spectroscopy_ge(
         verbose (bool, optional): show the plot of the pulse. Defaults to True.
     """
 
-    file_length = 16000
+    file_length = 30000
     num_steps = 101
     ringupdown_seq = Sequence(
         file_length, num_steps
@@ -143,7 +144,7 @@ def spectroscopy_ef(
         verbose (bool, optional): If True, displays plots of the pulse. Defaults to True.
     """
 
-    file_length = 16000
+    file_length = 30000
     num_steps = 101
     ringupdown_seq = Sequence(file_length, num_steps)
 

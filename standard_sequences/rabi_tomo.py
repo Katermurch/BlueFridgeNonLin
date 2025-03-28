@@ -18,6 +18,7 @@ def rabi_ef_swap_tomo(
     drive_amp_J=1,
     tomo_comp="z",
     y_ph=0,
+    amp=1.61
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
     file_length = 30000
     #    num_steps = 101
@@ -38,7 +39,7 @@ def rabi_ef_swap_tomo(
     ssm_ef = qubit_rabi.ef_ssm
     readout_dur = qubit_rabi.ro_dur
     buffer = 2
-    if 'z' == tomo_comp:
+    if "z" == tomo_comp:
         tomo_time = 0
     else:
         tomo_time = 24  # This adds a buffer for the tomography
@@ -57,11 +58,11 @@ def rabi_ef_swap_tomo(
     # first pi_ge pulse
 
     pi_ge_pulse = Pulse(
-        start=file_length - readout_dur - buffer - swap_time - tomo_time ,
+        start=file_length - readout_dur - buffer - swap_time - tomo_time,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
-        phase=y_ph - 90,
+        phase=0,
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
         channel=4,
@@ -83,7 +84,7 @@ def rabi_ef_swap_tomo(
     #     start=0,
     #     stop=-sweep_time,
     #     initial_pulse=pi_ef_pulse,
-    #)
+    # )
     # drive rabi e-f
     rabi_ef = Pulse(
         start=file_length - readout_dur - buffer - swap_time - tomo_time,
@@ -104,9 +105,9 @@ def rabi_ef_swap_tomo(
         pass
     elif tomo_comp == "x":
         tomo_pulse = Pulse(
-            start=file_length - readout_dur -buffer - swap_time,
+            start=file_length - readout_dur - buffer - swap_time,
             duration=-24,
-            amplitude=1.589 ,
+            amplitude=amp,
             ssm_freq=ssm_ef,
             phase=y_ph - 90,
         )
@@ -115,7 +116,7 @@ def rabi_ef_swap_tomo(
         tomo_pulse = Pulse(
             start=file_length - readout_dur - buffer - swap_time,
             duration=-24,
-            amplitude=1.589,
+            amplitude=amp,
             ssm_freq=ssm_ef,
             phase=y_ph,
         )
@@ -124,7 +125,7 @@ def rabi_ef_swap_tomo(
         raise ValueError("tomo_comp must be x, y, or z")
 
     swap = Pulse(
-        start=file_length - readout_dur  - tomo_time,
+        start=file_length - readout_dur - tomo_time,
         duration=-swap_time,
         amplitude=1.36,
         ssm_freq=swap_freq,

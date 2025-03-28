@@ -5,8 +5,7 @@
 
 BlueFridgeNonLin documentation
 ==============================
-Welcome to the BlueFridgeNonLin Project
-=======================================
+
 
 This documentation is for the Blue Fridge non-Hermitian 4+5 qubit setup, built while we're still using GPIB and the WX waveform generator. It serves as a snapshot of the control and analysis infrastructure as we transition toward a more modular and object-oriented codebase.
 
