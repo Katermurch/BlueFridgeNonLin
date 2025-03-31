@@ -43,7 +43,7 @@ def rabi_ef_swap_tomo(
         tomo_time = 0
     else:
         tomo_time = 24  # This adds a buffer for the tomography
-    y_ph = y_ph
+    
     ###########
 
     # comment this back in when we have found EP
@@ -91,7 +91,7 @@ def rabi_ef_swap_tomo(
         duration=0,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
-        phase=y_ph - 90,
+        phase=153,
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
         channel=4,
@@ -109,7 +109,7 @@ def rabi_ef_swap_tomo(
             duration=-24,
             amplitude=amp,
             ssm_freq=ssm_ef,
-            phase=y_ph - 90,
+            phase=0,
         )
         ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=tomo_pulse)
     elif tomo_comp == "y":
@@ -118,7 +118,7 @@ def rabi_ef_swap_tomo(
             duration=-24,
             amplitude=amp,
             ssm_freq=ssm_ef,
-            phase=y_ph,
+            phase=153+y_ph,
         )
         ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=tomo_pulse)
     else:
