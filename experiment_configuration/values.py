@@ -71,5 +71,5 @@ bnc_address = {
     "big_agilent": "GPIB0::30::INSTR",
     "agilent_function_generator": "GPIB0::30::INSTR",
     "target_bnc_6": "USB0::0x03EB::0xAFFF::411-433500000-0753::INSTR",
-    "wx_address": "128.252.134.31",
+    "wx_address": "10.225.208.204",
 }

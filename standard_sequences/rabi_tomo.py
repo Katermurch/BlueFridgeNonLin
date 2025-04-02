@@ -25,8 +25,6 @@ def rabi_ef_swap_tomo(
     ringupdown_seq = Sequence(
         file_length, num_steps
     )  # this creates something called rabi_seq that is an instance of a sequence class
-    # qubit_rabi = qubit_rabi.copy()
-    # qubit2 = qubit2.copy()
     ef_amp = qubit_rabi.ef_amp
     ge_amp = qubit_rabi.ge_amp
     phase_offset = gen_vals["mixer_offset"]
@@ -130,9 +128,11 @@ def rabi_ef_swap_tomo(
         amplitude=1.36,
         ssm_freq=swap_freq,
         phase=0,
+        gaussian_bool=False,
     )
     ringupdown_seq.add_sweep(channel=3, sweep_name="none", initial_pulse=swap)
-
+    # swap.make()
+    # swap.show()
     main_pulse_1 = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
@@ -150,9 +150,6 @@ def rabi_ef_swap_tomo(
         phase=-file_length * ROIF2 * 360,
     )
     ringupdown_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse_2)
-    #    main_pulse.phase = 90
-    # main_pulse = Pulse(start = file_length- readout_dur,duration= readout_dur, amplitude= 1.3*readout_amp,ssm_freq=ROIF, phase=0 )
-    # ringupdown_seq.add_sweep(channel=1, sweep_name='none',initial_pulse=main_pulse)
 
     ## markers
     alazar_trigger = Pulse(
@@ -175,7 +172,6 @@ def rabi_ef_swap_tomo(
         marker1 = ringupdown_seq.channel_list[0][2]
 
         channel = channel1_ch + channel3_ch + marker1
-
     write_dir = (
         r"C:\arbsequences\strong_dispersive_withPython\test_pulse_ringupdown_bin"
     )
@@ -187,7 +183,7 @@ def rabi_ef_swap_tomo(
         write_binary=True,
     )
     ringupdown_seq.load_sequence_from_disk(
-        "128.252.134.31",
+        "10.225.208.204",
         base_name="foo",
         file_path=write_dir,
         num_offset=0,

@@ -92,7 +92,7 @@ def set_run_mode_continuous():
 def set_marker_level(which_channel="ch1ch2", which_marker=2, marker_voltage_level=1.2):
     #
     instr_addr = get_wx_address()
-
+    print(instr_addr)
     # Initializing the instrument
     inst = tewx.TEWXAwg(instr_addr, paranoia_level=1)
 

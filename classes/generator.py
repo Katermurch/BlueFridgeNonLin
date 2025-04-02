@@ -50,16 +50,23 @@ class Pulse:
         self.gaussian_bool = gaussian_bool
 
     def make(self):
-        new_array = np.zeros(self.duration)
+        new_array = np.zeros(abs(self.duration))
         if self.ssm_bool:
             gen_pulse(dest_wave=new_array, pulse=self)
         else:
             gen_pulse(new_array, pulse=self)
-
+        self.waveform =new_array
         return new_array
 
     def show(self):
-        plt.plot(np.arange(self.start, self.duration), self.waveform)
+        if not hasattr(self, 'waveform'):
+            self.make()
+        times = np.arange(0,abs( self.duration))
+        plt.plot(times, self.waveform)
+        plt.title('Pulse Envelope (Local Time)')
+        plt.xlabel('Time (samples)')
+        plt.ylabel('Amplitude')
+        plt.grid(True)
         plt.show()
 
     def copy(self):
@@ -551,13 +558,8 @@ class Sequence:
             # Turn channels on:
             inst.send_cmd(":INIT:CONT 0")
 
-        # Setting up amplitudes and offsets
-        # amp = [1, 1.02, 2, 2]
-        # offset = [-0.04, -0.053, -0.026, -0.037]
-        # ch_amp = [1, 1, 1.5, 1] # changed on 20/06/11 for Strong dispersive
-        #        offset = [-0.041, -0.115, -0.016, -0.031]# changed on 20/06/18 for Strong dispersive
+      
         offset = [-0.012, -0.079, 0.006, -0.021]  # changed on 11/23/2022 by Xiayu
-        #        offset = [-0.021, -0.094, -0.006, -0.021] # for KZ047R111 qubit
         for ch_index, _ in enumerate(self.channel_list):
             inst.send_cmd(":INST:SEL {0}".format(ch_index + 1))
             inst.send_cmd(":VOLT {}".format(ch_amp[ch_index]))
@@ -723,11 +725,32 @@ def gen_pulse(dest_wave, pulse):
         addition = amp * np.ones(dur)
 
     if pulse.gaussian_bool:
-        argument = -((times - start - dur / 2) ** 2)
-        argument /= 2 * (dur * 0.2) ** 2  # 0.847 gives Gauss(start +dur/2) = 0.5
-        gauss_envelope = np.exp(argument)
-        addition *= gauss_envelope
+        rise_time = int(0.2 * dur)
+        fall_time = int(0.2 * dur)
+        flat_time = dur - rise_time - fall_time
 
+        if flat_time < 0:
+            flat_time = 0
+            rise_time = fall_time = dur //2
+        
+        t = np.arange(dur)
+        envelope = np.zeros(dur)
+
+        #rising edge
+        rise_idx = (t < rise_time)
+        envelope[rise_idx] = 0.5 * ( 1 - np.cos(np.pi * t[rise_idx]/ rise_time))
+        
+        # flat region
+        flat_idx = (t >= rise_time) & (t < rise_time + flat_time)
+        envelope[flat_idx] = 1.0
+
+        # falling edge
+        fall_idx = ( t >= rise_time + flat_time)
+        fall_t = t[fall_idx] - (rise_time + flat_time)
+        envelope[fall_idx] = 0.5 * (1 + np.cos(np.pi * fall_t / fall_time))
+
+        # multiply by the envelope
+        addition *= envelope
     try:
         dest_wave[start : start + dur] += addition
         return dest_wave

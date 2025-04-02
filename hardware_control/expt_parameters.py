@@ -6,6 +6,7 @@ Created on Fri Mar  6 13:00:39 2020.
 """
 import sys
 import os
+import experiment_configuration.values as values
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir not in sys.path:
@@ -119,7 +120,7 @@ def get_daq_parameters(ro_dur=7000, IQangle=90):
 
 def get_instrument_address(instrument_name):
     if instrument_name == "wx":
-        return "128.252.134.31"
+        return"10.225.208.204"
 
 
 if __name__ == "__main__":

@@ -384,7 +384,7 @@ class CommIntfType:
 class TEWXAwg(object):
     """Tabor-Electronics WX-Instrument Controller (Without VISA-NI)"""
 
-    def __init__(self, instr_addr="128.252.134.31", tcp_timeout=5.0, paranoia_level=1):
+    def __init__(self, instr_addr="10.225.208.204", tcp_timeout=5.0, paranoia_level=1):
         """
         Initialize this `TEWWAwg` instance.
 
@@ -474,6 +474,7 @@ class TEWXAwg(object):
             self._tcp_timeout = float(tcp_timeout)
 
         if self._ip_addr is not None:
+            #print(f"ip address: {self._ip_addr}")
             # Open TCP-IP Socket:
             self._tcp_sock = socket.socket(
                 socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP

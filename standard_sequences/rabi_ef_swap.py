@@ -17,7 +17,7 @@ def rabi_ef_swap(
     swap_time=213.58765318403013,
     swap_amp=1.23,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
-    file_length = 30000
+    file_length = 80000
     #    num_steps = 101
     ringupdown_seq = Sequence(
         file_length, num_steps
@@ -38,7 +38,7 @@ def rabi_ef_swap(
     # first pi_ge pulse
 
     pi_ge_pulse = Pulse(
-        start=file_length - readout_dur - buffer - swap_time,
+        start=file_length - readout_dur  - swap_time,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -53,11 +53,11 @@ def rabi_ef_swap(
     )
     # drive rabi e-f
     rabi_ef = Pulse(
-        start=file_length - readout_dur - buffer - swap_time,
+        start=file_length - readout_dur  - swap_time,
         duration=0,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
-        phase=0,
+        phase=153,
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
         channel=4,
@@ -68,16 +68,17 @@ def rabi_ef_swap(
     )
 
     swap = Pulse(
-        start=file_length - buffer - readout_dur,
+        start=file_length - readout_dur,
         duration=-swap_time,
-        amplitude=swap_amp,
+        amplitude=1.36,
         ssm_freq=swap_freq,
         phase=0,
+        gaussian_bool=False,
     )
     ringupdown_seq.add_sweep(channel=3, sweep_name="none", initial_pulse=swap)
 
     main_pulse_1 = Pulse(
-        start=file_length - buffer - readout_dur,
+        start=file_length  - readout_dur,
         duration=readout_dur,
         amplitude=qubit_rabi.ro_amp,
         ssm_freq=ROIF1,
@@ -88,7 +89,7 @@ def rabi_ef_swap(
     # Q2 Readout
     # if q == 0:
     main_pulse_2 = Pulse(
-        start=file_length - buffer - readout_dur,
+        start=file_length - readout_dur,
         duration=readout_dur,
         amplitude=qubit2.ro_amp,
         ssm_freq=ROIF2,
@@ -101,7 +102,7 @@ def rabi_ef_swap(
 
     ## markers
     alazar_trigger = Pulse(
-        start=file_length - buffer - readout_dur - 1000, duration=1000, amplitude=1
+        start=file_length - readout_dur - 1000, duration=1000, amplitude=1
     )
     ringupdown_seq.add_sweep(
         channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger
@@ -132,7 +133,7 @@ def rabi_ef_swap(
         write_binary=True,
     )
     ringupdown_seq.load_sequence_from_disk(
-        "128.252.134.31",
+        "10.225.208.204",
         base_name="foo",
         file_path=write_dir,
         num_offset=0,
