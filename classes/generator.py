@@ -50,24 +50,22 @@ class Pulse:
         self.gaussian_bool = gaussian_bool
 
     def make(self):
-        new_array = np.zeros(abs(self.duration))
-        if self.ssm_bool:
-            gen_pulse(dest_wave=new_array, pulse=self)
-        else:
-            gen_pulse(new_array, pulse=self)
-        self.waveform =new_array
-        return new_array
+        pass
 
     def show(self):
-        if not hasattr(self, 'waveform'):
-            self.make()
-        times = np.arange(0,abs( self.duration))
-        plt.plot(times, self.waveform)
-        plt.title('Pulse Envelope (Local Time)')
-        plt.xlabel('Time (samples)')
-        plt.ylabel('Amplitude')
+        # Only generate for plotting — never reuse this waveform in sequence
+        dur = abs(self.duration)
+        temp_waveform = np.zeros(self.start + dur)
+        gen_pulse(temp_waveform, self)
+        
+        times = np.arange(len(temp_waveform))
+        plt.plot(times, temp_waveform)
+        plt.title("Pulse Envelope (Global Time)")
+        plt.xlabel("Time (samples)")
+        plt.ylabel("Amplitude")
         plt.grid(True)
         plt.show()
+
 
     def copy(self):
         # there must be a better/ more general way to do this.
