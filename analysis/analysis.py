@@ -315,6 +315,48 @@ def fit_sine_decay(x_vals, y_vals, guess_vals=None):
     print("pi_pulse time" + ": {} +/- {}".format(1 / 2 / popt[0], perr[0]))
     return (popt, perr, y_vals_fit, pcov)
 
+def fit_sine_square_decay(x_vals, y_vals, guess_vals=None,lower_bounds=[0, 0.3,0, -np.inf, -np.inf], upper_bounds=[.3,0.6,np.inf, np.inf, np.inf]):
+    if guess_vals is None:
+        guess_freq_Hz = 5
+        guess_gamma = 5
+        guess_amplitude = 0.5
+        guess_phase_deg = -90
+        guess_offset = 0.5
+
+        guess_vals = [
+            guess_freq_Hz,
+            guess_gamma,
+            guess_amplitude,
+            guess_phase_deg,
+            guess_offset,
+        ]
+
+    #,
+    popt = np.full(len(guess_vals), np.nan)
+    pcov = np.full((len(guess_vals), len(guess_vals)), np.nan)
+    y_vals_fit = np.full(len(x_vals), np.nan)
+    
+
+    try:
+        popt, pcov = curve_fit(fitfun.sine_square_decay, x_vals, y_vals,bounds=(lower_bounds, upper_bounds) )
+        y_vals_fit = fitfun.sine_square_decay(x_vals, *popt)
+    except RuntimeError:
+        print("RuntimeError")
+
+    perr = np.sqrt(np.diag(pcov))
+
+    y_vals_fit = fitfun.sine_square_decay(x_vals, *popt)
+
+    plt.figure(figsize=(3, 2))
+    plt.plot(x_vals, y_vals)
+    plt.plot(x_vals, y_vals_fit)
+    plt.show()
+
+    print("freq:{},gamma: {}, amp:{}, phase_deg: {},offset: {},".format(popt[0],popt[1],popt[2], popt[3], popt[4]))#
+
+
+    
+    return (popt, perr, y_vals_fit, pcov)
 
 def fit_sine_decay_with_decay_time(x_vals, y_vals, guess_vals=None):
     if guess_vals is None:

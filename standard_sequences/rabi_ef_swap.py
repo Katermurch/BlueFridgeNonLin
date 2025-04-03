@@ -17,7 +17,7 @@ def rabi_ef_swap(
     swap_time=213.58765318403013,
     swap_amp=1.23,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
-    file_length = 80000
+    file_length = 50000
     #    num_steps = 101
     ringupdown_seq = Sequence(
         file_length, num_steps
@@ -150,7 +150,7 @@ def rabi_ef_swap_f(
     swap_freq=-0.21,
     swap_time=213.58765318403013,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
-    file_length = 60000
+    file_length = 80000
     #    num_steps = 101
     ringupdown_seq = Sequence(
         file_length, num_steps
@@ -188,7 +188,7 @@ def rabi_ef_swap_f(
     pi_ef_pulse = Pulse(
         start=file_length - readout_dur - buffer - swap_time,
         duration=-pi_ef,
-        amplitude=1.2,
+        amplitude=1.48,
         ssm_freq=ssm_ef,
         phase=0,
     )  # pulse is also a class p is an instance
@@ -218,9 +218,10 @@ def rabi_ef_swap_f(
     swap = Pulse(
         start=file_length - readout_dur,
         duration=-swap_time,
-        amplitude=1.23,
+        amplitude=1.36,
         ssm_freq=swap_freq,
         phase=0,
+        gaussian_bool=False,
     )
     ringupdown_seq.add_sweep(channel=3, sweep_name="none", initial_pulse=swap)
 
@@ -280,7 +281,7 @@ def rabi_ef_swap_f(
         write_binary=True,
     )
     ringupdown_seq.load_sequence_from_disk(
-        "128.252.134.31",
+        "10.225.208.204",
         base_name="foo",
         file_path=write_dir,
         num_offset=0,

@@ -37,6 +37,15 @@ def sine_decay(time, freq_Hz, gamma, amplitude, phase_deg, offset):
         + offset
     )
 
+def sine_square_decay(time, freq_Hz,gamma , amplitude,  phase_deg,offset):#
+    #    phase_deg = 90. # fix the phase
+    return (
+        amplitude
+        * np.exp(-gamma * time)
+        * (np.sin(time * 2 * np.pi * freq_Hz + np.pi * phase_deg / 180)**2)#
+        + offset
+    )
+
 
 def sine_decay_with_decay_time(time, freq_Hz, T, amplitude, phase_deg, offset):
     #    phase_deg = 90. # fix the phase
