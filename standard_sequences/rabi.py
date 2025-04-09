@@ -53,7 +53,21 @@ def rabi_ge(
     readout_dur = qubit_rabi.ro_dur
     phase_offset = gen_vals["mixer_offset"]
     buffer = 500
-    rabi_ge = Pulse(
+    rabi_ge_x = Pulse(
+        start=file_length - readout_dur - buffer - 100,
+        duration=0,
+        amplitude=ge_amp,
+        ssm_freq=qubit_rabi.ge_ssm,
+        phase=90,
+    )
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="width",
+        start=0,
+        stop=-sweep_time,
+        initial_pulse=rabi_ge_x,
+    )
+    rabi_ge_y = Pulse(
         start=file_length - readout_dur - buffer - 100,
         duration=0,
         amplitude=ge_amp,
@@ -61,11 +75,11 @@ def rabi_ge(
         phase=0,
     )
     ringupdown_seq.add_sweep(
-        channel=4,
+        channel=1,
         sweep_name="width",
         start=0,
         stop=-sweep_time,
-        initial_pulse=rabi_ge,
+        initial_pulse=rabi_ge_y,
     )
     # HET readout
     # Q1 Readout

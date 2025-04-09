@@ -336,6 +336,7 @@ def pi_nopi_swap(
     swap_time=60,
     phase=0,
     swap_amp=0,
+    off=0
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
     file_length = 30000
     num_steps = num_steps

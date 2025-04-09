@@ -15,7 +15,7 @@ q1_dict = {
     "ef_ssm": -0.2568,
     "ge_time": 82,
     "ef_time": 49,
-    "ge_amp": .795,#.5
+    "ge_amp": 1,#.5
     "ef_amp":1.48,
     "IQ_angle":110,
     "ro_amp": .15,
@@ -59,9 +59,9 @@ q5_dict = {
 general_vals_dict = {
     "mixer_offset": 0,
     "mixer_offset_ef": 20,
-    "wx_amps": [.5,1,1.7,.5],  # maximum 1.9
+    "wx_amps": [1,1,1.7,1],  # maximum 1.9
     "coupler_off_value": 0.7,
-    "wx_offs": [0, 0, -0.08, 0],
+    "wx_offs": [-0.023, 0, -0.08, -0.096],
     "qubit_bnc": 4.6,
     "TWPA_freq": 4.5,#4.45,
     "TWPA_pwr": -5.4#-5.5,
