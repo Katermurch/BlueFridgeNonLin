@@ -186,7 +186,22 @@ def rabi_ef(
     buffer = 500
 
     # Pi ge amp
-    pi_ge_pulse = Pulse(
+    pi_ge_pulse_x = Pulse(
+        start=file_length
+        - readout_dur,  # the 100 is the match the buffer below
+        duration=-pi_ge,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=90,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="start",
+        start=0,
+        stop=-sweep_time,
+        initial_pulse=pi_ge_pulse_x,
+    )
+    pi_ge_pulse_y = Pulse(
         start=file_length
         - readout_dur,  # the 100 is the match the buffer below
         duration=-pi_ge,
@@ -195,14 +210,30 @@ def rabi_ef(
         phase=0,
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
-        channel=4,
+        channel=1,
         sweep_name="start",
         start=0,
         stop=-sweep_time,
-        initial_pulse=pi_ge_pulse,
+        initial_pulse=pi_ge_pulse_y,
     )
     # drive rabi e-f
-    rabi_ef = Pulse(
+    rabi_ef_x = Pulse(
+        start=file_length
+        - readout_dur
+        ,  # buffer here to make sure rabi doesnt bleed into readout
+        duration=0,
+        amplitude=ef_amp,
+        ssm_freq=ssm_ef,
+        phase=90,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="width",
+        start=0,
+        stop=-sweep_time,
+        initial_pulse=rabi_ef_x,
+    )
+    rabi_ef_y = Pulse(
         start=file_length
         - readout_dur
         ,  # buffer here to make sure rabi doesnt bleed into readout
@@ -212,13 +243,12 @@ def rabi_ef(
         phase=0,
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
-        channel=4,
+        channel=1,
         sweep_name="width",
         start=0,
         stop=-sweep_time,
-        initial_pulse=rabi_ef,
+        initial_pulse=rabi_ef_y,
     )
-
     # Rabi Qubit Readout
 
     main_pulse = Pulse(

@@ -13,10 +13,10 @@ q1_dict = {
     "ro_freq": 6.72739,
     "ge_ssm": -0.1144,
     "ef_ssm": -0.2568,
-    "ge_time": 82,
-    "ef_time": 49,
+    "ge_time": 73,
+    "ef_time": 45,
     "ge_amp": 1,#.5
-    "ef_amp":1.48,
+    "ef_amp":1.5,
     "IQ_angle":110,
     "ro_amp": .15,
     "qubit_thr": [-10000, -600],
