@@ -120,7 +120,7 @@ def get_daq_parameters(ro_dur=7000, IQangle=90):
 
 def get_instrument_address(instrument_name):
     if instrument_name == "wx":
-        return"10.225.208.204"
+        return"10.225.208.207"
 
 
 if __name__ == "__main__":

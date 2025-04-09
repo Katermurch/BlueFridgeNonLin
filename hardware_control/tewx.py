@@ -384,7 +384,7 @@ class CommIntfType:
 class TEWXAwg(object):
     """Tabor-Electronics WX-Instrument Controller (Without VISA-NI)"""
 
-    def __init__(self, instr_addr="10.225.208.204", tcp_timeout=5.0, paranoia_level=1):
+    def __init__(self, instr_addr="10.225.208.207", tcp_timeout=5.0, paranoia_level=1):
         """
         Initialize this `TEWWAwg` instance.
 

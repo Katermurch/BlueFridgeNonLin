@@ -133,7 +133,7 @@ def rabi_ef_swap(
         write_binary=True,
     )
     ringupdown_seq.load_sequence_from_disk(
-        "10.225.208.204",
+        "10.225.208.207",
         base_name="foo",
         file_path=write_dir,
         num_offset=0,

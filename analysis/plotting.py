@@ -267,7 +267,26 @@ def plot_IQ_histograms(readout_vs_pats, qubit_num):
 
 
 def calculate_SNR(fit_params):
-    """Calculate the Signal-to-Noise Ratio (SNR) using the fit parameters."""
+    """
+    Calculate the Signal-to-Noise Ratio (SNR) using the provided fit parameters.
+
+    The SNR is defined by the equation:
+    
+        SNR = sqrt((μ_I_g - μ_I_e)² + (μ_Q_g - μ_Q_e)²) / ((|σ_I_g| + |σ_I_e| + |σ_Q_g| + |σ_Q_e|) / 4)
+      
+    The numerator represents the magnitude of the difference vector between the ground
+    and excited state means in the IQ-plane. The denominator is the average of the absolute
+    standard deviations of all components, serving as an estimate of the noise.
+
+    Parameters:
+        fit_params (dict): Dictionary containing measurement fit parameters. Expected to have keys:
+            "I_g", "I_e", "Q_g", "Q_e". Each of these is a dictionary with:
+                - "mu": the mean value.
+                - "std": the standard deviation value.
+    
+    Returns:
+        float: The calculated signal-to-noise ratio (SNR).
+    """
     mu_I_g = fit_params["I_g"]["mu"]
     mu_I_e = fit_params["I_e"]["mu"]
     mu_Q_g = fit_params["Q_g"]["mu"]

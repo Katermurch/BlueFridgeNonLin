@@ -121,7 +121,7 @@ def rabi_ge(
         write_binary=True,
     )
     ringupdown_seq.load_sequence_from_disk(
-        "128.252.134.31",
+        "10.225.208.207",
         base_name="foo",
         file_path=write_dir,
         num_offset=0,
@@ -174,8 +174,7 @@ def rabi_ef(
     # Pi ge amp
     pi_ge_pulse = Pulse(
         start=file_length
-        - readout_dur
-        - buffer,  # the 100 is the match the buffer below
+        - readout_dur,  # the 100 is the match the buffer below
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -192,7 +191,7 @@ def rabi_ef(
     rabi_ef = Pulse(
         start=file_length
         - readout_dur
-        - buffer,  # buffer here to make sure rabi doesnt bleed into readout
+        ,  # buffer here to make sure rabi doesnt bleed into readout
         duration=0,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
@@ -209,7 +208,7 @@ def rabi_ef(
     # Rabi Qubit Readout
 
     main_pulse = Pulse(
-        start=file_length - readout_dur - buffer,
+        start=file_length - readout_dur ,
         duration=readout_dur,
         amplitude=qubit_rabi.ro_amp,
         ssm_freq=ROIF1,
@@ -220,7 +219,7 @@ def rabi_ef(
     # Other qubit Readout
 
     main_pulse = Pulse(
-        start=file_length - readout_dur - buffer,
+        start=file_length - readout_dur ,
         duration=readout_dur,
         amplitude=qubit2.ro_amp,
         ssm_freq=ROIF2,
@@ -230,7 +229,7 @@ def rabi_ef(
 
     ## markers
     alazar_trigger = Pulse(
-        start=file_length - readout_dur - buffer - 1000, duration=1000, amplitude=1
+        start=file_length - readout_dur  - 1000, duration=1000, amplitude=1
     )
     ringupdown_seq.add_sweep(
         channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger
@@ -259,7 +258,7 @@ def rabi_ef(
         write_binary=True,
     )
     ringupdown_seq.load_sequence_from_disk(
-        "128.252.134.31",
+        "10.225.208.207",
         base_name="foo",
         file_path=write_dir,
         num_offset=0,

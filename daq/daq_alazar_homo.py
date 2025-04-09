@@ -418,7 +418,7 @@ def acquire_data_het_2q(
     # Select the number of buffers per acquisition.
     # print("\ndaq_alazar Troubleshoot stuck at this step 4")
     buffers_per_acquisition = alazar_params.buffers_per_acquisition
-
+            
     # print("\ndaq_alazar Troubleshoot stuck at this step 5")
     records_per_acquisition = records_per_buffer * buffers_per_acquisition
 

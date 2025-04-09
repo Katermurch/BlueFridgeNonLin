@@ -26,7 +26,7 @@ q2_dict = {
     "ro_freq": 6.65554,
     "ge_ssm": -0.154,
     "ef_ssm": -0.2962,
-    "ge_time": 55,
+    "ge_time": 54,
     "ge_amp": 0.8,
     "ef_amp": 1,
     "IQ_angle": 25,
@@ -59,12 +59,12 @@ q5_dict = {
 general_vals_dict = {
     "mixer_offset": 0,
     "mixer_offset_ef": 20,
-    "wx_amps": [1.0,1,1.7,.5],  # maximum 1.9
+    "wx_amps": [.5,1,1.7,.5],  # maximum 1.9
     "coupler_off_value": 0.7,
-    "wx_offs": [0.7, 0, 0, 0],
+    "wx_offs": [0, 0, -0.08, 0],
     "qubit_bnc": 4.6,
-    "TWPA_freq": 4.45,
-    "TWPA_pwr": -5.5,
+    "TWPA_freq": 4.5,#4.45,
+    "TWPA_pwr": -5.4#-5.5,
 }
 bnc_address = {
     "target_bnc_black": "GPIB0::19::INSTR",

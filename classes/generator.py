@@ -63,6 +63,7 @@ class Pulse:
         plt.title("Pulse Envelope (Global Time)")
         plt.xlabel("Time (samples)")
         plt.ylabel("Amplitude")
+        plt.xlim([24000,25000])
         plt.grid(True)
         plt.show()
 

@@ -71,6 +71,7 @@ def parametric_coupling_time_domain(
         amplitude=spec_amp,
         ssm_freq=ssm_para,
         phase=phase,
+        gaussian_bool= True
     )
     ringupdown_seq.add_sweep(
         channel=3,
@@ -142,7 +143,7 @@ def parametric_coupling_time_domain(
         write_binary=True,
     )
     ringupdown_seq.load_sequence_from_disk(
-        "128.252.134.31",
+        '10.225.208.204',
         base_name="foo",
         file_path=write_dir,
     )
