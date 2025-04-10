@@ -32,14 +32,22 @@ def pi_nopi_ge(
     )  # this creates something called rabi_seq that is an instance of a sequence class
 
     # channel 4 is for qubit control
-    rabi_ge = Pulse(
+    rabi_ge_x = Pulse(
+        start=file_length - readout_dur,
+        duration=pi_ge * coef,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=90,
+    )
+    the_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=rabi_ge_x)
+    rabi_ge_y = Pulse(
         start=file_length - readout_dur,
         duration=pi_ge * coef,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
         phase=0,
     )
-    the_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=rabi_ge)
+    the_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=rabi_ge_y)
     # Readout
     # HET readout
     # Q1 Readout
@@ -256,29 +264,40 @@ def pipi_pi_nopi(
     the_seq = Sequence(
         file_length, num_steps
     )  # this creates something called rabi_seq that is an instance of a sequence class
-    ### This is to get to e state###
-    ge_pulse = Pulse(start=file_length - readout_dur)
-
-    ### This is to get to f state###
     # pulse to e state
-    rabi_ge = Pulse(
+    rabi_ge_x = Pulse(
+        start=file_length - readout_dur - (pi_ge + ef_coef * pi_ef),
+        duration=pi_ge * ge_coef,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=90,
+    )
+    the_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=rabi_ge_x)
+    rabi_ge_y = Pulse(
         start=file_length - readout_dur - (pi_ge + ef_coef * pi_ef),
         duration=pi_ge * ge_coef,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
         phase=0,
     )
-    the_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=rabi_ge)
-
+    the_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=rabi_ge_y)
     # pulse to f state
-    rabi_ef = Pulse(
+    rabi_ef_x = Pulse(
+        start=file_length - readout_dur - ef_coef * pi_ef,
+        duration=pi_ef * ef_coef,
+        amplitude=ef_amp,
+        ssm_freq=ssm_ef,
+        phase=90,
+    )
+    the_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=rabi_ef_x)
+    rabi_ef_y = Pulse(
         start=file_length - readout_dur - ef_coef * pi_ef,
         duration=pi_ef * ef_coef,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
         phase=0,
     )
-    the_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=rabi_ef)
+    the_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=rabi_ef_y)
     # Readout
     # HET readout
     # Q1 Readout
@@ -356,7 +375,20 @@ def pi_nopi_swap(
     ef_amp = q1.ef_amp
     buffer = 0
     readout_dur = q1.ro_dur
-    pi_ge_pulse = Pulse(
+    pi_ge_pulse_x = Pulse(
+        start=file_length
+        - readout_dur
+        - copief * pi_ef
+        - coswap * swap_time
+        - 2 * buffer,
+        duration=-pi_ge * copige,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=90,
+    )
+    ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=pi_ge_pulse_x)
+
+    pi_ge_pulse_y = Pulse(
         start=file_length
         - readout_dur
         - copief * pi_ef
@@ -367,15 +399,23 @@ def pi_nopi_swap(
         ssm_freq=ssm_ge,
         phase=0,
     )
-    ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=pi_ge_pulse)
-    pi_ef_pulse = Pulse(
+    ringupdown_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=pi_ge_pulse_y)
+    pi_ef_pulse_x = Pulse(
+        start=file_length - readout_dur - coswap * swap_time - buffer,
+        duration=-pi_ef * copief,
+        amplitude=ef_amp,
+        ssm_freq=ssm_ef,
+        phase=90,
+    )
+    ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=pi_ef_pulse_x)
+    pi_ef_pulse_y = Pulse(
         start=file_length - readout_dur - coswap * swap_time - buffer,
         duration=-pi_ef * copief,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
         phase=0,
     )
-    ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=pi_ef_pulse)
+    ringupdown_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=pi_ef_pulse_y)
 
     swap = Pulse(
         start=file_length - readout_dur,

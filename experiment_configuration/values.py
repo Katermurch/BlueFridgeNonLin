@@ -13,12 +13,12 @@ q1_dict = {
     "ro_freq": 6.72739,
     "ge_ssm": -0.1144,
     "ef_ssm": -0.2568,
-    "ge_time": 73,
+    "ge_time": 81,
     "ef_time": 45,
     "ge_amp": 1,#.5
     "ef_amp":1.5,
     "IQ_angle":110,
-    "ro_amp": .15,
+    "ro_amp": .26,
     "qubit_thr": [-10000, -600],
 }
 q2_dict = {
@@ -26,11 +26,11 @@ q2_dict = {
     "ro_freq": 6.65554,
     "ge_ssm": -0.154,
     "ef_ssm": -0.2962,
-    "ge_time": 54,
+    "ge_time": 74,
     "ge_amp": 0.8,
     "ef_amp": 1,
     "IQ_angle": 25,
-    "ro_amp": .7,
+    "ro_amp": .5,
     "qubit_thr": [-10000, 1900],
 }
 q3_dict = {
@@ -64,7 +64,7 @@ general_vals_dict = {
     "wx_offs": [-0.023, 0, -0.08, -0.096],
     "qubit_bnc": 4.6,
     "TWPA_freq": 4.5,#4.45,
-    "TWPA_pwr": -5.4#-5.5,
+    "TWPA_pwr": -5.6#-5.5,
 }
 bnc_address = {
     "target_bnc_black": "GPIB0::19::INSTR",
