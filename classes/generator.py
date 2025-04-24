@@ -59,13 +59,13 @@ class Pulse:
         gen_pulse(temp_waveform, self)
         
         times = np.arange(len(temp_waveform))
-        plt.plot(times, temp_waveform)
-        plt.title("Pulse Envelope (Global Time)")
-        plt.xlabel("Time (samples)")
-        plt.ylabel("Amplitude")
-        plt.xlim([24000,25000])
-        plt.grid(True)
-        plt.show()
+        # plt.plot(times, temp_waveform)
+        # plt.title("Pulse Envelope (Global Time)")
+        # plt.xlabel("Time (samples)")
+        # plt.ylabel("Amplitude")
+        # plt.xlim([24000,25000])
+        # plt.grid(True)
+        # plt.show()
 
 
     def copy(self):

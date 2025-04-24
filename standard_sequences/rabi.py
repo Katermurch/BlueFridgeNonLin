@@ -51,14 +51,16 @@ def rabi_ge(
     ROIF1 = qubit_rabi.ROIF
     ROIF2 = qubit2.ROIF
     readout_dur = qubit_rabi.ro_dur
+    mixer_offset_ge=qubit_rabi.mixer_offset_ge
+    mixer_offset_ef=qubit_rabi.mixer_offset_ef
     phase_offset = gen_vals["mixer_offset"]
-    buffer = 500
+    buffer = 0
     rabi_ge_x = Pulse(
-        start=file_length - readout_dur - buffer - 100,
+        start=file_length - readout_dur  ,
         duration=0,
         amplitude=ge_amp,
         ssm_freq=qubit_rabi.ge_ssm,
-        phase=90,
+        phase=90+mixer_offset_ge,
     )
     ringupdown_seq.add_sweep(
         channel=4,
@@ -68,7 +70,7 @@ def rabi_ge(
         initial_pulse=rabi_ge_x,
     )
     rabi_ge_y = Pulse(
-        start=file_length - readout_dur - buffer - 100,
+        start=file_length - readout_dur ,
         duration=0,
         amplitude=ge_amp,
         ssm_freq=qubit_rabi.ge_ssm,
@@ -84,7 +86,7 @@ def rabi_ge(
     # HET readout
     # Q1 Readout
     main_pulse = Pulse(
-        start=file_length - buffer - readout_dur,
+        start=file_length  - readout_dur,
         duration=readout_dur,
         amplitude=qubit_rabi.ro_amp,
         ssm_freq=ROIF1,
@@ -94,7 +96,7 @@ def rabi_ge(
 
     # Q2 Readout
     main_pulse = Pulse(
-        start=file_length - buffer - readout_dur,
+        start=file_length - readout_dur,
         duration=readout_dur,
         amplitude=qubit2.ro_amp,
         ssm_freq=ROIF2,
@@ -104,7 +106,7 @@ def rabi_ge(
 
     ## markers
     alazar_trigger = Pulse(
-        start=file_length - buffer - readout_dur - 1000, duration=50, amplitude=1
+        start=file_length  - readout_dur - 1000, duration=50, amplitude=1
     )
     ringupdown_seq.add_sweep(
         channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger
@@ -181,9 +183,11 @@ def rabi_ef(
     ssm_ef = qubit_rabi.ef_ssm
     ROIF1 = qubit_rabi.ROIF
     ROIF2 = qubit2.ROIF
+    mixer_offset_ge=qubit_rabi.mixer_offset_ge
+    mixer_offset_ef=qubit_rabi.mixer_offset_ef
     readout_dur = qubit_rabi.ro_dur
     phase_offset = gen_vals["mixer_offset"]
-    buffer = 500
+    buffer = 0
 
     # Pi ge amp
     pi_ge_pulse_x = Pulse(
@@ -192,7 +196,8 @@ def rabi_ef(
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
-        phase=90,
+        phase=90+mixer_offset_ge,
+    
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
         channel=4,
@@ -224,7 +229,7 @@ def rabi_ef(
         duration=0,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
-        phase=90,
+        phase=90+mixer_offset_ef,
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
         channel=4,
@@ -416,4 +421,84 @@ def amp_rabi_ge(
         file_path=write_dir,
         num_offset=0,
         ch_amp=gen_vals["wx_amps"],
+    )
+
+def test_rabi_ge(
+    qubit_rabi: object,
+    qubit2: object,
+    gen_vals: dict,
+    num_steps=101,
+    phase_offset=0,
+):
+    """
+    This function should run the rabi ge sequence for a qubit, using the
+    qubit's properties.
+
+    Args:
+        qubit_rabi (_type_): this is the qubit you are performing the rabi on
+        qubit2 (_type_): this qubit exists for homodyne readout
+        gen_vals (dict): a dictionary of general values for readout and hardware control
+        num_steps (int, optional): _description_. Defaults to 101.
+        sweep_time (int, optional): _description_. Defaults to 200.
+    """
+
+    # this is pulsed readout to ring up and ring down cavity dfor e state
+    file_length = 16000
+    ringupdown_seq = Sequence(
+        file_length, num_steps
+    )  # this creates something called rabi_seq that is an instance of a sequence class
+
+    ## channels
+    ef_amp = qubit_rabi.ef_amp
+    pi_ge = qubit_rabi.ge_time
+    ge_amp = qubit_rabi.ge_amp
+    ROIF1 = qubit_rabi.ROIF
+    ROIF2 = qubit2.ROIF
+    readout_dur = qubit_rabi.ro_dur
+    
+    buffer =0
+    rabi_ge_Q = Pulse(
+        start=file_length - 16000  ,
+        duration=16000,
+        amplitude=ef_amp,
+        ssm_freq=qubit_rabi.ef_ssm,
+        phase=90+phase_offset,
+    )
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="none",
+        
+        initial_pulse=rabi_ge_Q,
+    )
+    rabi_ge_I = Pulse(
+        start=file_length - 16000,
+        duration=16000,
+        amplitude=ef_amp,
+        ssm_freq=qubit_rabi.ef_ssm,
+        phase=0,
+    )
+    ringupdown_seq.add_sweep(
+        channel=1,
+        sweep_name="none",
+        
+        initial_pulse=rabi_ge_I,
+    )
+    
+
+    write_dir = (
+        r"C:\arbsequences\strong_dispersive_withPython\test_pulse_ringupdown_bin"
+    )
+    ringupdown_seq.write_sequence_to_disk(
+        base_name="foo",
+        file_path=write_dir,
+        use_range_01=False,
+        num_offset=0,
+        write_binary=True,
+    )
+    ringupdown_seq.load_sequence_from_disk(
+        "10.225.208.207",
+        base_name="foo",
+        file_path=write_dir,
+        num_offset=0,
+        ch_amp=[1, 1, 1, 1],
     )

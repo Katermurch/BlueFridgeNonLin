@@ -375,6 +375,8 @@ def pi_nopi_swap(
     ef_amp = q1.ef_amp
     buffer = 0
     readout_dur = q1.ro_dur
+    mixer_offset_ge=q1.mixer_offset_ge
+    mixer_offset_ef=q1.mixer_offset_ef
     pi_ge_pulse_x = Pulse(
         start=file_length
         - readout_dur
@@ -384,7 +386,7 @@ def pi_nopi_swap(
         duration=-pi_ge * copige,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
-        phase=90,
+        phase=90+mixer_offset_ge,
     )
     ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=pi_ge_pulse_x)
 
@@ -405,7 +407,7 @@ def pi_nopi_swap(
         duration=-pi_ef * copief,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
-        phase=90,
+        phase=90+mixer_offset_ef,
     )
     ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=pi_ef_pulse_x)
     pi_ef_pulse_y = Pulse(

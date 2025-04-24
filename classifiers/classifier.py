@@ -7,7 +7,7 @@ import os
 # Get the directory where classifier.py is located
 script_dir = os.path.dirname(os.path.abspath(__file__))
 # Construct the full path to lgb.pkl
-classifier_path = os.path.join(script_dir, "lgb_square_swap_pulse.pkl")
+classifier_path = os.path.join(script_dir, "lgb.pkl")
 
 classifier = joblib.load(classifier_path)
 

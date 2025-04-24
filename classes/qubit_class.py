@@ -60,14 +60,19 @@ class Qubit(Readout):
             "ro_freq",
             "ge_time",
             "ef_time",
+            "ef_half_time",
             "ge_ssm",
             "ef_ssm",
             "ge_amp",
             "ef_amp",
+            "ef_half_amp",
             "IQ_angle",
             "ro_amp",
             "qubit_thr",
             "RO_IF",
+            "mixer_offset_ge",
+            "mixer_offset_ef",
+
         }
 
         # Validate and set Qubit-specific attributes

@@ -45,9 +45,22 @@ def T1(qubit1: object, qubit2: object, gen_vals: dict, sweep_time=100000, verbos
     ROIF1 = qubit1.ROIF
     ROIF2 = qubit2.ROIF
     phase_offset = gen_vals["mixer_offset"]
+    mixer_offset_ge=qubit1.mixer_offset_ge
+    mixer_offset_ef=qubit1.mixer_offset_ef
 
     # Apply π pulse followed by a variable wait time (T1 measurement)
-    pi_ge = Pulse(
+    pi_ge_Q = Pulse(
+        start=file_length - readout_dur,  # Start before readout
+        duration=-pi_ge_time,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=90  + mixer_offset_ge,
+    )
+    ringupdown_seq.add_sweep(
+        channel=4, sweep_name="start", start=0, stop=-sweep_time, initial_pulse=pi_ge_Q
+    )
+
+    pi_ge_I = Pulse(
         start=file_length - readout_dur,  # Start before readout
         duration=-pi_ge_time,
         amplitude=ge_amp,
@@ -55,9 +68,9 @@ def T1(qubit1: object, qubit2: object, gen_vals: dict, sweep_time=100000, verbos
         phase=0,
     )
     ringupdown_seq.add_sweep(
-        channel=4, sweep_name="start", start=0, stop=-sweep_time, initial_pulse=pi_ge
+        channel=1, sweep_name="start", start=0, stop=-sweep_time, initial_pulse=pi_ge_I
     )
-
+   
     # Readout pulses for both qubits
     main_pulse_q1 = Pulse(
         start=file_length - readout_dur,
@@ -117,7 +130,7 @@ def T1(qubit1: object, qubit2: object, gen_vals: dict, sweep_time=100000, verbos
         write_binary=True,
     )
     ringupdown_seq.load_sequence_from_disk(
-        "128.252.134.31",
+        "10.225.208.207",
         base_name="foo",
         file_path=write_dir,
     )
@@ -162,32 +175,52 @@ def T1_ef(
     readout_amp2 = qubit2.ro_amp
     ROIF1 = qubit1.ROIF
     ROIF2 = qubit2.ROIF
-    phase_offset = gen_vals.get("mixer_offset", 0)
-    phase_offset_ef = gen_vals.get(
-        "mixer_offset_ef", 0
-    )  # Defaults to 0 if not provided
+    mixer_offset_ge=qubit1.mixer_offset_ge
+    mixer_offset_ef=qubit1.mixer_offset_ef  # Defaults to 0 if not provided
 
     # Apply π_ge and π_ef pulses followed by a variable wait time (T1_ef measurement)
-    pi_ge = Pulse(
-        start=file_length - readout_dur - pi_ge_time - pi_ef_time - 50,
+    pi_ge_Q = Pulse(
+        start=file_length - readout_dur- pi_ef_time,  # Start before readout
+        duration=-pi_ge_time,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=90  + mixer_offset_ge,
+    )
+    ringupdown_seq.add_sweep(
+        channel=4, sweep_name="start", start=0, stop=-sweep_time, initial_pulse=pi_ge_Q
+    )
+
+    pi_ge_I = Pulse(
+        start=file_length - readout_dur- pi_ef_time,  # Start before readout
         duration=-pi_ge_time,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
         phase=0,
     )
     ringupdown_seq.add_sweep(
-        channel=4, sweep_name="start", start=0, stop=-sweep_time, initial_pulse=pi_ge
+        channel=1, sweep_name="start", start=0, stop=-sweep_time, initial_pulse=pi_ge_I
     )
 
-    pi_ef = Pulse(
-        start=file_length - readout_dur - pi_ef_time - 50,
+    pi_ef_Q = Pulse(
+        start=file_length - readout_dur ,
+        duration=-pi_ef_time,
+        amplitude=ef_amp,
+        ssm_freq=ssm_ef,
+        phase=90+ mixer_offset_ef,
+    )
+    ringupdown_seq.add_sweep(
+        channel=4, sweep_name="start", start=0, stop=-sweep_time, initial_pulse=pi_ef_Q
+    )
+
+    pi_ef_I = Pulse(
+        start=file_length - readout_dur ,
         duration=-pi_ef_time,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
         phase=0,
     )
     ringupdown_seq.add_sweep(
-        channel=4, sweep_name="start", start=0, stop=-sweep_time, initial_pulse=pi_ef
+        channel=1, sweep_name="start", start=0, stop=-sweep_time, initial_pulse=pi_ef_I
     )
 
     # Readout pulses for both qubits
@@ -249,7 +282,7 @@ def T1_ef(
         write_binary=True,
     )
     ringupdown_seq.load_sequence_from_disk(
-        "128.252.134.31",
+        "10.225.208.207",
         base_name="foo",
         file_path=write_dir,
     )
