@@ -18,8 +18,11 @@ def rabi_ef_swap_tomo(
     drive_amp=1,
     tomo_comp="z",
     state_comp="e",
+    rabi_freq=-0.25684,
+    y_phase=0,
+    x_phase=0,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
-    file_length = 50000
+    file_length = 30000
     #    num_steps = 101
     ringupdown_seq = Sequence(
         file_length, num_steps
@@ -44,8 +47,6 @@ def rabi_ef_swap_tomo(
     buffer = 0
     if "z" == tomo_comp:
         tomo_time = 0
-    elif "z-" == tomo_comp:
-        tomo_time = pi_ef
     else:
         tomo_time = ef_half_time 
     
@@ -53,7 +54,7 @@ def rabi_ef_swap_tomo(
         state_prep_time = 0
     elif "f" == state_comp:
         state_prep_time = pi_ef
-    else:
+    elif "+x" == state_comp or "-x" == state_comp:
         state_prep_time = ef_half_time 
     
     ###########
@@ -70,7 +71,7 @@ def rabi_ef_swap_tomo(
     # first pi_ge pulse
 
     pi_ge_pulse_Q = Pulse(
-        start=file_length - readout_dur - swap_time - tomo_time- state_prep_time,
+        start=file_length - readout_dur - swap_time - tomo_time- state_prep_time-pi_ef,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -84,7 +85,7 @@ def rabi_ef_swap_tomo(
         initial_pulse=pi_ge_pulse_Q,
     )
     pi_ge_pulse_I = Pulse(
-        start=file_length - readout_dur - swap_time - tomo_time- state_prep_time,
+        start=file_length - readout_dur - swap_time - tomo_time- state_prep_time-pi_ef,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -97,6 +98,7 @@ def rabi_ef_swap_tomo(
         stop=-sweep_time,
         initial_pulse=pi_ge_pulse_I,
     )
+
     if state_comp == "e":
         pass
     elif state_comp == "f":
@@ -128,13 +130,13 @@ def rabi_ef_swap_tomo(
             stop=-sweep_time,
             initial_pulse=pi_ef_pulse_I,
         )
-    elif state_comp == "x":
+    elif state_comp == "+x":
         half_ef_pulse_Q = Pulse(
             start=file_length - readout_dur - swap_time - tomo_time,
             duration=-state_prep_time,
             amplitude=ef_half_amp,
             ssm_freq=ssm_ef,
-            phase=90+mixer_offset_ef,
+            phase=90+mixer_offset_ef+x_phase,
         )
         ringupdown_seq.add_sweep(
             channel=4,
@@ -148,7 +150,36 @@ def rabi_ef_swap_tomo(
             duration=-state_prep_time,
             amplitude=ef_half_amp,
             ssm_freq=ssm_ef,
-            phase=0,
+            phase=0+x_phase,
+        )
+        ringupdown_seq.add_sweep(
+            channel=1,
+            sweep_name="start",
+            start=0,
+            stop=-sweep_time,
+            initial_pulse=half_ef_pulse_I,
+        )
+    elif state_comp == "-x":
+        half_ef_pulse_Q = Pulse(
+            start=file_length - readout_dur - swap_time - tomo_time,
+            duration=-state_prep_time,
+            amplitude=ef_half_amp,
+            ssm_freq=ssm_ef,
+            phase=270+mixer_offset_ef+x_phase,
+        )
+        ringupdown_seq.add_sweep(
+            channel=4,
+            sweep_name="start",
+            start=0,
+            stop=-sweep_time,
+            initial_pulse=half_ef_pulse_Q,
+        )
+        half_ef_pulse_I = Pulse(
+            start=file_length - readout_dur - swap_time - tomo_time,
+            duration=-state_prep_time,
+            amplitude=ef_half_amp,
+            ssm_freq=ssm_ef,
+            phase=180+x_phase,
         )
         ringupdown_seq.add_sweep(
             channel=1,
@@ -164,7 +195,7 @@ def rabi_ef_swap_tomo(
         start=file_length - readout_dur - swap_time - tomo_time,
         duration=0,
         amplitude=drive_amp,
-        ssm_freq=ssm_ef,
+        ssm_freq=rabi_freq,
         phase=90+mixer_offset_ef,
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
@@ -178,7 +209,7 @@ def rabi_ef_swap_tomo(
         start=file_length - readout_dur - swap_time - tomo_time,
         duration=0,
         amplitude=drive_amp,
-        ssm_freq=ssm_ef,
+        ssm_freq=rabi_freq,
         phase=0,
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
@@ -191,23 +222,6 @@ def rabi_ef_swap_tomo(
     # tomoraphy pulses
     if tomo_comp == "z":
         pass
-    elif tomo_comp == "z-":
-        tomo_pulse_Q = Pulse(
-            start=file_length - readout_dur  - swap_time,
-            duration=-pi_ef,
-            amplitude=ef_amp,
-            ssm_freq=ssm_ef,
-            phase=90+mixer_offset_ef,
-        )
-        ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=tomo_pulse_Q)
-        tomo_pulse_I = Pulse(
-            start=file_length - readout_dur  - swap_time,
-            duration=-pi_ef,
-            amplitude=ef_amp,
-            ssm_freq=ssm_ef,
-            phase=0,
-        )
-        ringupdown_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=tomo_pulse_I)
 
     elif tomo_comp == "x":
         tomo_pulse_Q = Pulse(
@@ -215,7 +229,7 @@ def rabi_ef_swap_tomo(
             duration=-ef_half_time,
             amplitude=ef_half_amp,
             ssm_freq=ssm_ef,
-            phase=90+mixer_offset_ef,
+            phase=90+mixer_offset_ef+y_phase,
         )
         ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=tomo_pulse_Q)
         tomo_pulse_I = Pulse(
@@ -223,33 +237,17 @@ def rabi_ef_swap_tomo(
             duration=-ef_half_time,
             amplitude=ef_half_amp,
             ssm_freq=ssm_ef,
-            phase=0,
+            phase=y_phase,
         )
         ringupdown_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=tomo_pulse_I)
-    elif tomo_comp == "x-":
-        tomo_pulse_Q = Pulse(
-            start=file_length - readout_dur  - swap_time,
-            duration=-ef_half_time,
-            amplitude=ef_half_amp,
-            ssm_freq=ssm_ef,
-            phase=270+mixer_offset_ef,
-        )
-        ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=tomo_pulse_Q)
-        tomo_pulse_I = Pulse(
-            start=file_length - readout_dur  - swap_time,
-            duration=-ef_half_time,
-            amplitude=ef_half_amp,
-            ssm_freq=ssm_ef,
-            phase=180,
-        )
-        ringupdown_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=tomo_pulse_I)
+    
     elif tomo_comp == "y":
         tomo_pulse_Q = Pulse(
             start=file_length - readout_dur  - swap_time,
             duration=-ef_half_time,
             amplitude=ef_half_amp,
             ssm_freq=ssm_ef,
-            phase=180+mixer_offset_ef,
+            phase=180+mixer_offset_ef+y_phase,
         )
         ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=tomo_pulse_Q)
         tomo_pulse_I = Pulse(
@@ -257,28 +255,12 @@ def rabi_ef_swap_tomo(
             duration=-ef_half_time,
             amplitude=ef_half_amp,
             ssm_freq=ssm_ef,
-            phase=90,
+            phase=90+y_phase,
         )
         ringupdown_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=tomo_pulse_I)
-    elif tomo_comp == "y-":
-        tomo_pulse_Q = Pulse(
-            start=file_length - readout_dur  - swap_time,
-            duration=-ef_half_time,
-            amplitude=ef_half_amp,
-            ssm_freq=ssm_ef,
-            phase=mixer_offset_ef,
-        )
-        ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=tomo_pulse_Q)
-        tomo_pulse_I = Pulse(
-            start=file_length - readout_dur  - swap_time,
-            duration=-ef_half_time,
-            amplitude=ef_half_amp,
-            ssm_freq=ssm_ef,
-            phase=270,
-        )
-        ringupdown_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=tomo_pulse_I)
+    
     else:
-        raise ValueError("tomo_comp must be x,x-, y,y- or z,z-")
+        raise ValueError("tomo_comp must be x, y or z")
 
     swap = Pulse(
         start=file_length - readout_dur,
@@ -290,7 +272,7 @@ def rabi_ef_swap_tomo(
     )
     ringupdown_seq.add_sweep(channel=3, sweep_name="none", initial_pulse=swap)
     # swap.make()
-    swap.show()
+    # swap.show()
     main_pulse_1 = Pulse(
         start=file_length - readout_dur,
         duration=readout_dur,
@@ -377,7 +359,7 @@ def sweep_pi_ef(
     mixer_offset_ef=qubit_rabi.mixer_offset_ef
     
     pi_ge_pulse_Q = Pulse(
-        start=file_length - readout_dur - swap_time-1*pi_time,
+        start=file_length - readout_dur - swap_time-8*pi_time,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -389,7 +371,7 @@ def sweep_pi_ef(
         initial_pulse=pi_ge_pulse_Q,
     )
     pi_ge_pulse_I = Pulse(
-        start=file_length - readout_dur - swap_time-1*pi_time,
+        start=file_length - readout_dur - swap_time-8*pi_time,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -400,212 +382,212 @@ def sweep_pi_ef(
         sweep_name="none",
         initial_pulse=pi_ge_pulse_I,
     )
-    # rabi_ef_Q_8 = Pulse(
-    #     start=file_length - readout_dur - swap_time -7*pi_time,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=90+mixer_offset_ef+phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=4,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_Q_8,
-    # )
-    # rabi_ef_I_8 = Pulse(
-    #     start=file_length - readout_dur - swap_time-7*pi_time ,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=1,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_I_8,
-    # )
+    rabi_ef_Q_8 = Pulse(
+        start=file_length - readout_dur - swap_time -7*pi_time,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=90+mixer_offset_ef+phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_Q_8,
+    )
+    rabi_ef_I_8 = Pulse(
+        start=file_length - readout_dur - swap_time-7*pi_time ,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=1,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_I_8,
+    )
 
-    # rabi_ef_Q_7 = Pulse(
-    #     start=file_length - readout_dur - swap_time-6*pi_time ,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=90+mixer_offset_ef+phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=4,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_Q_7,
-    # )
-    # rabi_ef_I_7 = Pulse(
-    #     start=file_length - readout_dur - swap_time-6*pi_time,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=1,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_I_7,
-    # )
+    rabi_ef_Q_7 = Pulse(
+        start=file_length - readout_dur - swap_time-6*pi_time ,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=90+mixer_offset_ef+phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_Q_7,
+    )
+    rabi_ef_I_7 = Pulse(
+        start=file_length - readout_dur - swap_time-6*pi_time,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=1,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_I_7,
+    )
 
-    # rabi_ef_Q_6 = Pulse(
-    #     start=file_length - readout_dur - swap_time-5*pi_time ,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=90+mixer_offset_ef+phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=4,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_Q_6,
-    # )
-    # rabi_ef_I_6 = Pulse(
-    #     start=file_length - readout_dur - swap_time -5*pi_time,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=1,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_I_6,
-    # )
+    rabi_ef_Q_6 = Pulse(
+        start=file_length - readout_dur - swap_time-5*pi_time ,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=90+mixer_offset_ef+phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_Q_6,
+    )
+    rabi_ef_I_6 = Pulse(
+        start=file_length - readout_dur - swap_time -5*pi_time,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=1,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_I_6,
+    )
 
-    # rabi_ef_Q_5 = Pulse(
-    #     start=file_length - readout_dur - swap_time -4*pi_time,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=90+mixer_offset_ef+phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=4,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_Q_5,
-    # )
-    # rabi_ef_I_5 = Pulse(
-    #     start=file_length - readout_dur - swap_time-4*pi_time ,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=1,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_I_5,
-    # )
-
-
+    rabi_ef_Q_5 = Pulse(
+        start=file_length - readout_dur - swap_time -4*pi_time,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=90+mixer_offset_ef+phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_Q_5,
+    )
+    rabi_ef_I_5 = Pulse(
+        start=file_length - readout_dur - swap_time-4*pi_time ,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=1,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_I_5,
+    )
 
 
 
-    # rabi_ef_Q_4 = Pulse(
-    #     start=file_length - readout_dur - swap_time -3*pi_time,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=90+mixer_offset_ef+phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=4,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_Q_4,
-    # )
-    # rabi_ef_I_4 = Pulse(
-    #     start=file_length - readout_dur - swap_time-3*pi_time ,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=1,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_I_4,
-    # )
 
-    # rabi_ef_Q_3 = Pulse(
-    #     start=file_length - readout_dur - swap_time-2*pi_time ,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=90+mixer_offset_ef+phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=4,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_Q_3,
-    # )
-    # rabi_ef_I_3 = Pulse(
-    #     start=file_length - readout_dur - swap_time-2*pi_time,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=1,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_I_3,
-    # )
 
-    # rabi_ef_Q_2 = Pulse(
-    #     start=file_length - readout_dur - swap_time-pi_time ,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=90+mixer_offset_ef+phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=4,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_Q_2,
-    # )
-    # rabi_ef_I_2 = Pulse(
-    #     start=file_length - readout_dur - swap_time -pi_time,
-    #     duration=-pi_time,
-    #     amplitude=0,
-    #     ssm_freq=ssm_ef,
-    #     phase=phase,
-    # )  # pulse is also a class p is an instance
-    # ringupdown_seq.add_sweep(
-    #     channel=1,
-    #     sweep_name="amplitude",
-    #     start=amp_start,
-    #     stop=amp_stop,
-    #     initial_pulse=rabi_ef_I_2,
-    # )
+    rabi_ef_Q_4 = Pulse(
+        start=file_length - readout_dur - swap_time -3*pi_time,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=90+mixer_offset_ef+phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_Q_4,
+    )
+    rabi_ef_I_4 = Pulse(
+        start=file_length - readout_dur - swap_time-3*pi_time ,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=1,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_I_4,
+    )
+
+    rabi_ef_Q_3 = Pulse(
+        start=file_length - readout_dur - swap_time-2*pi_time ,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=90+mixer_offset_ef+phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_Q_3,
+    )
+    rabi_ef_I_3 = Pulse(
+        start=file_length - readout_dur - swap_time-2*pi_time,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=1,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_I_3,
+    )
+
+    rabi_ef_Q_2 = Pulse(
+        start=file_length - readout_dur - swap_time-pi_time ,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=90+mixer_offset_ef+phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_Q_2,
+    )
+    rabi_ef_I_2 = Pulse(
+        start=file_length - readout_dur - swap_time -pi_time,
+        duration=-pi_time,
+        amplitude=0,
+        ssm_freq=ssm_ef,
+        phase=phase,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=1,
+        sweep_name="amplitude",
+        start=amp_start,
+        stop=amp_stop,
+        initial_pulse=rabi_ef_I_2,
+    )
 
     rabi_ef_Q_1 = Pulse(
         start=file_length - readout_dur - swap_time ,

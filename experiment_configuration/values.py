@@ -12,15 +12,15 @@ q1_dict = {
     "qubit_id": "q1",
     "ro_freq": 6.72739,
     "ge_ssm": -0.1144,
-    "ef_ssm": -0.2568,#-0.2568,#-0.2581,#
+    "ef_ssm": -0.25684,#-0.2568,#-0.2581,#
     "ge_time": 77,
     "ef_time": 44,
     "ef_half_time": 25,
-    "ef_half_amp": 1.31,
+    "ef_half_amp": 1.3,
     "ge_amp": 1.01,#.5
-    "ef_amp":1.49,
+    "ef_amp":1.5,
     "IQ_angle":60,
-    "ro_amp": .35,#.2,
+    "ro_amp": .25,#0.2#.35,
     "qubit_thr": [-10000, -600],
     "mixer_offset_ge":2.5,
     "mixer_offset_ef":6,
@@ -34,7 +34,7 @@ q2_dict = {
     "ge_amp": 0.4,
     "ef_amp": 1,
     "IQ_angle": 25,
-    "ro_amp": .5,#.35,
+    "ro_amp": .45,#5,
     "qubit_thr": [-10000, 1900],
 }
 q3_dict = {

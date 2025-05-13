@@ -138,7 +138,8 @@ def T1(qubit1: object, qubit2: object, gen_vals: dict, sweep_time=100000, verbos
 
 
 def T1_ef(
-    qubit1: object, qubit2: object, gen_vals: dict, sweep_time=15000, verbose=True
+    qubit1: object, qubit2: object, gen_vals: dict, sweep_time=15000,swap_freq=-0.21,
+    swap_time=213.58765318403013, verbose=True
 ):
     """
     Measures the T1 relaxation time of the e → f transition by applying a π_ge
@@ -180,7 +181,7 @@ def T1_ef(
 
     # Apply π_ge and π_ef pulses followed by a variable wait time (T1_ef measurement)
     pi_ge_Q = Pulse(
-        start=file_length - readout_dur- pi_ef_time,  # Start before readout
+        start=file_length - readout_dur- pi_ef_time-swap_time,  # Start before readout
         duration=-pi_ge_time,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -191,7 +192,7 @@ def T1_ef(
     )
 
     pi_ge_I = Pulse(
-        start=file_length - readout_dur- pi_ef_time,  # Start before readout
+        start=file_length - readout_dur- pi_ef_time-swap_time,  # Start before readout
         duration=-pi_ge_time,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
@@ -202,7 +203,7 @@ def T1_ef(
     )
 
     pi_ef_Q = Pulse(
-        start=file_length - readout_dur ,
+        start=file_length - readout_dur-swap_time ,
         duration=-pi_ef_time,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
@@ -213,7 +214,7 @@ def T1_ef(
     )
 
     pi_ef_I = Pulse(
-        start=file_length - readout_dur ,
+        start=file_length - readout_dur-swap_time ,
         duration=-pi_ef_time,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
@@ -222,7 +223,17 @@ def T1_ef(
     ringupdown_seq.add_sweep(
         channel=1, sweep_name="start", start=0, stop=-sweep_time, initial_pulse=pi_ef_I
     )
+    
 
+    swap = Pulse(
+        start=file_length - readout_dur,
+        duration=-swap_time,
+        amplitude=1.36,
+        ssm_freq=swap_freq,
+        phase=0,
+        gaussian_bool=False,
+    )
+    ringupdown_seq.add_sweep(channel=3, sweep_name="none", initial_pulse=swap)
     # Readout pulses for both qubits
     main_pulse_q1 = Pulse(
         start=file_length - readout_dur,
