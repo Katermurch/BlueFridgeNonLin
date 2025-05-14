@@ -33,11 +33,27 @@ def rabi_ef_swap(
     ssm_ge = qubit_rabi.ge_ssm
     ssm_ef = qubit_rabi.ef_ssm
     readout_dur = qubit_rabi.ro_dur
+    mixer_offset_ge=qubit_rabi.mixer_offset_ge
+    mixer_offset_ef=qubit_rabi.mixer_offset_ef
     buffer = 0
 
     # first pi_ge pulse
 
-    pi_ge_pulse = Pulse(
+    pi_ge_pulse_Q = Pulse(
+        start=file_length - readout_dur  - swap_time,
+        duration=-pi_ge,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=90+mixer_offset_ge,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="start",
+        start=0,
+        stop=-sweep_time,
+        initial_pulse=pi_ge_pulse_Q,
+    )
+    pi_ge_pulse_I = Pulse(
         start=file_length - readout_dur  - swap_time,
         duration=-pi_ge,
         amplitude=ge_amp,
@@ -45,26 +61,40 @@ def rabi_ef_swap(
         phase=0,
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
-        channel=4,
+        channel=1,
         sweep_name="start",
         start=0,
         stop=-sweep_time,
-        initial_pulse=pi_ge_pulse,
+        initial_pulse=pi_ge_pulse_I,
     )
     # drive rabi e-f
-    rabi_ef = Pulse(
+    rabi_ef_Q = Pulse(
         start=file_length - readout_dur  - swap_time,
         duration=0,
         amplitude=ef_amp,
         ssm_freq=ssm_ef,
-        phase=153,
+        phase=90+mixer_offset_ef,
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
         channel=4,
         sweep_name="width",
         start=0,
         stop=-sweep_time,
-        initial_pulse=rabi_ef,
+        initial_pulse=rabi_ef_Q,
+    )
+    rabi_ef_I = Pulse(
+        start=file_length - readout_dur  - swap_time,
+        duration=0,
+        amplitude=ef_amp,
+        ssm_freq=ssm_ef,
+        phase=0,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=1,
+        sweep_name="width",
+        start=0,
+        stop=-sweep_time,
+        initial_pulse=rabi_ef_I,
     )
 
     swap = Pulse(

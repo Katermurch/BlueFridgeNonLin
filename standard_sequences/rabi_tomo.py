@@ -22,7 +22,7 @@ def rabi_ef_swap_tomo(
     y_phase=0,
     x_phase=0,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
-    file_length = 30000
+    file_length = 50000
     #    num_steps = 101
     ringupdown_seq = Sequence(
         file_length, num_steps
