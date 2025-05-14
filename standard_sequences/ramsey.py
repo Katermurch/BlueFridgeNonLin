@@ -766,7 +766,7 @@ def echo_ef(
         Sequence: The generated pulse sequence for the Ramsey experiment.
     """
 
-    file_length = 16000  # Fixed file length
+    file_length = 40000  # Fixed file length
     ringupdown_seq = Sequence(file_length, num_steps)  # Initialize sequence
 
     # Extract qubit parameters
@@ -832,7 +832,7 @@ def echo_ef(
         phase=90+mixer_offset_ef,
     )
     ringupdown_seq.add_sweep(
-        channel=4, sweep_name="start", start=0, stop=-t1_time/2, initial_pulse=t2_ef_Q
+        channel=4, sweep_name="start", start=0, stop=-t1_time, initial_pulse=t2_ef_Q
     )
 
     t2_ef_I = Pulse(
@@ -848,7 +848,7 @@ def echo_ef(
         phase=0,
     )
     ringupdown_seq.add_sweep(
-        channel=4, sweep_name="start", start=0, stop=-t1_time/2, initial_pulse=t2_ef_I
+        channel=4, sweep_name="start", start=0, stop=-t1_time, initial_pulse=t2_ef_I
     )
 
     #adding hanh echo pulses
@@ -864,7 +864,7 @@ def echo_ef(
         phase=0,
     )
     ringupdown_seq.add_sweep(
-        channel=4, sweep_name="start", start=0, stop=-t1_time/2, initial_pulse=echo_pulse_I
+        channel=1, sweep_name="start", start=0, stop=-t1_time/2, initial_pulse=echo_pulse_I
     )
     echo_pulse_Q = Pulse(
        start=file_length
