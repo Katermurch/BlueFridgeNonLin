@@ -17,7 +17,7 @@ def rabi_ef_swap(
     swap_time=213.58765318403013,
     swap_amp=1.23,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
-    file_length = 50000
+    file_length = 30000
     #    num_steps = 101
     ringupdown_seq = Sequence(
         file_length, num_steps

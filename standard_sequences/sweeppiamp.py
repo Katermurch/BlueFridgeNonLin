@@ -598,7 +598,7 @@ def pi_ge_gaussian_tune_iq(
         "foo", write_dir, use_range_01=False, num_offset=0, write_binary=True
     )
     ringupdown_seq.load_sequence_from_disk(
-        "128.252.134.31", "foo", write_dir, num_offset=0, ch_amp=[1, 1, 1, 1]
+        "10.225.208.207", "foo", write_dir, num_offset=0, ch_amp=[1, 1, 1, 1]
     )
 
     return ringupdown_seq
