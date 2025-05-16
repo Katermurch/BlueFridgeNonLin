@@ -602,3 +602,114 @@ def pi_ge_gaussian_tune_iq(
     )
 
     return ringupdown_seq
+
+
+def pi_ge_no_gaussian_tune_iq(
+    q1,
+    q2,
+    gen_vals,
+    num_steps=3,
+    amp=0.8,
+    pi_ge_time=24,
+    swap_freq=-0.21,
+    swap_time=213.58765318403013,
+    file_length=16000,
+    verbose=True,
+):
+    ringupdown_seq = Sequence(file_length, num_steps)
+
+    ssm_ge = q1.ge_ssm
+    mixer_offset_ge = q1.mixer_offset_ge
+    readout_amp_1 = q1.ro_amp
+    ROIF1 = q1.ROIF
+    readout_amp_2 = q2.ro_amp
+    ROIF2 = q2.ROIF
+    readout_dur = q1.ro_dur
+    buffer = 3
+
+    # Loop to add 4 pi pulses (I and Q channels)
+    for i in range(4):
+        start_time = (
+            file_length
+            - readout_dur
+            - (4 - i) * buffer
+            - (3 - i) * pi_ge_time
+            - swap_time
+        )
+        pi_ge_I = Pulse(
+            start=start_time,
+            duration=-pi_ge_time,
+            amplitude=amp,
+            ssm_freq=ssm_ge,
+            phase=0,
+            gaussian_bool=True,
+        )
+        pi_ge_Q = Pulse(
+            start=start_time,
+            duration=-pi_ge_time,
+            amplitude=amp,
+            ssm_freq=ssm_ge,
+            phase=90 + mixer_offset_ge,
+            gaussian_bool=False,
+        )
+        ringupdown_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=pi_ge_I)
+        ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=pi_ge_Q)
+
+    # Swap pulse
+    swap = Pulse(
+        start=file_length - readout_dur,
+        duration=-swap_time,
+        amplitude=1.36,
+        ssm_freq=swap_freq,
+        phase=0,
+    )
+    ringupdown_seq.add_sweep(channel=3, sweep_name="none", initial_pulse=swap)
+
+    # Readout pulses for both qubits
+    for amp, ROIF in [(readout_amp_1, ROIF1), (readout_amp_2, ROIF2)]:
+        readout = Pulse(
+            start=file_length - readout_dur,
+            duration=readout_dur,
+            amplitude=amp,
+            ssm_freq=ROIF,
+            phase=-file_length * ROIF * 360,
+        )
+        ringupdown_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=readout)
+
+    # Alazar trigger
+    alazar_trigger = Pulse(
+        start=file_length - readout_dur - 1000, duration=1000, amplitude=1
+    )
+    ringupdown_seq.add_sweep(
+        channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger
+    )
+
+    # Plot if verbose
+    if verbose:
+        ch1, ch3, m1 = (
+            ringupdown_seq.channel_list[0][0],
+            ringupdown_seq.channel_list[2][0],
+            ringupdown_seq.channel_list[0][2],
+        )
+        full = ch1 + ch3 + m1
+        plt.figure()
+        plt.imshow(
+            full[
+                :, file_length - readout_dur - 1000 - 4000 : file_length - readout_dur
+            ],
+            aspect="auto",
+        )
+        plt.show()
+
+    # Save and load the sequence
+    write_dir = (
+        r"C:\arbsequences\strong_dispersive_withPython\test_pulse_ringupdown_bin"
+    )
+    ringupdown_seq.write_sequence_to_disk(
+        "foo", write_dir, use_range_01=False, num_offset=0, write_binary=True
+    )
+    ringupdown_seq.load_sequence_from_disk(
+        "10.225.208.207", "foo", write_dir, num_offset=0, ch_amp=[1, 1, 1, 1]
+    )
+
+    return ringupdown_seq
