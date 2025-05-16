@@ -2,6 +2,7 @@
 *.csv
 *.pkl
 *.txt
+*.json
 
 
 # But track this specific model
