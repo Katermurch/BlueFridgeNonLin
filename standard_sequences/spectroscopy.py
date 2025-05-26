@@ -32,7 +32,7 @@ def spectroscopy_ge(
         verbose (bool, optional): show the plot of the pulse. Defaults to True.
     """
 
-    file_length = 30000
+    file_length = 16000
     num_steps = 101
     ringupdown_seq = Sequence(
         file_length, num_steps
@@ -41,8 +41,23 @@ def spectroscopy_ge(
     readout_amp = qubit1.ro_amp
     readout_dur = qubit1.ro_dur
     ROIF1 = qubit1.ROIF
-
-    rabi_ge = Pulse(
+    mixer_offset_ge=qubit1.mixer_offset_ge
+    
+    rabi_ge_Q = Pulse(
+        start=file_length - readout_dur - 10,
+        duration=-sweep_time,
+        amplitude=spec_amp,
+        ssm_freq=0,
+        phase=90+ mixer_offset_ge,
+    )  # pulse is also a class p is an instance
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="ssm_freq",
+        start=ssm_start,
+        stop=ssm_stop,
+        initial_pulse=rabi_ge_Q,
+    )
+    rabi_ge_I = Pulse(
         start=file_length - readout_dur - 10,
         duration=-sweep_time,
         amplitude=spec_amp,
@@ -50,11 +65,11 @@ def spectroscopy_ge(
         phase=0,
     )  # pulse is also a class p is an instance
     ringupdown_seq.add_sweep(
-        channel=4,
+        channel=1,
         sweep_name="ssm_freq",
         start=ssm_start,
         stop=ssm_stop,
-        initial_pulse=rabi_ge,
+        initial_pulse=rabi_ge_I,
     )
 
     main_pulse = Pulse(
@@ -110,7 +125,7 @@ def spectroscopy_ge(
         write_binary=True,
     )
     ringupdown_seq.load_sequence_from_disk(
-        "128.252.134.31",
+         "10.225.208.207",
         base_name="foo",
         file_path=write_dir,
         num_offset=0,

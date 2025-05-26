@@ -344,7 +344,7 @@ def rabi_ef_swap_tomo_gaussian_ge(
     y_phase=0,
     x_phase=0,
 ):  # this is pulsed readout to ring up and ring down cavity dfor e state
-    file_length = 50000
+    file_length = 20000
     #    num_steps = 101
     ringupdown_seq = Sequence(
         file_length, num_steps
@@ -394,8 +394,8 @@ def rabi_ef_swap_tomo_gaussian_ge(
 
     pi_ge_pulse_Q = Pulse(
         start=file_length - readout_dur - swap_time - tomo_time- state_prep_time-pi_ef,
-        duration=-67,
-        amplitude=1.4964904558932262,
+        duration=-115,
+        amplitude=1.51,
         ssm_freq=ssm_ge,
         phase=90  + mixer_offset_ge,
         gaussian_bool=True
@@ -409,8 +409,8 @@ def rabi_ef_swap_tomo_gaussian_ge(
     )
     pi_ge_pulse_I = Pulse(
         start=file_length - readout_dur - swap_time - tomo_time- state_prep_time-pi_ef,
-        duration=-67,
-        amplitude=1.4964904558932262,
+        duration=-115,
+        amplitude=1.51,
         ssm_freq=ssm_ge,
         phase=0,
         gaussian_bool=True

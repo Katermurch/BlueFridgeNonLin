@@ -1,7 +1,9 @@
 readout_dict = {
     "RO_LO": 6.6247,
+    "RO_LO_34":6.4804,
+    "RO_LO_45":6.3804,
     "RO_LO_pwr": 16,
-    "ro_dur": 5000,
+    "ro_dur": 3000,
 }
 swap_gate = {
     "swap_freq": 0,
@@ -10,54 +12,69 @@ swap_gate = {
 }
 q1_dict = {
     "qubit_id": "q1",
-    "ro_freq": 6.72739,
-    "ge_ssm": -0.1144,
+    "ro_freq": 6.72736,
+    "ge_ssm": -0.117,
     "ef_ssm": -0.25684,#-0.2568,#-0.2581,#
     "ge_time": 77,
     "ef_time": 44,
     "ef_half_time": 25,
     "ef_half_amp": 1.3,
-    "ge_amp": 1.01,#.5
+    "ge_amp": 1,#.5
     "ef_amp":1.5,
     "IQ_angle":60,
-    "ro_amp": .25,#0.2#.35,
+    "ro_amp": .5,#0.2#.35,
     "qubit_thr": [-10000, -600],
     "mixer_offset_ge":2.5,
     "mixer_offset_ef":6,
 }
 q2_dict = {
     "qubit_id": "q2",
-    "ro_freq": 6.65554,
-    "ge_ssm": -0.154,
+    "ro_freq": 6.6554,
+    "ge_ssm": -0.155,
     "ef_ssm": -0.2962,
-    "ge_time": 74,
-    "ge_amp": 0.4,
+    "ge_time": 62,
+    "ge_amp": 1,
     "ef_amp": 1,
     "IQ_angle": 25,
-    "ro_amp": .45,#5,
+    "ro_amp": 0.7,#5,
     "qubit_thr": [-10000, 1900],
+    "mixer_offset_ge":2.5,
 }
 q3_dict = {
     "qubit_id": "q3",
-    "ro_freq": 6.65839,
+    "ro_freq": 6.58374,
+    "ge_ssm": -0.106,
+    "ge_time": 75,
     "ge_amp": 1,
     "ef_amp": 1,
-    "ro_amp": 0.4,
-    "RO_LO": 6.4804,
+    "IQ_angle": 25,
+    "ro_amp": .7,#5,
+    "qubit_thr": [-10000, 1900],
+    "mixer_offset_ge":2.5,
 }
 q4_dict = {
     "qubit_id": "q4",
-    "ro_freq": 6.5113,
+    "ro_freq": 6.51117,
+    "ge_ssm": -0.252,#rolo=4.4
+    "ge_time": 68,
     "ge_amp": 1,
     "ef_amp": 1,
-    "ro_amp": 0.4,
+    "IQ_angle": 25,
+    "ro_amp": .7,#5,
+    "qubit_thr": [-10000, 1900],
+    "mixer_offset_ge":2.5,
 }
 q5_dict = {
     "qubit_id": "q5",
-    "ro_freq": 6.44436,
+    "ro_freq": 6.44418,
+    "ge_ssm": -0.087,
+    "ge_time": 59,
     "ge_amp": 1,
     "ef_amp": 1,
-    "ro_amp": 0.4,
+    "IQ_angle": 25,
+    "ro_amp": .5,#5,
+    "qubit_thr": [-10000, 1900],
+    "mixer_offset_ge":2.5,
 }
 
 general_vals_dict = {
@@ -65,8 +82,10 @@ general_vals_dict = {
     "mixer_offset_ef": 20,
     "wx_amps": [1,1,1.7,1.015],  # maximum 1.9
     "coupler_off_value": 0.7,
-    "wx_offs": [-0.036, 0, -0.08, -0.098],
+    "wx_offs": [-0.036, 0, 0, -0.098],
     "qubit_bnc": 4.6,
+    "qubit_bnc_34": 4.4,
+    "qubit_bnc_45": 4.25,
     "TWPA_freq": 4.5,#4.45,
     "TWPA_pwr": -5.6#-5.5,
 }

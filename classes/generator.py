@@ -724,8 +724,8 @@ def gen_pulse(dest_wave, pulse):
         addition = amp * np.ones(dur)
 
     if pulse.gaussian_bool:
-        rise_time = int(0.2 * dur)
-        fall_time = int(0.2 * dur)
+        rise_time = int(0.5 * dur)
+        fall_time = int(0.5 * dur)
         flat_time = dur - rise_time - fall_time
 
         if flat_time < 0:

@@ -614,13 +614,11 @@ def ramsey_gf(
 
 def ramsey_quantum_efficiency(
     qubit1: object,
+    qubit2: object,
     gen_vals: dict,
     num_steps=101,
-    ssm_ge=-0.15,
-    pi_ge=20,
-    ROIF=0,
     RO_ram_amp=0.0,
-    verbose=True,
+    buffer = 500 ,
 ):
     """
     Performs a Ramsey experiment with an additional readout pulse to measure
@@ -645,12 +643,25 @@ def ramsey_quantum_efficiency(
 
     # Extract qubit parameters
     ge_amp = qubit1.ge_amp
+    ssm_ge = qubit1.ge_ssm
+    pi_ge= qubit1.ge_time
+    ROIF = qubit1.ROIF
     readout_amp1 = qubit1.ro_amp
-    readout_dur = 5000  # Adjusted readout duration for quantum efficiency measurement
-    buffer = 1000  # Buffer time before readout
-
+    readout_dur = qubit1.ro_dur  # Adjusted readout duration for quantum efficiency measurement
+    # Buffer time before readout
+    mixer_offset_ge=qubit1.mixer_offset_ge
     # Apply the first π/2 pulse
-    first_pi2_pulse = Pulse(
+    first_pi2_pulse_Q = Pulse(
+        start=file_length - 2 * readout_dur - buffer - pi_ge / 2 - 100,
+        duration=-pi_ge / 2,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=90+mixer_offset_ge,
+    )
+    ringupdown_seq.add_sweep(
+        channel=4, sweep_name="none", initial_pulse=first_pi2_pulse_Q
+    )
+    first_pi2_pulse_I = Pulse(
         start=file_length - 2 * readout_dur - buffer - pi_ge / 2 - 100,
         duration=-pi_ge / 2,
         amplitude=ge_amp,
@@ -658,7 +669,7 @@ def ramsey_quantum_efficiency(
         phase=0,
     )
     ringupdown_seq.add_sweep(
-        channel=4, sweep_name="none", initial_pulse=first_pi2_pulse
+        channel=1, sweep_name="none", initial_pulse=first_pi2_pulse_I
     )
 
     # Apply additional readout pulse for quantum efficiency measurement
@@ -674,7 +685,17 @@ def ramsey_quantum_efficiency(
     )
 
     # Apply the second π/2 pulse with phase sweep for quantum efficiency measurement
-    final_pi2_pulse = Pulse(
+    final_pi2_pulse_Q = Pulse(
+        start=file_length - readout_dur - 50,
+        duration=-pi_ge / 2,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=90+mixer_offset_ge,
+    )
+    ringupdown_seq.add_sweep(
+        channel=4, sweep_name="phase", start=0, stop=360, initial_pulse=final_pi2_pulse_Q
+    )
+    final_pi2_pulse_I = Pulse(
         start=file_length - readout_dur - 50,
         duration=-pi_ge / 2,
         amplitude=ge_amp,
@@ -682,9 +703,8 @@ def ramsey_quantum_efficiency(
         phase=0,
     )
     ringupdown_seq.add_sweep(
-        channel=4, sweep_name="phase", start=0, stop=360, initial_pulse=final_pi2_pulse
+        channel=1, sweep_name="phase", start=0, stop=360, initial_pulse=final_pi2_pulse_I
     )
-
     # Readout pulse for the qubit
     readout_pulse = Pulse(
         start=file_length - readout_dur,
@@ -708,17 +728,6 @@ def ramsey_quantum_efficiency(
 
     channel = channel1_ch + channel3_ch + marker1
 
-    # Plot pulse sequence if verbose mode is enabled
-    if verbose:
-
-        plt.figure()
-        plt.imshow(
-            channel[
-                :, file_length - readout_dur - 1000 - 4000 : file_length - readout_dur
-            ],
-            aspect="auto",
-        )
-        plt.show()
 
     # Save and load the sequence for execution
     write_dir = (

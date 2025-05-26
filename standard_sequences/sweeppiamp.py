@@ -642,7 +642,7 @@ def pi_ge_no_gaussian_tune_iq(
             amplitude=amp,
             ssm_freq=ssm_ge,
             phase=0,
-            gaussian_bool=True,
+            gaussian_bool=False,
         )
         pi_ge_Q = Pulse(
             start=start_time,

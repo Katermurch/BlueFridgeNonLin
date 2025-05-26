@@ -12,6 +12,8 @@ class Readout:
         """
         self.allowed_attributes = {
             "RO_LO",
+            "RO_LO_34",
+            "RO_LO_45",
             "RO_LO_pwr",
             "ro_dur",
         }
