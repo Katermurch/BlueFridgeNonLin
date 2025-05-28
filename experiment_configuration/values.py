@@ -3,7 +3,7 @@ readout_dict = {
     "RO_LO_34":6.4804,
     "RO_LO_45":6.3804,
     "RO_LO_pwr": 16,
-    "ro_dur": 3000,
+    "ro_dur": 5000,
 }
 swap_gate = {
     "swap_freq": 0,
@@ -14,15 +14,15 @@ q1_dict = {
     "qubit_id": "q1",
     "ro_freq": 6.72736,
     "ge_ssm": -0.117,
-    "ef_ssm": -0.25684,#-0.2568,#-0.2581,#
+    "ef_ssm": -0.259,#-0.2568,#-0.2581,#
     "ge_time": 77,
-    "ef_time": 44,
+    "ef_time": 46,
     "ef_half_time": 25,
     "ef_half_amp": 1.3,
     "ge_amp": 1,#.5
     "ef_amp":1.5,
     "IQ_angle":60,
-    "ro_amp": .5,#0.2#.35,
+    "ro_amp": .2,#0.2#.35,
     "qubit_thr": [-10000, -600],
     "mixer_offset_ge":2.5,
     "mixer_offset_ef":6,
@@ -36,7 +36,7 @@ q2_dict = {
     "ge_amp": 1,
     "ef_amp": 1,
     "IQ_angle": 25,
-    "ro_amp": 0.7,#5,
+    "ro_amp": 0.6,
     "qubit_thr": [-10000, 1900],
     "mixer_offset_ge":2.5,
 }
@@ -86,8 +86,9 @@ general_vals_dict = {
     "qubit_bnc": 4.6,
     "qubit_bnc_34": 4.4,
     "qubit_bnc_45": 4.25,
-    "TWPA_freq": 4.5,#4.45,
-    "TWPA_pwr": -5.6#-5.5,
+    "TWPA_freq":5.1,
+    "TWPA_amp": -4.4,
+
 }
 bnc_address = {
     "target_bnc_black": "GPIB0::19::INSTR",
@@ -95,4 +96,6 @@ bnc_address = {
     "agilent_function_generator": "GPIB0::30::INSTR",
     "target_bnc_6": "USB0::0x03EB::0xAFFF::411-433500000-0753::INSTR",
     "wx_address": "10.225.208.204",
+    "TWPA_address":"USB0::0x03EB::0xAFFF::471-43A6D0000-1458::INSTR"
+
 }

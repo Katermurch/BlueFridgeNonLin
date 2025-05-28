@@ -171,19 +171,45 @@ def spectroscopy_ef(
     readout_dur = qubit1.ro_dur
     ROIF1 = qubit1.ROIF
     ROIF2 = qubit2.ROIF
+    mixer_offset_ge=qubit1.mixer_offset_ge
+    mixer_offset_ef=qubit1.mixer_offset_ef
 
     ## Apply π_ge pulse before spectroscopy
-    pi_ge_pulse = Pulse(
+    pi_ge_pulse_Q = Pulse(
+        start=file_length - readout_dur - sweep_time - 10,
+        duration=-pi_ge,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=90+mixer_offset_ge,
+    )
+    ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=pi_ge_pulse_Q)
+
+    pi_ge_pulse_I = Pulse(
         start=file_length - readout_dur - sweep_time - 10,
         duration=-pi_ge,
         amplitude=ge_amp,
         ssm_freq=ssm_ge,
         phase=0,
     )
-    ringupdown_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=pi_ge_pulse)
+    ringupdown_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=pi_ge_pulse_I)
 
     ## EF Rabi pulse (sweeping ssm_freq for spectroscopy)
-    rabi_ge = Pulse(
+    rabi_ge_Q = Pulse(
+        start=file_length - readout_dur - 10,
+        duration=-sweep_time,
+        amplitude=spec_amp,
+        ssm_freq=0,
+        phase=90+ mixer_offset_ef,
+    )
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="ssm_freq",
+        start=ssm_start,
+        stop=ssm_stop,
+        initial_pulse=rabi_ge_Q,
+    )
+    
+    rabi_ge_I = Pulse(
         start=file_length - readout_dur - 10,
         duration=-sweep_time,
         amplitude=spec_amp,
@@ -191,13 +217,12 @@ def spectroscopy_ef(
         phase=0,
     )
     ringupdown_seq.add_sweep(
-        channel=4,
+        channel=1,
         sweep_name="ssm_freq",
         start=ssm_start,
         stop=ssm_stop,
-        initial_pulse=rabi_ge,
+        initial_pulse=rabi_ge_I,
     )
-
     ## Readout pulses for Q1 and Q2
     main_pulse_q1 = Pulse(
         start=file_length - readout_dur,
@@ -208,14 +233,6 @@ def spectroscopy_ef(
     )
     ringupdown_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse_q1)
 
-    main_pulse_q2 = Pulse(
-        start=file_length - readout_dur,
-        duration=readout_dur,
-        amplitude=readout_amp,
-        ssm_freq=ROIF2,
-        phase=-file_length * ROIF2 * 360,
-    )
-    ringupdown_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse_q2)
 
     ## Alazar trigger pulse (for data acquisition)
     alazar_trigger = Pulse(
@@ -255,7 +272,7 @@ def spectroscopy_ef(
         write_binary=True,
     )
     ringupdown_seq.load_sequence_from_disk(
-        "128.252.134.31",
+        "10.225.208.207",
         base_name="foo",
         file_path=write_dir,
         num_offset=0,

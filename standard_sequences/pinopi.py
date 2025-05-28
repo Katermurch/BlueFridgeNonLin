@@ -94,7 +94,7 @@ def pi_nopi_ge(
 
 
 def pi_nopi_ef(
-    coef: float, offset: float, qubit: object, qubit2: object, gen_vals: dict
+    coge:float,coef: float, offset: float, qubit: object, qubit2: object, gen_vals: dict
 ):
     """
     This function should run the pi nopi sequence for a qubit on the ef
@@ -117,103 +117,79 @@ def pi_nopi_ef(
     ROIF2 = qubit2.ROIF
     ge_amp = qubit.ge_amp
     ef_amp = qubit.ef_amp
+    mixer_offset_ge = qubit.mixer_offset_ge
+    mixer_offset_ef = qubit.mixer_offset_ef
     file_length = 16000
     num_steps = 3
     the_seq = Sequence(
         file_length, num_steps
     )  # this creates something called rabi_seq that is an instance of a sequence class
 
-    # we need to write it seperately here since the ge T1 time is short, so we want to make sure the readout is close to the end of the pi pulse for the e state
-    if 0 == coef:
-        # pulse to e state
-        rabi_ge = Pulse(
-            start=file_length - readout_dur - (pi_ge),
-            duration=pi_ge * coef,
-            amplitude=ge_amp,
-            ssm_freq=ssm_ge,
-            phase=0,
-        )
-        the_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=rabi_ge)
+    # pulse to e state
+    rabi_ge_Q = Pulse(
+        start=file_length - readout_dur  -coef * pi_ef,
+        duration=-pi_ge*coge ,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=90+mixer_offset_ge,
+    )
+    the_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=rabi_ge_Q)
 
-        # HET readout
-        # Q1 Readout
-        main_pulse = Pulse(
-            start=file_length - readout_dur,
-            duration=readout_dur,
-            amplitude=qubit.ro_amp,
-            ssm_freq=ROIF1,
-            phase=-file_length * ROIF1 * 360,
-        )
-        the_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse)
+    rabi_ge_I = Pulse(
+        start=file_length - readout_dur  -coef * pi_ef,
+        duration=-pi_ge*coge ,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=0,
+    )
+    the_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=rabi_ge_I)
 
-        # Q2 Readout
-        main_pulse = Pulse(
-            start=file_length - readout_dur,
-            duration=readout_dur,
-            amplitude=qubit2.ro_amp,
-            ssm_freq=ROIF2,
-            phase=-file_length * ROIF2 * 360,
-        )
-        the_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse)
+    # pulse to f state
+    rabi_ef_Q = Pulse(
+        start=file_length - readout_dur ,
+        duration=-pi_ef * coef,
+        amplitude=ef_amp,
+        ssm_freq=ssm_ef,
+        phase=90+mixer_offset_ef,
+    )
+    the_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=rabi_ef_Q)
+    rabi_ef_I = Pulse(
+        start=file_length - readout_dur ,
+        duration=-pi_ef * coef,
+        amplitude=ef_amp,
+        ssm_freq=ssm_ef,
+        phase=0,
+    )
+    the_seq.add_sweep(channel=1, sweep_name="none", initial_pulse=rabi_ef_I)
+    # Readout
+    # HET readout
+    # Q1 Readout
+    main_pulse = Pulse(
+        start=file_length - readout_dur,
+        duration=readout_dur,
+        amplitude=qubit.ro_amp,
+        ssm_freq=ROIF1,
+        phase=-file_length * ROIF1 * 360,
+    )
+    the_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse)
 
-        # channel 3 marker 1 is for pc trigger
-        alazar_trigger = Pulse(
-            start=file_length - readout_dur - 1000, duration=1000, amplitude=1
-        )
-        the_seq.add_sweep(
-            channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger
-        )
+    # Q2 Readout
+    main_pulse = Pulse(
+        start=file_length - readout_dur,
+        duration=readout_dur,
+        amplitude=qubit2.ro_amp,
+        ssm_freq=ROIF2,
+        phase=-file_length * ROIF2 * 360,
+    )
+    the_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse)
 
-    else:
-
-        # pulse to e state
-        rabi_ge = Pulse(
-            start=file_length - readout_dur - (pi_ge + coef * pi_ef),
-            duration=pi_ge * coef,
-            amplitude=ge_amp,
-            ssm_freq=ssm_ge,
-            phase=0,
-        )
-        the_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=rabi_ge)
-
-        # pulse to f state
-        rabi_ef = Pulse(
-            start=file_length - readout_dur - coef * pi_ef,
-            duration=pi_ef * coef,
-            amplitude=ef_amp,
-            ssm_freq=ssm_ef,
-            phase=0,
-        )
-        the_seq.add_sweep(channel=4, sweep_name="none", initial_pulse=rabi_ef)
-        # Readout
-        # HET readout
-        # Q1 Readout
-        main_pulse = Pulse(
-            start=file_length - readout_dur,
-            duration=readout_dur,
-            amplitude=qubit.ro_amp,
-            ssm_freq=ROIF1,
-            phase=-file_length * ROIF1 * 360,
-        )
-        the_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse)
-
-        # Q2 Readout
-        main_pulse = Pulse(
-            start=file_length - readout_dur,
-            duration=readout_dur,
-            amplitude=qubit2.ro_amp,
-            ssm_freq=ROIF2,
-            phase=-file_length * ROIF2 * 360,
-        )
-        the_seq.add_sweep(channel=2, sweep_name="none", initial_pulse=main_pulse)
-
-        # channel 3 marker 1 is for pc trigger
-        alazar_trigger = Pulse(
-            start=file_length - readout_dur - 1000, duration=1000, amplitude=1
-        )
-        the_seq.add_sweep(
-            channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger
-        )
+    # channel 3 marker 1 is for pc trigger
+    alazar_trigger = Pulse(
+        start=file_length - readout_dur - 1000, duration=1000, amplitude=1
+    )
+    the_seq.add_sweep(
+        channel=3, marker=1, sweep_name="none", initial_pulse=alazar_trigger
+    )
 
     write_dir = (
         r"C:\arbsequences\strong_dispersive_withPython\test_pulse_ringupdown_bin"

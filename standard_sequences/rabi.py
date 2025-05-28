@@ -190,7 +190,7 @@ def rabi_ef(
     buffer = 0
 
     # Pi ge amp
-    pi_ge_pulse_x = Pulse(
+    pi_ge_pulse_Q = Pulse(
         start=file_length
         - readout_dur,  # the 100 is the match the buffer below
         duration=-pi_ge,
@@ -204,9 +204,9 @@ def rabi_ef(
         sweep_name="start",
         start=0,
         stop=-sweep_time,
-        initial_pulse=pi_ge_pulse_x,
+        initial_pulse=pi_ge_pulse_Q,
     )
-    pi_ge_pulse_y = Pulse(
+    pi_ge_pulse_I = Pulse(
         start=file_length
         - readout_dur,  # the 100 is the match the buffer below
         duration=-pi_ge,
@@ -219,10 +219,10 @@ def rabi_ef(
         sweep_name="start",
         start=0,
         stop=-sweep_time,
-        initial_pulse=pi_ge_pulse_y,
+        initial_pulse=pi_ge_pulse_I,
     )
     # drive rabi e-f
-    rabi_ef_x = Pulse(
+    rabi_ef_Q = Pulse(
         start=file_length
         - readout_dur
         ,  # buffer here to make sure rabi doesnt bleed into readout
@@ -236,9 +236,9 @@ def rabi_ef(
         sweep_name="width",
         start=0,
         stop=-sweep_time,
-        initial_pulse=rabi_ef_x,
+        initial_pulse=rabi_ef_Q,
     )
-    rabi_ef_y = Pulse(
+    rabi_ef_I = Pulse(
         start=file_length
         - readout_dur
         ,  # buffer here to make sure rabi doesnt bleed into readout
@@ -252,7 +252,7 @@ def rabi_ef(
         sweep_name="width",
         start=0,
         stop=-sweep_time,
-        initial_pulse=rabi_ef_y,
+        initial_pulse=rabi_ef_I,
     )
     # Rabi Qubit Readout
 
