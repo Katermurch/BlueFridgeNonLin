@@ -45,11 +45,25 @@ def parametric_coupling_time_domain(
     ssm_ge = qubit1.ge_ssm
     ROIF1 = qubit1.ROIF
     ROIF2 = qubit2.ROIF
-    phase_offset = gen_vals["mixer_offset"]
+    mixer_offset_ge= qubit1.mixer_offset_ge
     buffer = 0
 
     # Apply π pulse on the selected qubit
-    pi_ge_pulse = Pulse(
+    pi_ge_pulse_Q = Pulse(
+        start=file_length - readout_dur - buffer,
+        duration=-pi_ge,
+        amplitude=ge_amp,
+        ssm_freq=ssm_ge,
+        phase=90+mixer_offset_ge,
+    )
+    ringupdown_seq.add_sweep(
+        channel=4,
+        sweep_name="start",
+        start=0,
+        stop=-sweep_time,
+        initial_pulse=pi_ge_pulse_Q,
+    )
+    pi_ge_pulse_I = Pulse(
         start=file_length - readout_dur - buffer,
         duration=-pi_ge,
         amplitude=ge_amp,
@@ -57,11 +71,11 @@ def parametric_coupling_time_domain(
         phase=0,
     )
     ringupdown_seq.add_sweep(
-        channel=4,
+        channel=1,
         sweep_name="start",
         start=0,
         stop=-sweep_time,
-        initial_pulse=pi_ge_pulse,
+        initial_pulse=pi_ge_pulse_I,
     )
 
     # Apply parametric drive with duration sweep
@@ -71,7 +85,7 @@ def parametric_coupling_time_domain(
         amplitude=spec_amp,
         ssm_freq=ssm_para,
         phase=phase,
-        gaussian_bool= True
+        gaussian_bool= False
     )
     ringupdown_seq.add_sweep(
         channel=3,
@@ -143,7 +157,7 @@ def parametric_coupling_time_domain(
         write_binary=True,
     )
     ringupdown_seq.load_sequence_from_disk(
-        '10.225.208.204',
+        '10.225.208.207',
         base_name="foo",
         file_path=write_dir,
     )

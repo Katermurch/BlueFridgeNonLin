@@ -12,7 +12,7 @@ swap_gate = {
 }
 q1_dict = {
     "qubit_id": "q1",
-    "ro_freq": 6.72736,
+    "ro_freq": 6.72734,
     "ge_ssm": -0.117,
     "ef_ssm": -0.259,#-0.2568,#-0.2581,#
     "ge_time": 77,
@@ -22,7 +22,7 @@ q1_dict = {
     "ge_amp": 1,#.5
     "ef_amp":1.5,
     "IQ_angle":60,
-    "ro_amp": .2,#0.2#.35,
+    "ro_amp": .25,#0.2#.35,c:\Users\quantum1\OneDrive\Documents\Python Scripts\Important Blue Fridge Python Files\New\nonlinear_QM\standard_sequences\parametric_coupling.py
     "qubit_thr": [-10000, -600],
     "mixer_offset_ge":2.5,
     "mixer_offset_ef":6,
