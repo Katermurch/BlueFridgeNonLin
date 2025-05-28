@@ -27,7 +27,7 @@ def parametric_coupling_time_domain(
         sweep_time (int, optional): Maximum duration for parametric drive pulse. Defaults to 0.
         verbose (bool, optional): If True, generates visualizations of the pulse sequence. Defaults to True.
 
-    Returns:
+    Returns: 
         Sequence: The generated pulse sequence for parametric coupling time-domain measurement.
     """
 
