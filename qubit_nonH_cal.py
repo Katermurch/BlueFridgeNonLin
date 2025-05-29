@@ -253,7 +253,7 @@ def optimize_pi_pulse(
         initial_time: Initial time guess (from Rabi)
         manifold: 'ge' or 'ef'
         n_calls: Number of optimization steps
-        save_dir: Directory to save checkpoint files. If None, uses current directory.
+        save_dir: Directory to save results. If None, uses current directory.
         
     Returns:
         tuple: (optimal_amp, optimal_time, result) containing the optimized parameters
@@ -285,7 +285,7 @@ def optimize_pi_pulse(
         Categorical(time_vals.tolist(), name="pi_time"),
     ]
 
-    def minimization_function(params):
+    def objective(params):
         amp, pi_time = params
         _, _, df_prob = pi_tune(
             q1,
@@ -300,91 +300,59 @@ def optimize_pi_pulse(
         
         if manifold == "ge":
             # For ge, maximize e state population difference from g state
-            min_val = np.mean(df_prob["P_g"]) - np.mean(df_prob["P_e"])
+            score = np.mean(df_prob["P_g"]) - np.mean(df_prob["P_e"])
         else:
             # For ef, maximize f state population difference from e state
-            min_val = np.mean(df_prob["P_e"]) - np.mean(df_prob["P_f"])
+            score = np.mean(df_prob["P_e"]) - np.mean(df_prob["P_f"])
         
-        return min_val
+        return score
 
-    # Setup checkpoint saving with proper directory
-    if save_dir is None:
-        save_dir = os.getcwd()  # Use current working directory if none specified
-    
-    # Create save directory if it doesn't exist
-    os.makedirs(save_dir, exist_ok=True)
-    
-    checkpoint_file = os.path.join(save_dir, f"gp_minimize_checkpoint_{manifold}.pkl")
-    checkpoint_saver = CheckpointSaver(checkpoint_file, compress=9)
-
-    # Try to load existing checkpoint
-    checkpoint_result = None
-    if os.path.exists(checkpoint_file):
-        try:
-            with open(checkpoint_file, "rb") as f:
-                checkpoint_result = pickle.load(f)
-            print(f"Checkpoint loaded successfully from {checkpoint_file}")
-        except Exception as e:
-            print(f"Checkpoint corrupted ({e}), deleting and starting over.")
-            os.remove(checkpoint_file)
-            checkpoint_result = None
-
-    # Run or continue optimization
-    if checkpoint_result is not None:
-        x0 = checkpoint_result.x_iters
-        y0 = checkpoint_result.func_vals
-        already_done = len(x0)
-        remaining = n_calls - already_done
-        print(f"Already completed: {already_done} calls; Remaining: {remaining}")
-        if remaining <= 0:
-            result = checkpoint_result
-        else:
-            result = gp_minimize(
-                func=minimization_function,
-                dimensions=space,
-                acq_func="EI",
-                n_calls=remaining,
-                n_initial_points=0,
-                noise="gaussian",
-                random_state=42,
-                x0=x0,
-                y0=y0,
-                callback=[checkpoint_saver],
-            )
-    else:
-        print(f"Starting new optimization. Checkpoints will be saved to {checkpoint_file}")
-        result = gp_minimize(
-            func=minimization_function,
-            dimensions=space,
-            acq_func="EI",
-            n_calls=n_calls,
-            n_initial_points=10,
-            noise="gaussian",
-            random_state=42,
-            callback=[checkpoint_saver],
-        )
+    # Run optimization
+    print(f"Starting optimization for {manifold} manifold...")
+    result = gp_minimize(
+        func=objective,
+        dimensions=space,
+        acq_func="EI",
+        n_calls=n_calls,
+        n_initial_points=10,
+        noise="gaussian",
+        random_state=42
+    )
 
     optimal_amp = result.x[0]
     optimal_time = result.x[1]
     
-    # Save results with clearer parameter names
-    optimization_results = {
-        f'pi_pulse_{manifold}_optimal_amplitude': optimal_amp,
-        f'pi_pulse_{manifold}_optimal_time': optimal_time,
-        f'pi_pulse_{manifold}_best_score': result.fun,
-        f'pi_pulse_{manifold}_initial_amplitude': initial_amp,
-        f'pi_pulse_{manifold}_initial_time': initial_time,
-        f'pi_pulse_{manifold}_n_calls': n_calls,
-        f'pi_pulse_{manifold}_n_initial_points': 10,
-        f'pi_pulse_{manifold}_amp_range': amp_range,
-        f'pi_pulse_{manifold}_time_range': time_range
-    }
-    save_optimization_results(optimization_results, '', save_dir)
+    # Save results if directory provided
+    if save_dir:
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+            
+        # Save optimization results
+        optimization_results = {
+            f'pi_pulse_{manifold}_optimal_amplitude': optimal_amp,
+            f'pi_pulse_{manifold}_optimal_time': optimal_time,
+            f'pi_pulse_{manifold}_best_score': result.fun,
+            f'pi_pulse_{manifold}_initial_amplitude': initial_amp,
+            f'pi_pulse_{manifold}_initial_time': initial_time,
+            f'pi_pulse_{manifold}_n_calls': n_calls,
+            f'pi_pulse_{manifold}_n_initial_points': 10,
+            f'pi_pulse_{manifold}_amp_range': amp_range,
+            f'pi_pulse_{manifold}_time_range': time_range
+        }
+        save_optimization_results(optimization_results, '', save_dir)
+        
+        # Save optimization trajectory
+        trajectory_file = os.path.join(save_dir, f"pi_pulse_{manifold}_trajectory.csv")
+        with open(trajectory_file, 'w') as f:
+            f.write("Iteration,Amplitude,Time,Score\n")
+            for i, (x, y) in enumerate(zip(result.x_iters, result.func_vals)):
+                f.write(f"{i},{x[0]},{x[1]},{y}\n")
     
     print(f"\nOptimization results for {manifold} manifold:")
     print(f"Optimal amplitude: {optimal_amp}")
     print(f"Optimal pi time: {optimal_time}")
     print(f"Best score: {result.fun}")
+    print(f"Number of function evaluations: {result.nfev}")
     
     return optimal_amp, optimal_time, result
 
