@@ -111,7 +111,7 @@ def run_rabi(
     IQ_df = pd.DataFrame({"I1": I1_raw, "Q1": Q1_raw, "I2": I2_raw, "Q2": Q2_raw})
     
     # Get average IQ values for fitting
-    IQ_data = analysis.get_IQ_averages(values)
+    IQ_data = plotting.get_IQ_averages(values)
     Q = IQ_data[f"Q1"]  # Using Q1 for fitting
     I = IQ_data[f"I1"]  # Using I1 for fitting
     
