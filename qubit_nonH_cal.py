@@ -21,6 +21,48 @@ from skopt.callbacks import CheckpointSaver
 import classifiers.classifier as classifier
 import pickle
 import standard_sequences.parametric_coupling as parametric_coupling
+from datetime import datetime
+
+def save_optimization_results(params_dict, experiment_name, save_dir=None):
+    """Save optimization results to a dated text file"""
+    if save_dir is None:
+        save_dir = os.getcwd()
+    
+    log_dir = os.path.join(save_dir, 'optimization_logs')
+    os.makedirs(log_dir, exist_ok=True)
+    
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"optimization_parameters_{timestamp}.txt"
+    filepath = os.path.join(log_dir, filename)
+    
+    # Check if file exists and read existing content
+    existing_params = {}
+    if os.path.exists(filepath):
+        with open(filepath, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                if ':' in line:
+                    key, value = line.split(':', 1)
+                    existing_params[key.strip()] = value.strip()
+    
+    # Update with new parameters
+    for key, value in params_dict.items():
+        if experiment_name:
+            param_name = f"{experiment_name}_{key}"
+        else:
+            param_name = key
+        existing_params[param_name] = value
+    
+    # Write all parameters to file
+    with open(filepath, 'w') as f:
+        f.write(f"Optimization Parameters\n")
+        f.write(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+        # Write parameters in sorted order
+        for key in sorted(existing_params.keys()):
+            f.write(f"{key}: {existing_params[key]}\n")
+    
+    print(f"Results saved to {filepath}")
+    return filepath
 
 def run_rabi(
     q1,
@@ -29,7 +71,8 @@ def run_rabi(
     num_steps: int,
     sweep_time: float,
     reps: int,
-    manifold: str
+    manifold: str,
+    save_dir: str = None
 ):
     """
     Runs a single instance of the geRabi experiment
@@ -93,6 +136,19 @@ def run_rabi(
     # Extract Rabi amplitude and pi time
     rabi_amp = pi_ge_fit_vals[2]  # Amplitude from fit
     pi_time = abs((1 / 2 / pi_ge_fit_vals[0]) * 1000)  # Convert to ns
+    
+    # Save results with clearer parameter names
+    rabi_results = {
+        f'rabi_{manifold}_amplitude': rabi_amp,
+        f'rabi_{manifold}_pi_time': pi_time,
+        f'rabi_{manifold}_num_steps': num_steps,
+        f'rabi_{manifold}_sweep_time': sweep_time,
+        f'rabi_{manifold}_reps': reps,
+        f'rabi_{manifold}_fit_frequency': pi_ge_fit_vals[0],
+        f'rabi_{manifold}_fit_decay': pi_ge_fit_vals[1],
+        f'rabi_{manifold}_fit_offset': pi_ge_fit_vals[4]
+    }
+    save_optimization_results(rabi_results, '', save_dir)
     
     return values, IQ_df, rabi_amp, pi_time
 
@@ -311,6 +367,20 @@ def optimize_pi_pulse(
     optimal_amp = result.x[0]
     optimal_time = result.x[1]
     
+    # Save results with clearer parameter names
+    optimization_results = {
+        f'pi_pulse_{manifold}_optimal_amplitude': optimal_amp,
+        f'pi_pulse_{manifold}_optimal_time': optimal_time,
+        f'pi_pulse_{manifold}_best_score': result.fun,
+        f'pi_pulse_{manifold}_initial_amplitude': initial_amp,
+        f'pi_pulse_{manifold}_initial_time': initial_time,
+        f'pi_pulse_{manifold}_n_calls': n_calls,
+        f'pi_pulse_{manifold}_n_initial_points': 10,
+        f'pi_pulse_{manifold}_amp_range': amp_range,
+        f'pi_pulse_{manifold}_time_range': time_range
+    }
+    save_optimization_results(optimization_results, '', save_dir)
+    
     print(f"\nOptimization results for {manifold} manifold:")
     print(f"Optimal amplitude: {optimal_amp}")
     print(f"Optimal pi time: {optimal_time}")
@@ -331,3 +401,106 @@ def swap_gate_sweep(
     """
     This function should sweep the swap gate amplitude and time for a given qubit pair
     """
+
+def optimize_swap_gate(
+    q1: object,
+    q2: object,
+    general_vals_dict: dict,
+    reps: int,
+    initial_freq: float,
+    initial_amp: float,
+    n_calls: int = 35,
+    save_dir: str = None
+):
+    """
+    Optimizes swap gate parameters using Gaussian Process optimization.
+    Tries to maximize I1 and I2 while minimizing Q1 and Q2.
+    
+    Args:
+        q1, q2: Qubit objects
+        general_vals_dict: General values dictionary
+        reps: Number of repetitions
+        initial_freq: Initial frequency guess
+        initial_amp: Initial amplitude guess
+        n_calls: Number of optimization steps
+        save_dir: Directory to save checkpoint files
+        
+    Returns:
+        tuple: (optimal_freq, optimal_time, optimal_amp, result)
+    """
+    def objective(params):
+        freq, time, amp = params
+        
+        # Run swap gate with current parameters
+        pmc.parametric_coupling_time_domain(
+            q1,
+            q2,
+            general_vals_dict,
+            num_steps=3,
+            ssm_para=freq,
+            spec_amp=amp,
+            sweep_time=time,
+            phase=0,
+            verbose=False,
+        )
+        
+        # Get IQ data
+        values = daq.run_daq_het_2q(
+            q1, q2, num_patterns=3, num_records_per_pattern=reps, verbose=False
+        )
+        IQ_df = plotting.get_IQ_averages(values)
+        
+        # Calculate score:
+        # Want to maximize I1 and I2 (negative contribution to score)
+        # Want to minimize Q1 and Q2 (positive contribution to score)
+        score = (IQ_df["Q1"][2] + IQ_df["Q2"][2]) - (IQ_df["I1"][2] + IQ_df["I2"][2])
+        return score
+
+    # Define the parameter space
+    space = [
+        (initial_freq - 0.05, initial_freq + 0.05),  # Frequency range
+        (40.0, 400.0),                              # Time range in ns
+        (initial_amp * 0.5, initial_amp * 1.5),      # Amplitude range
+    ]
+
+    # Setup checkpoint saving
+    checkpoint_path = None
+    if save_dir:
+        os.makedirs(save_dir, exist_ok=True)
+        checkpoint_path = os.path.join(save_dir, "swap_gate_checkpoint.pkl")
+        callback = [CheckpointSaver(checkpoint_path)]
+    else:
+        callback = None
+
+    # Run optimization
+    result = gp_minimize(
+        objective,
+        space,
+        n_calls=n_calls,
+        n_random_starts=15,
+        callback=callback,
+        random_state=42
+    )
+
+    optimal_freq, optimal_time, optimal_amp = result.x
+    
+    # Save results with clearer parameter names
+    optimization_results = {
+        'swap_gate_optimal_frequency': optimal_freq,
+        'swap_gate_optimal_time': optimal_time,
+        'swap_gate_optimal_amplitude': optimal_amp,
+        'swap_gate_best_score': result.fun,
+        'swap_gate_initial_frequency': initial_freq,
+        'swap_gate_initial_amplitude': initial_amp,
+        'swap_gate_n_calls': n_calls,
+        'swap_gate_n_random_starts': 15
+    }
+    save_optimization_results(optimization_results, '', save_dir)
+
+    print(f"Optimization completed:")
+    print(f"Best frequency: {optimal_freq:.6f}")
+    print(f"Best time: {optimal_time:.2f}")
+    print(f"Best amplitude: {optimal_amp:.6f}")
+    print(f"Best score: {result.fun}")
+
+    return optimal_freq, optimal_time, optimal_amp, result
